@@ -1,6 +1,6 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
-import HomePage from './pages/HomePage.tsx'
-import LobbyPage from './pages/LobbyPage.tsx'
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
+import HomePage from "./pages/HomePage.tsx";
+import LobbyPage from "./pages/LobbyPage.tsx";
 
 function App() {
   return (
@@ -11,7 +11,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;

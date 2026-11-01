@@ -1,11 +1,11 @@
-import type { PublicLobbyState } from '../types.ts'
-import './PlayerList.css'
+import type { PublicLobbyState } from "../types.ts";
+import "./PlayerList.css";
 
 type Props = {
-  lobby: PublicLobbyState
+  lobby: PublicLobbyState;
   /** The viewing player, marked "(you)" */
-  playerId: string
-}
+  playerId: string;
+};
 
 function PlayerList({ lobby, playerId }: Props) {
   return (
@@ -30,7 +30,7 @@ function PlayerList({ lobby, playerId }: Props) {
         ))}
       </ul>
     </section>
-  )
+  );
 }
 
-export default PlayerList
+export default PlayerList;

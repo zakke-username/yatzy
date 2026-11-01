@@ -1,18 +1,18 @@
-import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
-import LobbyInvite from '../components/LobbyInvite.tsx'
-import NameDialog from '../components/NameDialog.tsx'
-import PlayerList from '../components/PlayerList.tsx'
-import { useLobby } from '../hooks/useLobby.ts'
-import { joinLobby } from '../lib/api.ts'
-import { loadSession } from '../lib/session.ts'
-import './LobbyPage.css'
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router";
+import LobbyInvite from "../components/LobbyInvite.tsx";
+import NameDialog from "../components/NameDialog.tsx";
+import PlayerList from "../components/PlayerList.tsx";
+import { useLobby } from "../hooks/useLobby.ts";
+import { joinLobby } from "../lib/api.ts";
+import { loadSession } from "../lib/session.ts";
+import "./LobbyPage.css";
 
 function LobbyPage() {
-  const lobbyId = useParams().lobbyId!.toUpperCase()
-  const navigate = useNavigate()
-  const [session, setSession] = useState(() => loadSession(lobbyId))
-  const { lobby, leave } = useLobby(session)
+  const lobbyId = useParams().lobbyId!.toUpperCase();
+  const navigate = useNavigate();
+  const [session, setSession] = useState(() => loadSession(lobbyId));
+  const { lobby, leave } = useLobby(session);
 
   // No token for this lobby in this tab yet, so join as a new player
   if (!session) {
@@ -21,9 +21,9 @@ function LobbyPage() {
         title="Join game"
         submitLabel="Join"
         onSubmit={async (name) => setSession(await joinLobby(lobbyId, name))}
-        onCancel={() => navigate('/')}
+        onCancel={() => navigate("/")}
       />
-    )
+    );
   }
 
   if (!lobby) {
@@ -31,7 +31,7 @@ function LobbyPage() {
       <main className="page">
         <p className="muted">Connecting…</p>
       </main>
-    )
+    );
   }
 
   return (
@@ -51,7 +51,7 @@ function LobbyPage() {
         Leave lobby
       </button>
     </main>
-  )
+  );
 }
 
-export default LobbyPage
+export default LobbyPage;

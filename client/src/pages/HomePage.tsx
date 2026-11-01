@@ -1,24 +1,23 @@
-import { useState, type FormEvent } from 'react'
-import { useLocation, useNavigate } from 'react-router'
-import NameDialog from '../components/NameDialog.tsx'
-import { createLobby } from '../lib/api.ts'
-import './HomePage.css'
+import { useState, type FormEvent } from "react";
+import { useLocation, useNavigate } from "react-router";
+import NameDialog from "../components/NameDialog.tsx";
+import { createLobby } from "../lib/api.ts";
+import "./HomePage.css";
 
 function HomePage() {
-  const navigate = useNavigate()
-  const message = (useLocation().state as { message?: string } | null)?.message
-  const [creating, setCreating] = useState(false)
-  const [code, setCode] = useState('')
+  const navigate = useNavigate();
+  const message = (useLocation().state as { message?: string } | null)?.message;
+  const [creating, setCreating] = useState(false);
+  const [code, setCode] = useState("");
 
   async function create(name: string) {
-    const { lobbyId } = await createLobby(name)
-    navigate(`/l/${lobbyId}`)
+    const { lobbyId } = await createLobby(name);
+    navigate(`/l/${lobbyId}`);
   }
 
-  // The lobby page asks for a name before joining, same as when opening an invite link
   function join(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    navigate(`/l/${code.replace(/\s/g, '').toUpperCase()}`)
+    event.preventDefault();
+    navigate(`/l/${code.replace(/\s/g, "").toUpperCase()}`);
   }
 
   return (
@@ -31,7 +30,11 @@ function HomePage() {
         </p>
       )}
 
-      <button type="button" className="button" onClick={() => setCreating(true)}>
+      <button
+        type="button"
+        className="button"
+        onClick={() => setCreating(true)}
+      >
         Create new game
       </button>
 
@@ -62,7 +65,7 @@ function HomePage() {
         />
       )}
     </main>
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;
