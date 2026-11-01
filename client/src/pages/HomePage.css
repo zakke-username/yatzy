@@ -1,0 +1,32 @@
+.home-title {
+  margin: 0 0 1rem;
+  font-size: clamp(3.5rem, 14vw, 5.5rem);
+  line-height: 1;
+}
+
+.notice {
+  margin: 0;
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
+  background: var(--accent-soft);
+  font-size: 1.125rem;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--muted);
+  font-size: 1.25rem;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--border);
+}
+
+.code-input:not(:placeholder-shown) {
+  text-transform: uppercase;
+}
