@@ -1,5 +1,6 @@
-import { randomBytes, randomInt, randomUUID } from 'node:crypto'
-import type { JoinResponse, LobbyStatus, PublicLobbyState } from './types.ts'
+import { randomInt, randomUUID } from 'node:crypto'
+import type { JoinResponse, LobbyStatus, PublicLobbyState } from '../types.ts'
+import { createSession, deleteSessions, type Session } from './sessions.ts'
 
 export const MAX_PLAYERS = 6
 
@@ -17,15 +18,7 @@ export type Lobby = {
   hostLeaveTimer?: NodeJS.Timeout
 }
 
-export type Session = {
-  lobbyId: string
-  playerId: string
-}
-
 export const lobbies = new Map<string, Lobby>()
-
-// Tokens live only here, never on a lobby, so broadcasting lobby state can't leak them
-export const sessions = new Map<string, Session>()
 
 // No 0/O or 1/I/L, so codes are easy to read out and type
 const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'
@@ -50,10 +43,9 @@ export function createLobby(hostName: string) {
 
 export function addPlayer(lobby: Lobby, name: string): JoinResponse {
   const player: Player = { id: randomUUID(), name, socketId: null }
-  const token = randomBytes(32).toString('base64url')
-
   lobby.players.push(player)
-  sessions.set(token, { lobbyId: lobby.id, playerId: player.id })
+
+  const token = createSession({ lobbyId: lobby.id, playerId: player.id })
   return { lobbyId: lobby.id, playerId: player.id, token }
 }
 
@@ -66,12 +58,6 @@ export function deleteLobby(lobby: Lobby) {
   clearTimeout(lobby.hostLeaveTimer)
   lobbies.delete(lobby.id)
   deleteSessions((session) => session.lobbyId === lobby.id)
-}
-
-function deleteSessions(matches: (session: Session) => boolean) {
-  for (const [token, session] of sessions) {
-    if (matches(session)) sessions.delete(token)
-  }
 }
 
 export function findPlayer({ lobbyId, playerId }: Session) {

@@ -1,73 +1,8 @@
-import type { Express, Response } from 'express'
-import type { DefaultEventsMap, Server } from 'socket.io'
-import {
-  addPlayer,
-  createLobby,
-  deleteLobby,
-  findPlayer,
-  lobbies,
-  MAX_PLAYERS,
-  removePlayer,
-  sessions,
-  toPublicState,
-  type Lobby,
-  type Session,
-} from './store.ts'
-import type { ApiError, ClientToServerEvents, ServerToClientEvents } from './types.ts'
+import { findPlayer, removePlayer } from '../store/lobbies.ts'
+import { sessions } from '../store/sessions.ts'
+import { broadcast, closeLobby, scheduleHostLeave, type GameServer } from './io.ts'
 
-export type GameServer = Server<ClientToServerEvents, ServerToClientEvents, DefaultEventsMap, Session>
-
-// How long the host may be disconnected (e.g. during a page refresh) before the lobby closes
-const HOST_LEAVE_GRACE_MS = 30_000
-const MAX_NAME_LENGTH = 20
-
-// Names are cosmetic: trimmed, length-limited, and rendered as plain text by the client
-function parseName(value: unknown) {
-  const name = typeof value === 'string' ? value.trim() : ''
-  return name.length > 0 && name.length <= MAX_NAME_LENGTH ? name : null
-}
-
-function sendError(res: Response, status: number, error: ApiError) {
-  res.status(status).json({ error })
-}
-
-export function registerHandlers(app: Express, io: GameServer) {
-  function broadcast(lobby: Lobby) {
-    io.to(lobby.id).emit('lobby:state', toPublicState(lobby))
-  }
-
-  function closeLobby(lobby: Lobby) {
-    io.to(lobby.id).emit('lobby:closed')
-    io.socketsLeave(lobby.id)
-    deleteLobby(lobby)
-  }
-
-  function scheduleHostLeave(lobby: Lobby) {
-    lobby.hostLeaveTimer = setTimeout(() => closeLobby(lobby), HOST_LEAVE_GRACE_MS)
-  }
-
-  app.post('/api/lobbies', (req, res) => {
-    const name = parseName(req.body?.name)
-    if (!name) return sendError(res, 400, 'BAD_INPUT')
-
-    const { lobby, session } = createLobby(name)
-    // Close the lobby if the host never connects
-    scheduleHostLeave(lobby)
-    res.status(201).json(session)
-  })
-
-  app.post('/api/lobbies/:lobbyId/players', (req, res) => {
-    const name = parseName(req.body?.name)
-    if (!name) return sendError(res, 400, 'BAD_INPUT')
-
-    const lobby = lobbies.get(req.params.lobbyId)
-    if (!lobby) return sendError(res, 404, 'LOBBY_NOT_FOUND')
-    if (lobby.status !== 'waiting') return sendError(res, 409, 'GAME_STARTED')
-    if (lobby.players.length >= MAX_PLAYERS) return sendError(res, 409, 'LOBBY_FULL')
-
-    res.status(201).json(addPlayer(lobby, name))
-  })
-
+export function registerSocketHandlers(io: GameServer) {
   // Identity comes only from the token issued at create/join, never from event payloads
   io.use((socket, next) => {
     const session = sessions.get(socket.handshake.auth.token)
@@ -88,7 +23,7 @@ export function registerHandlers(app: Express, io: GameServer) {
     if (player.id === lobby.hostId) clearTimeout(lobby.hostLeaveTimer)
 
     socket.join(lobby.id)
-    broadcast(lobby)
+    broadcast(io, lobby)
 
     socket.on('lobby:leave', () => {
       const found = findPlayer(socket.data)
@@ -96,10 +31,10 @@ export function registerHandlers(app: Express, io: GameServer) {
 
       socket.leave(found.lobby.id)
       if (found.player.id === found.lobby.hostId) {
-        closeLobby(found.lobby)
+        closeLobby(io, found.lobby)
       } else {
         removePlayer(found.lobby, found.player.id)
-        broadcast(found.lobby)
+        broadcast(io, found.lobby)
       }
     })
 
@@ -109,8 +44,8 @@ export function registerHandlers(app: Express, io: GameServer) {
       if (!found || found.player.socketId !== socket.id) return
 
       found.player.socketId = null
-      if (found.player.id === found.lobby.hostId) scheduleHostLeave(found.lobby)
-      broadcast(found.lobby)
+      if (found.player.id === found.lobby.hostId) scheduleHostLeave(io, found.lobby)
+      broadcast(io, found.lobby)
     })
   })
 }
