@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router";
 import NameDialog from "../components/NameDialog.tsx";
-import { createLobby } from "../lib/api.ts";
+import { createRoom } from "../lib/api.ts";
 import "./HomePage.css";
 
 function HomePage() {
@@ -11,13 +11,13 @@ function HomePage() {
   const [code, setCode] = useState("");
 
   async function create(name: string) {
-    const { lobbyId } = await createLobby(name);
-    navigate(`/l/${lobbyId}`);
+    const { roomId } = await createRoom(name);
+    navigate(`/lobby/${roomId}`);
   }
 
   function join(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    navigate(`/l/${code.replace(/\s/g, "").toUpperCase()}`);
+    navigate(`/lobby/${code.replace(/\s/g, "").toUpperCase()}`);
   }
 
   return (

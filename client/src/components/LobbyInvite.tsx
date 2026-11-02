@@ -2,12 +2,12 @@ import { useState } from "react";
 import "./LobbyInvite.css";
 
 type Props = {
-  lobbyId: string;
+  roomId: string;
 };
 
-function LobbyInvite({ lobbyId }: Props) {
+function LobbyInvite({ roomId }: Props) {
   const [copied, setCopied] = useState(false);
-  const link = `${window.location.origin}/l/${lobbyId}`;
+  const link = `${window.location.origin}/lobby/${roomId}`;
 
   async function copyLink() {
     try {
@@ -22,7 +22,7 @@ function LobbyInvite({ lobbyId }: Props) {
   return (
     <section className="stack">
       <h1 className="label">Lobby code</h1>
-      <p className="lobby-code">{lobbyId}</p>
+      <p className="lobby-code">{roomId}</p>
       <div className="row invite">
         <input
           className="input"

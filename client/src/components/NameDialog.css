@@ -32,9 +32,3 @@
 .dialog-actions .button {
   flex: 1;
 }
-
-.error {
-  margin: 0;
-  color: var(--error);
-  font-size: 1.125rem;
-}

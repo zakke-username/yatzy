@@ -3,14 +3,3 @@
   color: var(--muted);
   font-size: 1.25rem;
 }
-
-.leave {
-  align-self: center;
-  padding: 0.25rem;
-  border: none;
-  background: none;
-  color: var(--muted);
-  font-size: 1.125rem;
-  text-decoration: underline;
-  cursor: pointer;
-}

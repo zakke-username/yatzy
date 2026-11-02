@@ -1,11 +1,13 @@
 import type { ApiError, JoinResponse } from "../types.ts";
 import { saveSession } from "./session.ts";
 
-const ERROR_MESSAGES: Record<ApiError, string> = {
+// Shared by REST errors and socket acknowledgements
+export const ERROR_MESSAGES: Record<ApiError, string> = {
   BAD_INPUT: "Please enter a name",
-  LOBBY_NOT_FOUND: "Lobby not found",
-  LOBBY_FULL: "This lobby is full",
+  ROOM_NOT_FOUND: "Lobby not found",
+  ROOM_FULL: "This lobby is full",
   GAME_STARTED: "This game has already started",
+  NOT_HOST: "Only the host can start the game",
 };
 
 async function requestSession(path: string, name: string) {
@@ -25,13 +27,13 @@ async function requestSession(path: string, name: string) {
   return session;
 }
 
-export function createLobby(name: string) {
-  return requestSession("/api/lobbies", name);
+export function createRoom(name: string) {
+  return requestSession("/api/rooms", name);
 }
 
-export function joinLobby(lobbyId: string, name: string) {
+export function joinRoom(roomId: string, name: string) {
   return requestSession(
-    `/api/lobbies/${encodeURIComponent(lobbyId)}/players`,
+    `/api/rooms/${encodeURIComponent(roomId)}/players`,
     name,
   );
 }

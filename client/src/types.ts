@@ -1,4 +1,4 @@
-export type LobbyStatus = "waiting" | "playing" | "finished";
+export type RoomStatus = "waiting" | "playing" | "finished";
 
 export type PublicPlayer = {
   id: string;
@@ -6,31 +6,38 @@ export type PublicPlayer = {
   connected: boolean;
 };
 
-export type PublicLobbyState = {
+/** A room is the lobby until the host starts it, then the game: the same ID, players and tokens throughout */
+export type PublicRoomState = {
   id: string;
   hostId: string;
-  status: LobbyStatus;
+  status: RoomStatus;
   maxPlayers: number;
   players: PublicPlayer[];
 };
 
+/** Returned when creating or joining a room. The token is secret and identifies the player. */
 export type JoinResponse = {
-  lobbyId: string;
+  roomId: string;
   playerId: string;
   token: string;
 };
 
 export type ApiError =
   | "BAD_INPUT"
-  | "LOBBY_NOT_FOUND"
-  | "LOBBY_FULL"
-  | "GAME_STARTED";
+  | "ROOM_NOT_FOUND"
+  | "ROOM_FULL"
+  | "GAME_STARTED"
+  | "NOT_HOST";
+
+/** The acknowledgement of every client event except room:leave */
+export type AckResponse = { ok: true } | { ok: false; error: ApiError };
 
 export type ServerToClientEvents = {
-  "lobby:state": (state: PublicLobbyState) => void;
-  "lobby:closed": () => void;
+  "room:state": (state: PublicRoomState) => void;
+  "room:closed": () => void;
 };
 
 export type ClientToServerEvents = {
-  "lobby:leave": () => void;
+  "room:leave": () => void;
+  "game:start": (ack: (response: AckResponse) => void) => void;
 };

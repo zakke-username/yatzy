@@ -2,16 +2,16 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { clearSession } from "../lib/session.ts";
 import { socket } from "../lib/socket.ts";
-import type { JoinResponse, PublicLobbyState } from "../types.ts";
+import type { JoinResponse, PublicRoomState } from "../types.ts";
 
-export function useLobby(session: JoinResponse | null) {
+export function useRoom(session: JoinResponse | null) {
   const navigate = useNavigate();
-  const [lobby, setLobby] = useState<PublicLobbyState | null>(null);
+  const [room, setRoom] = useState<PublicRoomState | null>(null);
 
-  // Forget this lobby and return to the front page, optionally showing a message there
+  // Forget this room and return to the front page, optionally showing a message there
   const exit = useCallback(
     (message?: string) => {
-      if (session) clearSession(session.lobbyId);
+      if (session) clearSession(session.roomId);
       socket.disconnect();
       navigate("/", { replace: true, state: { message } });
     },
@@ -33,15 +33,15 @@ export function useLobby(session: JoinResponse | null) {
     };
 
     socket.auth = { token: session.token };
-    socket.on("lobby:state", setLobby);
-    socket.on("lobby:closed", onClosed);
+    socket.on("room:state", setRoom);
+    socket.on("room:closed", onClosed);
     socket.on("connect_error", onConnectError);
     socket.on("disconnect", onDisconnect);
     socket.connect();
 
     return () => {
-      socket.off("lobby:state", setLobby);
-      socket.off("lobby:closed", onClosed);
+      socket.off("room:state", setRoom);
+      socket.off("room:closed", onClosed);
       socket.off("connect_error", onConnectError);
       socket.off("disconnect", onDisconnect);
       socket.disconnect();
@@ -49,9 +49,11 @@ export function useLobby(session: JoinResponse | null) {
   }, [session, exit]);
 
   const leave = useCallback(() => {
-    socket.emit("lobby:leave");
+    socket.emit("room:leave");
     exit();
   }, [exit]);
 
-  return { lobby, leave };
+  const start = useCallback(() => socket.emitWithAck("game:start"), []);
+
+  return { room, leave, start };
 }

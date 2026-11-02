@@ -1,9 +1,9 @@
-import { findPlayer, removePlayer } from "../store/lobbies.ts";
+import { findPlayer, removePlayer } from "../store/rooms.ts";
 import { sessions } from "../store/sessions.ts";
 import {
   broadcast,
-  closeLobby,
-  scheduleHostLeave,
+  closeRoom,
+  updateCloseTimer,
   type GameServer,
 } from "./io.ts";
 
@@ -17,8 +17,10 @@ export function registerSocketHandlers(io: GameServer) {
   });
 
   io.on("connection", (socket) => {
-    // Sessions are deleted together with their player and lobby, so the lookup can't fail here
-    const { lobby, player } = findPlayer(socket.data)!;
+    // Socket.IO connects a tick after the handshake, so the player may have left in between
+    const found = findPlayer(socket.data);
+    if (!found) return socket.disconnect(true);
+    const { room, player } = found;
 
     // One live connection per player: the newest wins
     const previousSocketId = player.socketId;
@@ -26,22 +28,45 @@ export function registerSocketHandlers(io: GameServer) {
     if (previousSocketId)
       io.sockets.sockets.get(previousSocketId)?.disconnect(true);
 
-    if (player.id === lobby.hostId) clearTimeout(lobby.hostLeaveTimer);
+    updateCloseTimer(io, room);
+    socket.join(room.id);
+    broadcast(io, room);
 
-    socket.join(lobby.id);
-    broadcast(io, lobby);
+    // The handlers look the player up again, because they may have left or the room closed since connecting
 
-    socket.on("lobby:leave", () => {
+    socket.on("room:leave", () => {
       const found = findPlayer(socket.data);
       if (!found) return;
 
-      socket.leave(found.lobby.id);
-      if (found.player.id === found.lobby.hostId) {
-        closeLobby(io, found.lobby);
+      socket.leave(found.room.id);
+      // The host leaving closes a room that is still a lobby, but a started game goes on without them
+      if (
+        found.room.status === "waiting" &&
+        found.player.id === found.room.hostId
+      ) {
+        closeRoom(io, found.room);
       } else {
-        removePlayer(found.lobby, found.player.id);
-        broadcast(io, found.lobby);
+        removePlayer(found.room, found.player.id);
+        updateCloseTimer(io, found.room);
+        broadcast(io, found.room);
       }
+    });
+
+    socket.on("game:start", (ack) => {
+      // The ack comes from the client too, and calling a non-function would throw
+      if (typeof ack !== "function") return;
+
+      const found = findPlayer(socket.data);
+      if (!found) return ack({ ok: false, error: "ROOM_NOT_FOUND" });
+      if (found.player.id !== found.room.hostId)
+        return ack({ ok: false, error: "NOT_HOST" });
+      if (found.room.status !== "waiting")
+        return ack({ ok: false, error: "GAME_STARTED" });
+
+      found.room.status = "playing";
+      // The new status in the snapshot is what moves every client to the game page
+      broadcast(io, found.room);
+      ack({ ok: true });
     });
 
     socket.on("disconnect", () => {
@@ -50,9 +75,8 @@ export function registerSocketHandlers(io: GameServer) {
       if (!found || found.player.socketId !== socket.id) return;
 
       found.player.socketId = null;
-      if (found.player.id === found.lobby.hostId)
-        scheduleHostLeave(io, found.lobby);
-      broadcast(io, found.lobby);
+      updateCloseTimer(io, found.room);
+      broadcast(io, found.room);
     });
   });
 }

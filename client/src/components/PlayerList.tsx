@@ -1,31 +1,32 @@
-import type { PublicLobbyState } from "../types.ts";
+import type { PublicRoomState } from "../types.ts";
 import "./PlayerList.css";
 
 type Props = {
-  lobby: PublicLobbyState;
+  room: PublicRoomState;
   /** The viewing player, marked "(you)" */
   playerId: string;
 };
 
-function PlayerList({ lobby, playerId }: Props) {
+function PlayerList({ room, playerId }: Props) {
   return (
     <section className="stack">
       <h2 className="label">
-        Players {lobby.players.length}/{lobby.maxPlayers}
+        Players {room.players.length}
+        {room.status === "waiting" && `/${room.maxPlayers}`}
       </h2>
       <ul className="players">
-        {lobby.players.map((player) => (
+        {room.players.map((player) => (
           <li
             key={player.id}
             className="player"
-            data-host={player.id === lobby.hostId}
+            data-host={player.id === room.hostId}
             data-offline={!player.connected}
           >
             <span className="player-name">
               {player.name}
               {player.id === playerId && <span className="muted"> (you)</span>}
             </span>
-            {player.id === lobby.hostId && <span className="badge">Host</span>}
+            {player.id === room.hostId && <span className="badge">Host</span>}
           </li>
         ))}
       </ul>
