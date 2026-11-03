@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Navigate, useParams } from "react-router";
-import PlayerList from "../components/PlayerList.tsx";
+import Scoreboard from "../components/Scoreboard.tsx";
 import { useRoom } from "../hooks/useRoom.ts";
 import { loadSession } from "../lib/session.ts";
 import "./GamePage.css";
 
-// No gameplay yet: the page shows the game's players and who is connected
+// No gameplay yet: the page shows the scoreboard, with disconnected players faded
 function GamePage() {
   const roomId = useParams().roomId!.toUpperCase();
   const [session] = useState(() => loadSession(roomId));
@@ -28,7 +28,7 @@ function GamePage() {
   return (
     <main className="page">
       <h1 className="game-title">Game in progress</h1>
-      <PlayerList room={room} playerId={session.playerId} />
+      <Scoreboard players={room.players} />
 
       <button type="button" className="leave" onClick={leave}>
         Leave game

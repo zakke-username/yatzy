@@ -18,12 +18,12 @@
   text-align: left;
 }
 
-.player[data-host='true'] {
+.player[data-host="true"] {
   border-color: var(--accent);
   background: var(--accent-soft);
 }
 
-.player[data-offline='true'] {
+.player[data-offline="true"] {
   opacity: 0.45;
 }
 

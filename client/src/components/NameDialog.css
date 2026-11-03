@@ -24,11 +24,6 @@
   font-size: 1.75rem;
 }
 
-.dialog-actions {
-  display: flex;
-  gap: 0.75rem;
-}
-
 .dialog-actions .button {
   flex: 1;
 }

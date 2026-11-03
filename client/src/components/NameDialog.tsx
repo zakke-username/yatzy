@@ -59,7 +59,7 @@ function NameDialog({ title, submitLabel, onSubmit, onCancel }: Props) {
           onChange={(event) => setName(event.target.value)}
         />
         {error && <p className="error">{error}</p>}
-        <div className="dialog-actions">
+        <div className="row dialog-actions">
           <button
             type="button"
             className="button button-secondary"

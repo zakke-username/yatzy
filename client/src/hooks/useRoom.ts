@@ -8,7 +8,6 @@ export function useRoom(session: JoinResponse | null) {
   const navigate = useNavigate();
   const [room, setRoom] = useState<PublicRoomState | null>(null);
 
-  // Forget this room and return to the front page, optionally showing a message there
   const exit = useCallback(
     (message?: string) => {
       if (session) clearSession(session.roomId);

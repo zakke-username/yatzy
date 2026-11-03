@@ -1,9 +1,34 @@
 export type RoomStatus = "waiting" | "playing" | "finished";
 
+/** The Scandinavian Yatzy categories, in scorecard order */
+export const CATEGORIES = [
+  "ones",
+  "twos",
+  "threes",
+  "fours",
+  "fives",
+  "sixes",
+  "onePair",
+  "twoPairs",
+  "threeOfAKind",
+  "fourOfAKind",
+  "smallStraight",
+  "largeStraight",
+  "fullHouse",
+  "chance",
+  "yatzy",
+] as const;
+
+export type Category = (typeof CATEGORIES)[number];
+
+/** A player's score in every category */
+export type Scores = Record<Category, number>;
+
 export type PublicPlayer = {
   id: string;
   name: string;
   connected: boolean;
+  scores: Scores;
 };
 
 /** A room is the lobby until the host starts it, then the game: the same ID, players and tokens throughout */

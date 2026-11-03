@@ -1,0 +1,28 @@
+/* Scrolls sideways when there are more players than fit the page */
+.scoreboard {
+  overflow-x: auto;
+}
+
+.scoreboard table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.scoreboard th,
+.scoreboard td {
+  padding: 0.5rem 0.625rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.scoreboard tbody th {
+  font-weight: normal;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* A disconnected player's whole column is faded, like their row in the player list */
+.scoreboard [data-offline="true"] {
+  opacity: 0.45;
+}
