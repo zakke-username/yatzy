@@ -21,9 +21,10 @@ const LABELS: Record<Category, string> = {
 
 type Props = {
   players: PublicPlayer[];
+  currentPlayerId: string | null;
 };
 
-function Scoreboard({ players }: Props) {
+function Scoreboard({ players, currentPlayerId }: Props) {
   return (
     <section className="stack">
       <h2 className="label">Scoreboard</h2>
@@ -36,6 +37,7 @@ function Scoreboard({ players }: Props) {
                 <th
                   key={player.id}
                   scope="col"
+                  data-current={player.id === currentPlayerId}
                   data-offline={!player.connected}
                 >
                   {player.name}
@@ -48,7 +50,11 @@ function Scoreboard({ players }: Props) {
               <tr key={category}>
                 <th scope="row">{LABELS[category]}</th>
                 {players.map((player) => (
-                  <td key={player.id} data-offline={!player.connected}>
+                  <td
+                    key={player.id}
+                    data-current={player.id === currentPlayerId}
+                    data-offline={!player.connected}
+                  >
                     {player.scores[category]}
                   </td>
                 ))}

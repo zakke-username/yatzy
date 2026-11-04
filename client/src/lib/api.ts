@@ -8,6 +8,7 @@ export const ERROR_MESSAGES: Record<ApiError, string> = {
   ROOM_FULL: "This lobby is full",
   GAME_STARTED: "This game has already started",
   NOT_HOST: "Only the host can start the game",
+  NOT_YOUR_TURN: "It's not your turn",
 };
 
 async function requestSession(path: string, name: string) {

@@ -22,6 +22,16 @@
   white-space: nowrap;
 }
 
+/* The column of the player whose turn it is, with their name styled like the host badge */
+.scoreboard [data-current="true"] {
+  background: var(--accent-soft);
+}
+
+.scoreboard thead [data-current="true"] {
+  background: var(--accent);
+  color: #fff;
+}
+
 /* A disconnected player's whole column is faded, like their row in the player list */
 .scoreboard [data-offline="true"] {
   opacity: 0.45;

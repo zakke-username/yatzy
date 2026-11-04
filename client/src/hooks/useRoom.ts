@@ -53,6 +53,7 @@ export function useRoom(session: JoinResponse | null) {
   }, [exit]);
 
   const start = useCallback(() => socket.emitWithAck("game:start"), []);
+  const endTurn = useCallback(() => socket.emitWithAck("turn:end"), []);
 
-  return { room, leave, start };
+  return { room, leave, start, endTurn };
 }

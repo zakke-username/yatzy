@@ -22,7 +22,7 @@ function HomePage() {
 
   return (
     <main className="page">
-      <h1 className="home-title">Free Yatzy</h1>
+      <h1 className="home-title">Yatzy</h1>
 
       {message && (
         <p className="notice" role="status">

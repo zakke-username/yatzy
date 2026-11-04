@@ -34,7 +34,7 @@ Run from the repo root:
 
 ```
 client/   React + Vite app (pages, components, hooks, lib)
-server/   Express + Socket.IO (routes, socket, store; TypeScript run directly by Node, no build step)
+server/   Express + Socket.IO (game engine, routes, socket, store; TypeScript run directly by Node, no build step)
 ```
 
 The API types live in `server/src/types.ts`, with an identical copy in `client/src/types.ts`. See [NOTES.md](NOTES.md) for the design.

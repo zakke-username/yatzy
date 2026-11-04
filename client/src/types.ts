@@ -38,6 +38,7 @@ export type PublicRoomState = {
   status: RoomStatus;
   maxPlayers: number;
   players: PublicPlayer[];
+  currentPlayerId: string | null;
 };
 
 /** Returned when creating or joining a room. The token is secret and identifies the player. */
@@ -48,7 +49,12 @@ export type JoinResponse = {
 };
 
 export type ApiError =
-  "BAD_INPUT" | "ROOM_NOT_FOUND" | "ROOM_FULL" | "GAME_STARTED" | "NOT_HOST";
+  | "BAD_INPUT"
+  | "ROOM_NOT_FOUND"
+  | "ROOM_FULL"
+  | "GAME_STARTED"
+  | "NOT_HOST"
+  | "NOT_YOUR_TURN";
 
 /** The acknowledgement of every client event except room:leave */
 export type AckResponse = { ok: true } | { ok: false; error: ApiError };
@@ -61,4 +67,5 @@ export type ServerToClientEvents = {
 export type ClientToServerEvents = {
   "room:leave": () => void;
   "game:start": (ack: (response: AckResponse) => void) => void;
+  "turn:end": (ack: (response: AckResponse) => void) => void;
 };

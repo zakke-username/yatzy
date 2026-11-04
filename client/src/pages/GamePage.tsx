@@ -2,14 +2,28 @@ import { useState } from "react";
 import { Navigate, useParams } from "react-router";
 import Scoreboard from "../components/Scoreboard.tsx";
 import { useRoom } from "../hooks/useRoom.ts";
+import { ERROR_MESSAGES } from "../lib/api.ts";
 import { loadSession } from "../lib/session.ts";
 import "./GamePage.css";
 
-// No gameplay yet: the page shows the scoreboard, with disconnected players faded
+// No dice or scoring yet: the page shows the scoreboard and lets the current player end their turn
 function GamePage() {
   const roomId = useParams().roomId!.toUpperCase();
   const [session] = useState(() => loadSession(roomId));
-  const { room, leave } = useRoom(session);
+  const { room, leave, endTurn } = useRoom(session);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function handleEndTurn() {
+    // Disables the "end turn" button until the server answers or the connection drops: so a double click sends only one request
+    setBusy(true);
+    try {
+      const response = await endTurn();
+      setError(response.ok ? "" : ERROR_MESSAGES[response.error]);
+    } finally {
+      setBusy(false);
+    }
+  }
 
   // Only the lobby page hands out seats, and it refuses new ones once the game has started
   if (!session) return <Navigate to={`/lobby/${roomId}`} replace />;
@@ -28,7 +42,20 @@ function GamePage() {
   return (
     <main className="page">
       <h1 className="game-title">Game in progress</h1>
-      <Scoreboard players={room.players} />
+      <Scoreboard
+        players={room.players}
+        currentPlayerId={room.currentPlayerId}
+      />
+
+      <button
+        type="button"
+        className="button"
+        disabled={busy || room.currentPlayerId !== session.playerId}
+        onClick={handleEndTurn}
+      >
+        End turn
+      </button>
+      {error && <p className="error">{error}</p>}
 
       <button type="button" className="leave" onClick={leave}>
         Leave game
