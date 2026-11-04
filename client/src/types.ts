@@ -48,11 +48,7 @@ export type JoinResponse = {
 };
 
 export type ApiError =
-  | "BAD_INPUT"
-  | "ROOM_NOT_FOUND"
-  | "ROOM_FULL"
-  | "GAME_STARTED"
-  | "NOT_HOST";
+  "BAD_INPUT" | "ROOM_NOT_FOUND" | "ROOM_FULL" | "GAME_STARTED" | "NOT_HOST";
 
 /** The acknowledgement of every client event except room:leave */
 export type AckResponse = { ok: true } | { ok: false; error: ApiError };

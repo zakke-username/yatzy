@@ -14,6 +14,7 @@ function sendError(res: Response, status: number, error: ApiError) {
   res.status(status).json({ error });
 }
 
+// HTTP requests for creating and joining rooms, because sockets use an auth token already in the handshake
 export function registerRoomRoutes(app: Express, io: GameServer) {
   app.post("/api/rooms", (req, res) => {
     const name = parseName(req.body?.name);

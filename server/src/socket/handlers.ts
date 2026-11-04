@@ -8,7 +8,7 @@ import {
 } from "./io.ts";
 
 export function registerSocketHandlers(io: GameServer) {
-  // Identity comes only from the token issued at create/join, never from event payloads
+  // Client is identified by auth token in socket handshake
   io.use((socket, next) => {
     const session = sessions.get(socket.handshake.auth.token);
     if (!session) return next(new Error("UNAUTHORIZED"));
@@ -17,7 +17,7 @@ export function registerSocketHandlers(io: GameServer) {
   });
 
   io.on("connection", (socket) => {
-    // Socket.IO connects a tick after the handshake, so the player may have left in between
+    // Make sure that player belongs to a room
     const found = findPlayer(socket.data);
     if (!found) return socket.disconnect(true);
     const { room, player } = found;
@@ -32,20 +32,21 @@ export function registerSocketHandlers(io: GameServer) {
     socket.join(room.id);
     broadcast(io, room);
 
-    // The handlers look the player up again, because they may have left or the room closed since connecting
-
+    // Socket handlers
+    // Each one looks up the player & room again, in case the player has disconnected or room is deleted
     socket.on("room:leave", () => {
       const found = findPlayer(socket.data);
       if (!found) return;
 
       socket.leave(found.room.id);
-      // The host leaving closes a room that is still a lobby, but a started game goes on without them
       if (
         found.room.status === "waiting" &&
         found.player.id === found.room.hostId
       ) {
+        // If host leaves a lobby -> close room
         closeRoom(io, found.room);
       } else {
+        // Just remove player
         removePlayer(found.room, found.player.id);
         updateCloseTimer(io, found.room);
         broadcast(io, found.room);

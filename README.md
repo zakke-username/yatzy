@@ -22,12 +22,13 @@ In development, Vite proxies `/api` and `/socket.io` to the server, so the clien
 
 Run from the repo root:
 
-| Script              | Description                                               |
-| ------------------- | --------------------------------------------------------- |
-| `npm run dev`       | Start server (auto-restart) and client (HMR) together     |
-| `npm run build`     | Typecheck and build the client to `client/dist`           |
-| `npm run typecheck` | Typecheck both workspaces                                 |
-| `npm run lint`      | Lint everything with Oxlint                               |
+| Script              | Description                                                    |
+| ------------------- | -------------------------------------------------------------- |
+| `npm run dev`       | Start server (auto-restart) and client (HMR) together          |
+| `npm run build`     | Typecheck and build the client to `client/dist`                |
+| `npm run typecheck` | Typecheck both workspaces                                      |
+| `npm run lint`      | Lint everything with Oxlint                                    |
+| `npm run format`    | Format everything with Prettier (`format:check` to only check) |
 
 ## Structure
 
