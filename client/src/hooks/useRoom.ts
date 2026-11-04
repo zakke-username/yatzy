@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { clearSession } from "../lib/session.ts";
 import { socket } from "../lib/socket.ts";
-import type { JoinResponse, PublicRoomState } from "../types.ts";
+import type { JoinResponse, PublicRoomState } from "../../../shared/types.ts";
 
 export function useRoom(session: JoinResponse | null) {
   const navigate = useNavigate();
@@ -52,8 +52,15 @@ export function useRoom(session: JoinResponse | null) {
     exit();
   }, [exit]);
 
-  const start = useCallback(() => socket.emitWithAck("game:start"), []);
-  const endTurn = useCallback(() => socket.emitWithAck("turn:end"), []);
+  const start = useCallback(
+    () => socket.emitWithAck("game:start").catch(() => undefined),
+    [],
+  );
+
+  const endTurn = useCallback(
+    () => socket.emitWithAck("turn:end").catch(() => undefined),
+    [],
+  );
 
   return { room, leave, start, endTurn };
 }

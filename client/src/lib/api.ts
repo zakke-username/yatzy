@@ -1,4 +1,4 @@
-import type { ApiError, JoinResponse } from "../types.ts";
+import type { ApiError, JoinResponse } from "../../../shared/types.ts";
 import { saveSession } from "./session.ts";
 
 // Shared by REST errors and socket acknowledgements

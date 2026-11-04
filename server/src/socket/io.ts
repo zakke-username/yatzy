@@ -2,7 +2,10 @@ import type { DefaultEventsMap, Server } from "socket.io";
 import { toPublicState, type Room } from "../game/engine.ts";
 import { deleteRoom } from "../store/rooms.ts";
 import { deleteSessions, type Session } from "../store/sessions.ts";
-import type { ClientToServerEvents, ServerToClientEvents } from "../types.ts";
+import type {
+  ClientToServerEvents,
+  ServerToClientEvents,
+} from "../../../shared/types.ts";
 
 export type GameServer = Server<
   ClientToServerEvents,

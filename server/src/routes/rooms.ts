@@ -10,7 +10,7 @@ import {
 import { updateCloseTimer, type GameServer } from "../socket/io.ts";
 import { getRoom, saveRoom } from "../store/rooms.ts";
 import { saveSession } from "../store/sessions.ts";
-import type { ApiError, JoinResponse } from "../types.ts";
+import type { ApiError, JoinResponse } from "../../../shared/types.ts";
 
 const MAX_NAME_LENGTH = 20;
 

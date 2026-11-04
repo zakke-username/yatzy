@@ -1,5 +1,8 @@
 import { io, type Socket } from "socket.io-client";
-import type { ClientToServerEvents, ServerToClientEvents } from "../types.ts";
+import type {
+  ClientToServerEvents,
+  ServerToClientEvents,
+} from "../../../shared/types.ts";
 
 // Connects to the page's own origin; Vite proxies /socket.io to the server in development.
 // useRoom connects it once the player has a session token.

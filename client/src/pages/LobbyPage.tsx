@@ -18,7 +18,7 @@ function LobbyPage() {
   async function startGame() {
     // On success the new status arrives in room:state, which sends everyone to the game page
     const response = await start();
-    if (!response.ok) setError(ERROR_MESSAGES[response.error]);
+    if (response && !response.ok) setError(ERROR_MESSAGES[response.error]);
   }
 
   // No token for this room in this tab yet, so join as a new player.

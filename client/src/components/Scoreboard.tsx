@@ -1,4 +1,8 @@
-import { CATEGORIES, type Category, type PublicPlayer } from "../types.ts";
+import {
+  CATEGORIES,
+  type Category,
+  type PublicPlayer,
+} from "../../../shared/types.ts";
 import "./Scoreboard.css";
 
 const LABELS: Record<Category, string> = {

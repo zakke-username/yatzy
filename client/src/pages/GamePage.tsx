@@ -17,12 +17,9 @@ function GamePage() {
   async function handleEndTurn() {
     // Disables the "end turn" button until the server answers or the connection drops: so a double click sends only one request
     setBusy(true);
-    try {
-      const response = await endTurn();
-      setError(response.ok ? "" : ERROR_MESSAGES[response.error]);
-    } finally {
-      setBusy(false);
-    }
+    const response = await endTurn();
+    setBusy(false);
+    setError(response && !response.ok ? ERROR_MESSAGES[response.error] : "");
   }
 
   // Only the lobby page hands out seats, and it refuses new ones once the game has started

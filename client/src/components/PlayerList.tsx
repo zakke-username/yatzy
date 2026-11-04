@@ -1,4 +1,4 @@
-import type { PublicRoomState } from "../types.ts";
+import type { PublicRoomState } from "../../../shared/types.ts";
 import "./PlayerList.css";
 
 type Props = {

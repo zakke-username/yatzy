@@ -1,4 +1,4 @@
-import type { JoinResponse } from "../types.ts";
+import type { JoinResponse } from "../../../shared/types.ts";
 
 // sessionStorage is per tab: a refresh keeps your seat, and other tabs can join as other players
 const key = (roomId: string) => `free-yatzy:${roomId}`;

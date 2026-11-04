@@ -6,7 +6,7 @@ import {
   type PublicRoomState,
   type RoomStatus,
   type Scores,
-} from "../types.ts";
+} from "../../../shared/types.ts";
 
 export const MAX_PLAYERS = 8;
 

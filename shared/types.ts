@@ -1,8 +1,7 @@
-// The API contract between server and client. client/src/types.ts is an exact copy: change both together.
-
+// API contract between server and client
 export type RoomStatus = "waiting" | "playing" | "finished";
 
-/** The Scandinavian Yatzy categories, in scorecard order */
+/** Yatzy scoring categories */
 export const CATEGORIES = [
   "ones",
   "twos",
@@ -23,7 +22,7 @@ export const CATEGORIES = [
 
 export type Category = (typeof CATEGORIES)[number];
 
-/** A player's score in every category */
+/** Player's score */
 export type Scores = Record<Category, number>;
 
 export type PublicPlayer = {
@@ -33,7 +32,7 @@ export type PublicPlayer = {
   scores: Scores;
 };
 
-/** A room is the lobby until the host starts it, then the game: the same ID, players and tokens throughout */
+/** A room is both a lobby and a game */
 export type PublicRoomState = {
   id: string;
   hostId: string;
@@ -43,7 +42,7 @@ export type PublicRoomState = {
   currentPlayerId: string | null;
 };
 
-/** Returned when creating or joining a room. The token is secret and identifies the player. */
+/** Returned when creating or joining a room. */
 export type JoinResponse = {
   roomId: string;
   playerId: string;

@@ -1,6 +1,7 @@
 {
   "name": "free-yatzy",
   "private": true,
+  "type": "module",
   "workspaces": [
     "client",
     "server"
