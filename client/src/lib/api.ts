@@ -1,7 +1,6 @@
 import type { ApiError, JoinResponse } from "../../../shared/types.ts";
 import { saveSession } from "./session.ts";
 
-// Shared by REST errors and socket acknowledgements
 export const ERROR_MESSAGES: Record<ApiError, string> = {
   BAD_INPUT: "Please enter a name",
   ROOM_NOT_FOUND: "Lobby not found",
@@ -9,6 +8,7 @@ export const ERROR_MESSAGES: Record<ApiError, string> = {
   GAME_STARTED: "This game has already started",
   NOT_HOST: "Only the host can start the game",
   NOT_YOUR_TURN: "It's not your turn",
+  NO_ROLLS_LEFT: "You have no rolls left this turn",
 };
 
 async function requestSession(path: string, name: string) {

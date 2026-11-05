@@ -1,0 +1,39 @@
+.dice {
+  display: flex;
+  justify-content: center;
+  gap: 0.625rem;
+}
+
+.die {
+  position: relative;
+  flex: 1;
+  max-width: 4rem;
+  aspect-ratio: 1;
+  border: 2px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.die:not(:disabled):hover {
+  border-color: var(--accent);
+}
+
+.die:disabled {
+  cursor: default;
+}
+
+.die[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.die-lock {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  font-size: 1rem;
+}

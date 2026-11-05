@@ -57,10 +57,16 @@ export function useRoom(session: JoinResponse | null) {
     [],
   );
 
+  const roll = useCallback(
+    (held: boolean[]) =>
+      socket.emitWithAck("turn:roll", { held }).catch(() => undefined),
+    [],
+  );
+
   const endTurn = useCallback(
     () => socket.emitWithAck("turn:end").catch(() => undefined),
     [],
   );
 
-  return { room, leave, start, endTurn };
+  return { room, leave, start, roll, endTurn };
 }

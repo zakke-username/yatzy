@@ -1,6 +1,7 @@
-import { endTurn, removePlayer, startGame } from "../game/engine.ts";
+import { endTurn, removePlayer, rollDice, startGame } from "../game/engine.ts";
 import { getRoomAndPlayer } from "../store/rooms.ts";
 import { deleteSessions, getSession } from "../store/sessions.ts";
+import { DICE_COUNT } from "../../../shared/types.ts";
 import {
   broadcast,
   closeRoom,
@@ -44,10 +45,10 @@ export function registerSocketHandlers(io: GameServer) {
         found.room.status === "waiting" &&
         found.player.id === found.room.hostId
       ) {
-        // If host leaves a lobby -> close room
+        // If host leaves a lobby -> close whole room
         closeRoom(io, found.room);
       } else {
-        // Just remove player
+        // otherwise just remove player
         removePlayer(found.room, found.player.id);
         deleteSessions((session) => session.playerId === found.player.id);
         updateCloseTimer(io, found.room);
@@ -62,6 +63,27 @@ export function registerSocketHandlers(io: GameServer) {
       const found = getRoomAndPlayer(socket.data);
       if (!found) return ack({ ok: false, error: "ROOM_NOT_FOUND" });
       const error = startGame(found.room, found.player.id);
+      if (error) return ack({ ok: false, error });
+
+      broadcast(io, found.room);
+      ack({ ok: true });
+    });
+
+    socket.on("turn:roll", (payload, ack) => {
+      if (typeof ack !== "function") return;
+
+      const held = payload?.held;
+
+      // Validate input: array of booleans of right length
+      const isHeldArray =
+        Array.isArray(held) &&
+        held.length === DICE_COUNT &&
+        held.every((item) => typeof item === "boolean");
+      if (!isHeldArray) return ack({ ok: false, error: "BAD_INPUT" });
+
+      const found = getRoomAndPlayer(socket.data);
+      if (!found) return ack({ ok: false, error: "ROOM_NOT_FOUND" });
+      const error = rollDice(found.room, found.player.id, held);
       if (error) return ack({ ok: false, error });
 
       broadcast(io, found.room);
