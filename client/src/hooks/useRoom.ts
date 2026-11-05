@@ -4,7 +4,6 @@ import { clearSession } from "../lib/session.ts";
 import { socket } from "../lib/socket.ts";
 import type { JoinResponse, PublicRoomState } from "../../../shared/types.ts";
 
-// Each resolves to the server's ack, or to undefined if the connection drops first
 const start = () => socket.emitWithAck("game:start").catch(() => undefined);
 const roll = (held: boolean[]) =>
   socket.emitWithAck("turn:roll", { held }).catch(() => undefined);

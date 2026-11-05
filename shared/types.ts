@@ -55,6 +55,8 @@ export type PublicRoomState = {
   currentPlayerId: string | null;
   dice: number[];
   rollsLeft: number;
+  /** What the dice would score in each category. Like the dice, only meaningful once the current player has rolled. */
+  potentialScores: Scores;
 };
 
 /** Returned when creating or joining a room. */

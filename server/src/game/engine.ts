@@ -12,6 +12,7 @@ import {
   type RoomStatus,
   type Scores,
 } from "../../../shared/types.ts";
+import { calculateScores } from "./scores.ts";
 
 export const MAX_PLAYERS = 8;
 
@@ -144,5 +145,6 @@ export function toPublicState(room: Room): PublicRoomState {
     currentPlayerId: room.currentPlayerId,
     dice: room.dice,
     rollsLeft: room.rollsLeft,
+    potentialScores: calculateScores(room.dice),
   };
 }

@@ -37,6 +37,11 @@
   color: #fff;
 }
 
+/* What the current player's dice would score, greyed so it isn't mistaken for a score */
+.scoreboard .potential {
+  color: var(--muted);
+}
+
 /* A disconnected player's whole column is faded, like their row in the player list */
 .scoreboard [data-offline="true"] {
   opacity: 0.45;

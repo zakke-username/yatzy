@@ -99,6 +99,7 @@ function GamePage() {
       <Scoreboard
         players={room.players}
         currentPlayerId={room.currentPlayerId}
+        potentialScores={hasRolled ? room.potentialScores : null}
       />
 
       <button
