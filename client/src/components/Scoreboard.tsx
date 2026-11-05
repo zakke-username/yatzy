@@ -1,5 +1,6 @@
 import {
-  CATEGORIES,
+  LOWER_CATEGORIES,
+  UPPER_CATEGORIES,
   type Category,
   type PublicPlayer,
 } from "../../../shared/types.ts";
@@ -29,6 +30,25 @@ type Props = {
 };
 
 function Scoreboard({ players, currentPlayerId }: Props) {
+  const row = (
+    label: string,
+    score: (player: PublicPlayer) => number,
+    className?: string,
+  ) => (
+    <tr key={label} className={className}>
+      <th scope="row">{label}</th>
+      {players.map((player) => (
+        <td
+          key={player.id}
+          data-current={player.id === currentPlayerId}
+          data-offline={!player.connected}
+        >
+          {score(player)}
+        </td>
+      ))}
+    </tr>
+  );
+
   return (
     <section className="stack">
       <h2 className="label">Scoreboard</h2>
@@ -50,20 +70,15 @@ function Scoreboard({ players, currentPlayerId }: Props) {
             </tr>
           </thead>
           <tbody>
-            {CATEGORIES.map((category) => (
-              <tr key={category}>
-                <th scope="row">{LABELS[category]}</th>
-                {players.map((player) => (
-                  <td
-                    key={player.id}
-                    data-current={player.id === currentPlayerId}
-                    data-offline={!player.connected}
-                  >
-                    {player.scores[category]}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {UPPER_CATEGORIES.map((category) =>
+              row(LABELS[category], (player) => player.scores[category]),
+            )}
+            {row("Sum", (player) => player.sum, "summary")}
+            {row("Bonus", (player) => player.bonus, "summary")}
+            {LOWER_CATEGORIES.map((category) =>
+              row(LABELS[category], (player) => player.scores[category]),
+            )}
+            {row("Total", (player) => player.total, "summary")}
           </tbody>
         </table>
       </div>

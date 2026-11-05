@@ -4,14 +4,20 @@ import { clearSession } from "../lib/session.ts";
 import { socket } from "../lib/socket.ts";
 import type { JoinResponse, PublicRoomState } from "../../../shared/types.ts";
 
+// Each resolves to the server's ack, or to undefined if the connection drops first
+const start = () => socket.emitWithAck("game:start").catch(() => undefined);
+const roll = (held: boolean[]) =>
+  socket.emitWithAck("turn:roll", { held }).catch(() => undefined);
+const endTurn = () => socket.emitWithAck("turn:end").catch(() => undefined);
+
 export function useRoom(session: JoinResponse | null) {
   const navigate = useNavigate();
   const [room, setRoom] = useState<PublicRoomState | null>(null);
 
+  // Leaving the page unmounts it, and its effect cleanup disconnects the socket
   const exit = useCallback(
     (message?: string) => {
       if (session) clearSession(session.roomId);
-      socket.disconnect();
       navigate("/", { replace: true, state: { message } });
     },
     [session, navigate],
@@ -47,26 +53,12 @@ export function useRoom(session: JoinResponse | null) {
     };
   }, [session, exit]);
 
-  const leave = useCallback(() => {
-    socket.emit("room:leave");
+  async function leave() {
+    // Waits for the server to handle it, since disconnecting straight away can drop it. Offline, there's nobody to tell.
+    if (socket.connected)
+      await socket.emitWithAck("room:leave").catch(() => undefined);
     exit();
-  }, [exit]);
-
-  const start = useCallback(
-    () => socket.emitWithAck("game:start").catch(() => undefined),
-    [],
-  );
-
-  const roll = useCallback(
-    (held: boolean[]) =>
-      socket.emitWithAck("turn:roll", { held }).catch(() => undefined),
-    [],
-  );
-
-  const endTurn = useCallback(
-    () => socket.emitWithAck("turn:end").catch(() => undefined),
-    [],
-  );
+  }
 
   return { room, leave, start, roll, endTurn };
 }

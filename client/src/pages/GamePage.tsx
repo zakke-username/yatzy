@@ -5,7 +5,11 @@ import Scoreboard from "../components/Scoreboard.tsx";
 import { useRoom } from "../hooks/useRoom.ts";
 import { ERROR_MESSAGES } from "../lib/api.ts";
 import { loadSession } from "../lib/session.ts";
-import { DICE_COUNT, ROLLS_PER_TURN } from "../../../shared/types.ts";
+import {
+  DICE_COUNT,
+  ROLLS_PER_TURN,
+  type AckResponse,
+} from "../../../shared/types.ts";
 import "./GamePage.css";
 
 const NONE_HELD = Array<boolean>(DICE_COUNT).fill(false);
@@ -17,32 +21,43 @@ function GamePage() {
   const { room, leave, roll, endTurn } = useRoom(session);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [rolling, setRolling] = useState(false);
   const [held, setHeld] = useState(NONE_HELD);
 
   function toggleHeld(index: number) {
     setHeld(held.map((isHeld, i) => (i === index ? !isHeld : isHeld)));
   }
 
-  async function handleRoll() {
-    // Disables the buttons until the server answers or the connection drops: so a double click sends only one request
+  // Disables the buttons until the server answers or the connection drops, so a double click sends only one request
+  async function send(request: Promise<AckResponse | undefined>) {
     setBusy(true);
-    const response = await roll(held);
+    const response = await request;
     setBusy(false);
     setError(response && !response.ok ? ERROR_MESSAGES[response.error] : "");
+    return response?.ok;
+  }
+
+  async function handleRoll() {
+    setRolling(true);
+    await send(roll(held));
+    setRolling(false);
   }
 
   async function handleEndTurn() {
-    setBusy(true);
-    const response = await endTurn();
-    setBusy(false);
-    setError(response && !response.ok ? ERROR_MESSAGES[response.error] : "");
-
     // The next turn starts with nothing held. This can't wait for currentPlayerId to change: in a one-player game it doesn't.
-    if (response?.ok) setHeld(NONE_HELD);
+    if (await send(endTurn())) setHeld(NONE_HELD);
   }
 
-  // Only the lobby page hands out seats, and it refuses new ones once the game has started
-  if (!session) return <Navigate to={`/lobby/${roomId}`} replace />;
+  // A tab without a seat can't get one once the game has started
+  if (!session) {
+    return (
+      <Navigate
+        to="/"
+        replace
+        state={{ message: ERROR_MESSAGES.GAME_STARTED }}
+      />
+    );
+  }
 
   if (!room) {
     return (
@@ -57,7 +72,6 @@ function GamePage() {
 
   const canAct = !busy && room.currentPlayerId === session.playerId;
   const canRoll = canAct && room.rollsLeft > 0;
-  // A turn's starting dice are rerolled by its first roll, so they can't be held
   const hasRolled = room.rollsLeft < ROLLS_PER_TURN;
 
   return (
@@ -68,6 +82,7 @@ function GamePage() {
         <Dice
           values={room.dice}
           held={held}
+          rolling={rolling}
           disabled={!canRoll || !hasRolled}
           onToggle={toggleHeld}
         />

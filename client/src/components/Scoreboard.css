@@ -22,6 +22,11 @@
   white-space: nowrap;
 }
 
+/* Sum, bonus and total */
+.scoreboard .summary > * {
+  font-weight: 600;
+}
+
 /* The column of the player whose turn it is, with their name styled like the host badge */
 .scoreboard [data-current="true"] {
   background: var(--accent-soft);

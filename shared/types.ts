@@ -1,14 +1,16 @@
 // API contract between server and client
 export type RoomStatus = "waiting" | "playing" | "finished";
 
-/** Yatzy scoring categories */
-export const CATEGORIES = [
+export const UPPER_CATEGORIES = [
   "ones",
   "twos",
   "threes",
   "fours",
   "fives",
   "sixes",
+] as const;
+
+export const LOWER_CATEGORIES = [
   "onePair",
   "twoPairs",
   "threeOfAKind",
@@ -19,6 +21,9 @@ export const CATEGORIES = [
   "chance",
   "yatzy",
 ] as const;
+
+/** Yatzy scoring categories, in scorecard order */
+export const CATEGORIES = [...UPPER_CATEGORIES, ...LOWER_CATEGORIES] as const;
 
 export type Category = (typeof CATEGORIES)[number];
 
@@ -33,6 +38,11 @@ export type PublicPlayer = {
   name: string;
   connected: boolean;
   scores: Scores;
+  /** Ones to sixes */
+  sum: number;
+  bonus: number;
+  /** Every score plus the bonus */
+  total: number;
 };
 
 /** A room is both a lobby and a game */
@@ -63,7 +73,7 @@ export type ApiError =
   | "NOT_YOUR_TURN"
   | "NO_ROLLS_LEFT";
 
-/** The acknowledgement of every client event except room:leave */
+/** The acknowledgement of every client event except room:leave, whose ack carries nothing */
 export type AckResponse = { ok: true } | { ok: false; error: ApiError };
 
 export type ServerToClientEvents = {
@@ -72,7 +82,7 @@ export type ServerToClientEvents = {
 };
 
 export type ClientToServerEvents = {
-  "room:leave": () => void;
+  "room:leave": (ack: () => void) => void;
   "game:start": (ack: (response: AckResponse) => void) => void;
   "turn:roll": (
     payload: { held: boolean[] },

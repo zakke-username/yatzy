@@ -36,9 +36,12 @@ export function registerSocketHandlers(io: GameServer) {
 
     // Socket handlers
     // Each one looks up the player & room again, making sure that IDs point to something valid
-    socket.on("room:leave", () => {
+    // Acked so the client disconnects only after this has run: Socket.IO drops an event that arrives together with the disconnect
+    socket.on("room:leave", (ack) => {
+      if (typeof ack !== "function") return;
+
       const found = getRoomAndPlayer(socket.data);
-      if (!found) return;
+      if (!found) return ack();
 
       socket.leave(found.room.id);
       if (
@@ -54,6 +57,7 @@ export function registerSocketHandlers(io: GameServer) {
         updateCloseTimer(io, found.room);
         broadcast(io, found.room);
       }
+      ack();
     });
 
     socket.on("game:start", (ack) => {

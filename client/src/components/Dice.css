@@ -1,34 +1,61 @@
 .dice {
   display: flex;
   justify-content: center;
-  gap: 0.625rem;
+  /* Wide enough that neighbouring dice don't touch when turned 45° */
+  gap: 1.25rem;
 }
 
 .die {
   position: relative;
   flex: 1;
   max-width: 4rem;
-  aspect-ratio: 1;
-  border: 2px solid var(--border);
-  border-radius: 0.75rem;
-  background: var(--surface);
-  color: var(--text);
-  font-size: 1.75rem;
-  font-weight: 700;
+  padding: 0;
+  border: none;
+  background: none;
   cursor: pointer;
-}
-
-.die:not(:disabled):hover {
-  border-color: var(--accent);
 }
 
 .die:disabled {
   cursor: default;
 }
 
-.die[aria-pressed="true"] {
-  border-color: var(--accent);
-  background: var(--accent-soft);
+.die-face {
+  display: block;
+  width: 100%;
+  /* Matches the rounded corners in the images, so outlines follow them */
+  border-radius: 18%;
+}
+
+.die:not(:disabled, [aria-pressed="true"]):hover .die-face {
+  outline: 3px solid var(--border);
+  outline-offset: 3px;
+}
+
+.die[aria-pressed="true"] .die-face {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .die[data-spinning="true"] {
+    animation: die-spin 0.25s linear infinite;
+  }
+
+  .die-face {
+    transform: rotate(2turn);
+    transition: transform 1s ease-out;
+  }
+
+  .die[data-spinning="true"] .die-face {
+    transform: none;
+    transition: none;
+  }
+}
+
+@keyframes die-spin {
+  to {
+    transform: rotate(1turn);
+  }
 }
 
 .die-lock {
