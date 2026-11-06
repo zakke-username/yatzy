@@ -5,8 +5,10 @@ import { socket } from "../lib/socket.ts";
 import type { JoinResponse, PublicRoomState } from "../../../shared/types.ts";
 
 const start = () => socket.emitWithAck("game:start").catch(() => undefined);
+
 const roll = (held: boolean[]) =>
   socket.emitWithAck("turn:roll", { held }).catch(() => undefined);
+
 const endTurn = () => socket.emitWithAck("turn:end").catch(() => undefined);
 
 export function useRoom(session: JoinResponse | null) {
@@ -27,11 +29,9 @@ export function useRoom(session: JoinResponse | null) {
 
     const onClosed = () => exit("Lobby closed: host has left");
     const onConnectError = () => {
-      // An inactive socket means the server rejected the token, rather than a network error that will be retried
       if (!socket.active) exit("This lobby no longer exists");
     };
     const onDisconnect = (reason: string) => {
-      // The server only disconnects a player itself when they connect again from another tab
       if (reason === "io server disconnect")
         exit("This lobby was opened in another tab");
     };

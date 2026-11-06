@@ -48,7 +48,7 @@ function GamePage() {
     if (await send(endTurn())) setHeld(NONE_HELD);
   }
 
-  // A tab without a seat can't get one once the game has started
+  // No session = player not in this game, redirect to home page
   if (!session) {
     return (
       <Navigate
@@ -62,7 +62,7 @@ function GamePage() {
   if (!room) {
     return (
       <main className="page">
-        <p className="muted">Connecting…</p>
+        <p className="muted">Connecting to game...</p>
       </main>
     );
   }
@@ -70,9 +70,7 @@ function GamePage() {
   if (room.status === "waiting")
     return <Navigate to={`/lobby/${room.id}`} replace />;
 
-  const canAct = !busy && room.currentPlayerId === session.playerId;
-  const canRoll = canAct && room.rollsLeft > 0;
-  const hasRolled = room.rollsLeft < ROLLS_PER_TURN;
+  const isMyTurn = room.currentPlayerId === session.playerId;
 
   return (
     <main className="page">
@@ -83,13 +81,20 @@ function GamePage() {
           values={room.dice}
           held={held}
           rolling={rolling}
-          disabled={!canRoll || !hasRolled}
+          // Dice are disabled if not your turn, haven't yet rolled, or no rolls left
+          disabled={
+            busy ||
+            !isMyTurn ||
+            room.rollsLeft === 0 ||
+            room.rollsLeft === ROLLS_PER_TURN
+          }
           onToggle={toggleHeld}
         />
         <button
           type="button"
           className="button"
-          disabled={!canRoll}
+          // Roll button disabled if not your turn or no rolls left
+          disabled={busy || !isMyTurn || room.rollsLeft === 0}
           onClick={handleRoll}
         >
           Roll ({room.rollsLeft} left)
@@ -99,13 +104,15 @@ function GamePage() {
       <Scoreboard
         players={room.players}
         currentPlayerId={room.currentPlayerId}
-        potentialScores={hasRolled ? room.potentialScores : null}
+        potentialScores={
+          room.rollsLeft < ROLLS_PER_TURN ? room.potentialScores : null
+        }
       />
 
       <button
         type="button"
         className="button"
-        disabled={!canAct}
+        disabled={busy || !isMyTurn}
         onClick={handleEndTurn}
       >
         End turn

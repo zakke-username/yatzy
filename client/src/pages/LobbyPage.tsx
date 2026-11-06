@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router";
 import LobbyInvite from "../components/LobbyInvite.tsx";
 import NameDialog from "../components/NameDialog.tsx";
 import PlayerList from "../components/PlayerList.tsx";
 import { useRoom } from "../hooks/useRoom.ts";
-import { ERROR_MESSAGES, joinRoom } from "../lib/api.ts";
+import { ERROR_MESSAGES, getRoomStatus, joinRoom } from "../lib/api.ts";
 import { loadSession } from "../lib/session.ts";
 import "./LobbyPage.css";
 
@@ -14,6 +14,38 @@ function LobbyPage() {
   const [session, setSession] = useState(() => loadSession(roomId));
   const { room, leave, start } = useRoom(session);
   const [error, setError] = useState("");
+  const [joinable, setJoinable] = useState(false);
+
+  // Check if room can be joined
+  useEffect(() => {
+    if (session) return;
+    // Do not redirect if player has already left the page
+    let ignoreRedirect = false;
+    async function checkRoom() {
+      try {
+        const status = await getRoomStatus(roomId);
+        if (ignoreRedirect) return;
+        if (status === "waiting") {
+          setJoinable(true);
+        } else {
+          navigate("/", {
+            replace: true,
+            state: { message: ERROR_MESSAGES.GAME_STARTED },
+          });
+        }
+      } catch (err) {
+        if (!ignoreRedirect)
+          navigate("/", {
+            replace: true,
+            state: { message: (err as Error).message },
+          });
+      }
+    }
+    checkRoom();
+    return () => {
+      ignoreRedirect = true;
+    };
+  }, [roomId, session, navigate]);
 
   async function startGame() {
     // On success the new status arrives in room:state, which sends everyone to the game page
@@ -21,9 +53,8 @@ function LobbyPage() {
     if (response && !response.ok) setError(ERROR_MESSAGES[response.error]);
   }
 
-  // No token for this room in this tab yet, so join as a new player.
-  // The server refuses this once the game has started.
-  if (!session) {
+  // No token for this room in this tab yet -> join as a new player
+  if (!session && joinable) {
     return (
       <NameDialog
         title="Join game"
@@ -34,7 +65,7 @@ function LobbyPage() {
     );
   }
 
-  if (!room) {
+  if (!session || !room) {
     return (
       <main className="page">
         <p className="muted">Connecting…</p>

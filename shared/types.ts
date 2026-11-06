@@ -66,6 +66,11 @@ export type JoinResponse = {
   token: string;
 };
 
+/** Returned by GET /api/rooms/:roomId, which needs no token, so it tells nothing more */
+export type RoomStatusResponse = {
+  status: RoomStatus;
+};
+
 export type ApiError =
   | "BAD_INPUT"
   | "ROOM_NOT_FOUND"

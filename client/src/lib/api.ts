@@ -1,4 +1,8 @@
-import type { ApiError, JoinResponse } from "../../../shared/types.ts";
+import type {
+  ApiError,
+  JoinResponse,
+  RoomStatusResponse,
+} from "../../../shared/types.ts";
 import { saveSession } from "./session.ts";
 
 export const ERROR_MESSAGES: Record<ApiError, string> = {
@@ -11,30 +15,42 @@ export const ERROR_MESSAGES: Record<ApiError, string> = {
   NO_ROLLS_LEFT: "You have no rolls left this turn",
 };
 
-async function requestSession(path: string, name: string) {
-  const res = await fetch(path, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name }),
-  });
-  const body = await res.json().catch(() => null);
+// A GET, or a POST when there's a body. Resolves to the response, or throws an Error with a message to show.
+async function request<T>(path: string, body?: object): Promise<T> {
+  const res = await fetch(
+    path,
+    body && {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  );
+  const data = await res.json().catch(() => null);
   if (!res.ok)
     throw new Error(
-      ERROR_MESSAGES[body?.error as ApiError] ?? "Could not reach the server",
+      ERROR_MESSAGES[data?.error as ApiError] ?? "Could not reach the server",
     );
+  return data;
+}
 
-  const session: JoinResponse = body;
+export async function getRoomStatus(roomId: string) {
+  const { status } = await request<RoomStatusResponse>(
+    `/api/rooms/${encodeURIComponent(roomId)}`,
+  );
+  return status;
+}
+
+export async function createRoom(name: string) {
+  const session = await request<JoinResponse>("/api/rooms", { name });
   saveSession(session);
   return session;
 }
 
-export function createRoom(name: string) {
-  return requestSession("/api/rooms", name);
-}
-
-export function joinRoom(roomId: string, name: string) {
-  return requestSession(
+export async function joinRoom(roomId: string, name: string) {
+  const session = await request<JoinResponse>(
     `/api/rooms/${encodeURIComponent(roomId)}/players`,
-    name,
+    { name },
   );
+  saveSession(session);
+  return session;
 }
