@@ -4,7 +4,6 @@ import type {
   JoinResponse,
   RoomStatusResponse,
 } from "../../../shared/types.ts";
-import { saveSession } from "./session.ts";
 
 export const ERROR_MESSAGES: Record<ApiError, string> = {
   BAD_INPUT: "Please enter a name",
@@ -47,11 +46,9 @@ export async function createRoom() {
   return roomId;
 }
 
-export async function joinRoom(roomId: string, name: string) {
-  const session = await request<JoinResponse>(
+export function joinRoom(roomId: string, name: string) {
+  return request<JoinResponse>(
     `/api/rooms/${encodeURIComponent(roomId)}/players`,
     { name },
   );
-  saveSession(session);
-  return session;
 }

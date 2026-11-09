@@ -4,7 +4,7 @@ import Dice from "../components/Dice.tsx";
 import Scoreboard from "../components/Scoreboard.tsx";
 import { useRoom } from "../hooks/useRoom.ts";
 import { ERROR_MESSAGES } from "../lib/api.ts";
-import { loadSession } from "../lib/session.ts";
+import { socket } from "../lib/socket.ts";
 import {
   DICE_COUNT,
   ROLLS_PER_TURN,
@@ -17,8 +17,7 @@ const NONE_HELD = Array<boolean>(DICE_COUNT).fill(false);
 // No scoring yet: the current player rolls the dice and ends their turn
 function GamePage() {
   const roomId = useParams().roomId!.toUpperCase();
-  const [session] = useState(() => loadSession(roomId));
-  const { room, leave, roll, endTurn } = useRoom(session);
+  const { session, room, leave } = useRoom(roomId);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [rolling, setRolling] = useState(false);
@@ -29,9 +28,10 @@ function GamePage() {
   }
 
   // Disables the buttons until the server answers or the connection drops, so a double click sends only one request
-  async function send(request: Promise<AckResponse | undefined>) {
+  async function send(request: Promise<AckResponse>) {
     setBusy(true);
-    const response = await request;
+    // Rejects if the connection drops before the server answers
+    const response = await request.catch(() => undefined);
     setBusy(false);
     setError(response && !response.ok ? ERROR_MESSAGES[response.error] : "");
     return response?.ok;
@@ -39,13 +39,13 @@ function GamePage() {
 
   async function handleRoll() {
     setRolling(true);
-    await send(roll(held));
+    await send(socket.emitWithAck("turn:roll", { held }));
     setRolling(false);
   }
 
   async function handleEndTurn() {
     // The next turn starts with nothing held. This can't wait for currentPlayerId to change: in a one-player game it doesn't.
-    if (await send(endTurn())) setHeld(NONE_HELD);
+    if (await send(socket.emitWithAck("turn:end"))) setHeld(NONE_HELD);
   }
 
   // No session = player not in this game, redirect to home page

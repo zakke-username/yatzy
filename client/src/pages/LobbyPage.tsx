@@ -4,23 +4,21 @@ import LobbyInvite from "../components/LobbyInvite.tsx";
 import NameDialog from "../components/NameDialog.tsx";
 import PlayerList from "../components/PlayerList.tsx";
 import { useRoom } from "../hooks/useRoom.ts";
-import { ERROR_MESSAGES, getRoomStatus, joinRoom } from "../lib/api.ts";
-import { loadSession } from "../lib/session.ts";
+import { ERROR_MESSAGES, getRoomStatus } from "../lib/api.ts";
+import { socket } from "../lib/socket.ts";
 import "./LobbyPage.css";
 
 function LobbyPage() {
   const roomId = useParams().roomId!.toUpperCase();
   const navigate = useNavigate();
-  const [session, setSession] = useState(() => loadSession(roomId));
-  const { room, leave, start } = useRoom(session);
+  const { session, room, join, leave } = useRoom(roomId);
   const [error, setError] = useState("");
   const [joinable, setJoinable] = useState(false);
 
   // Check if room can be joined
   useEffect(() => {
     if (session) return;
-    // Do not redirect if player has already left the page
-    let ignoreRedirect = false;
+    let ignoreRedirect = false; // Don't redirect if player has already left the page
     async function checkRoom() {
       try {
         const status = await getRoomStatus(roomId);
@@ -49,18 +47,14 @@ function LobbyPage() {
 
   async function startGame() {
     // On success the new status arrives in room:state, which sends everyone to the game page
-    const response = await start();
-    if (response && !response.ok) setError(ERROR_MESSAGES[response.error]);
+    // Rejects if the connection drops before the server answers
+    const res = await socket.emitWithAck("game:start").catch(() => undefined);
+    if (res && !res.ok) setError(ERROR_MESSAGES[res.error]);
   }
 
   // No token for this room in this tab yet -> join as a new player
   if (!session && joinable) {
-    return (
-      <NameDialog
-        onSubmit={async (name) => setSession(await joinRoom(roomId, name))}
-        onCancel={() => navigate("/")}
-      />
-    );
+    return <NameDialog onSubmit={join} onCancel={() => navigate("/")} />;
   }
 
   if (!session || !room) {
