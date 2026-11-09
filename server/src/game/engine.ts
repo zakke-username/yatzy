@@ -48,6 +48,7 @@ export type Room = {
   players: Player[];
   currentPlayerId: string | null;
   dice: number[];
+  held: boolean[];
   rollsLeft: number;
 };
 
@@ -75,6 +76,7 @@ export function createRoom(): Room {
     currentPlayerId: null,
     // The game starts with these, and each turn starts with the dice the last one left
     dice: Array.from({ length: DICE_COUNT }, () => randomInt(1, 7)),
+    held: Array<boolean>(DICE_COUNT).fill(false),
     rollsLeft: 0,
   };
 }
@@ -109,10 +111,11 @@ export function rollDice(
   if (playerId !== room.currentPlayerId) return "NOT_YOUR_TURN";
   if (room.rollsLeft === 0) return "NO_ROLLS_LEFT";
 
-  // On first roll, all dice are rolled
+  // The first roll rerolls all five, whatever is held. The holds that applied are kept, so every client knows which dice were rerolled.
   const firstRoll = room.rollsLeft === ROLLS_PER_TURN;
+  room.held = held.map((isHeld) => isHeld && !firstRoll);
   room.dice = room.dice.map((value, i) =>
-    held[i] && !firstRoll ? value : randomInt(1, 7),
+    room.held[i] ? value : randomInt(1, 7),
   );
 
   room.rollsLeft--;
@@ -155,6 +158,7 @@ export function toPublicState(room: Room): PublicRoomState {
     ),
     currentPlayerId: room.currentPlayerId,
     dice: room.dice,
+    held: room.held,
     rollsLeft: room.rollsLeft,
     potentialScores: calculateScores(room.dice),
   };

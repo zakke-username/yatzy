@@ -11,12 +11,15 @@ const FACES = [one, two, three, four, five, six];
 type Props = {
   values: number[];
   held: boolean[];
+  /** The roller's roll is in flight: the dice that aren't held spin until the server answers */
   rolling: boolean;
+  /** The dice the latest roll rerolled, which spin to a stop when they appear */
+  landing: boolean[];
   disabled: boolean;
   onToggle: (index: number) => void;
 };
 
-function Dice({ values, held, rolling, disabled, onToggle }: Props) {
+function Dice({ values, held, rolling, landing, disabled, onToggle }: Props) {
   return (
     <div className="dice">
       {values.map((value, index) => (
@@ -27,6 +30,7 @@ function Dice({ values, held, rolling, disabled, onToggle }: Props) {
           aria-pressed={held[index]}
           disabled={disabled}
           data-spinning={rolling && !held[index]}
+          data-landing={landing[index]}
           onClick={() => onToggle(index)}
         >
           <img

@@ -71,6 +71,7 @@ function GamePage() {
     return <Navigate to={`/lobby/${room.id}`} replace />;
 
   const isMyTurn = room.currentPlayerId === session.playerId;
+  const hasRolled = room.rollsLeft < ROLLS_PER_TURN;
 
   return (
     <main className="page">
@@ -78,16 +79,15 @@ function GamePage() {
 
       <section className="stack">
         <Dice
+          // A roll always changes rollsLeft, so the new key rebuilds the dice and replays their landing spin
+          key={room.rollsLeft}
           values={room.dice}
           held={held}
           rolling={rolling}
+          // Boolean array: which dice were just rolled. For spin animation.
+          landing={room.held.map((isHeld) => hasRolled && !isHeld)}
           // Dice are disabled if not your turn, haven't yet rolled, or no rolls left
-          disabled={
-            busy ||
-            !isMyTurn ||
-            room.rollsLeft === 0 ||
-            room.rollsLeft === ROLLS_PER_TURN
-          }
+          disabled={busy || !isMyTurn || !hasRolled || room.rollsLeft === 0}
           onToggle={toggleHeld}
         />
         <button
@@ -104,9 +104,7 @@ function GamePage() {
       <Scoreboard
         players={room.players}
         currentPlayerId={room.currentPlayerId}
-        potentialScores={
-          room.rollsLeft < ROLLS_PER_TURN ? room.potentialScores : null
-        }
+        potentialScores={hasRolled ? room.potentialScores : null}
       />
 
       <button

@@ -55,6 +55,8 @@ export type PublicRoomState = {
   players: PublicPlayer[];
   currentPlayerId: string | null;
   dice: number[];
+  /** The dice the latest roll kept; the rest were rerolled. Like the dice, only meaningful once the current player has rolled. */
+  held: boolean[];
   rollsLeft: number;
   /** What the dice would score in each category. Like the dice, only meaningful once the current player has rolled. */
   potentialScores: Scores;

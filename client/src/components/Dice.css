@@ -37,24 +37,27 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  /* The roller's dice, while waiting for the server */
   .die[data-spinning="true"] {
     animation: die-spin 0.25s linear infinite;
   }
 
-  .die-face {
-    transform: rotate(2turn);
-    transition: transform 1s ease-out;
-  }
-
-  .die[data-spinning="true"] .die-face {
-    transform: none;
-    transition: none;
+  /* Every player's rerolled dice, once the new values arrive */
+  .die[data-landing="true"] .die-face {
+    animation: die-land 1s ease-out;
   }
 }
 
 @keyframes die-spin {
   to {
     transform: rotate(1turn);
+  }
+}
+
+/* Spins in from two turns back, slowing down until it stops upright */
+@keyframes die-land {
+  from {
+    transform: rotate(-2turn);
   }
 }
 
