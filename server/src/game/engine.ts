@@ -43,7 +43,7 @@ function totals(scores: Scores) {
 
 export type Room = {
   id: string;
-  hostId: string;
+  hostId: string | null;
   status: RoomStatus;
   players: Player[];
   currentPlayerId: string | null;
@@ -66,12 +66,12 @@ export function createPlayer(name: string): Player {
   return { id: randomUUID(), name, socketId: null, scores, ...totals(scores) };
 }
 
-export function createRoom(host: Player): Room {
+export function createRoom(): Room {
   return {
     id: newRoomId(),
-    hostId: host.id,
+    hostId: null,
     status: "waiting",
-    players: [host],
+    players: [],
     currentPlayerId: null,
     // The game starts with these, and each turn starts with the dice the last one left
     dice: Array.from({ length: DICE_COUNT }, () => randomInt(1, 7)),
@@ -83,6 +83,7 @@ export function addPlayer(room: Room, player: Player): ApiError | undefined {
   if (room.status !== "waiting") return "GAME_STARTED";
   if (room.players.length >= MAX_PLAYERS) return "ROOM_FULL";
   room.players.push(player);
+  room.hostId ??= player.id;
 }
 
 export function removePlayer(room: Room, playerId: string) {

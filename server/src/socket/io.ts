@@ -14,15 +14,11 @@ export type GameServer = Server<
   Session
 >;
 
-// How long a room may stay abandoned (e.g. during a page refresh) before it closes
-const CLOSE_GRACE_MS = 30_000;
+// How long a room may stay abandoned before it closes
+const CLOSE_GRACE_MS = 5 * 60_000;
 
 // Timers are live handles in this process, so they're kept here rather than on the stored room
 const closeTimers = new Map<string, NodeJS.Timeout>();
-
-// export function broadcast(io: GameServer, room: Room) {
-//   io.to(room.id).emit("room:state", toPublicState(room));
-// }
 
 export function closeRoom(io: GameServer, roomId: string) {
   io.to(roomId).emit("room:closed");

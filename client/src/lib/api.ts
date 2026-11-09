@@ -1,5 +1,6 @@
 import type {
   ApiError,
+  CreateRoomResponse,
   JoinResponse,
   RoomStatusResponse,
 } from "../../../shared/types.ts";
@@ -41,10 +42,9 @@ export async function getRoomStatus(roomId: string) {
   return status;
 }
 
-export async function createRoom(name: string) {
-  const session = await request<JoinResponse>("/api/rooms", { name });
-  saveSession(session);
-  return session;
+export async function createRoom() {
+  const { roomId } = await request<CreateRoomResponse>("/api/rooms", {});
+  return roomId;
 }
 
 export async function joinRoom(roomId: string, name: string) {

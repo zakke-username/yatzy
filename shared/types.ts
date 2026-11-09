@@ -48,7 +48,8 @@ export type PublicPlayer = {
 /** A room is both a lobby and a game */
 export type PublicRoomState = {
   id: string;
-  hostId: string;
+  /** The first player to join, so null only while the room is empty */
+  hostId: string | null;
   status: RoomStatus;
   maxPlayers: number;
   players: PublicPlayer[];
@@ -59,7 +60,12 @@ export type PublicRoomState = {
   potentialScores: Scores;
 };
 
-/** Returned when creating or joining a room. */
+/** Returned by POST /api/rooms, which creates an empty room. Its creator then joins it like anyone else. */
+export type CreateRoomResponse = {
+  roomId: string;
+};
+
+/** Returned when joining a room. */
 export type JoinResponse = {
   roomId: string;
   playerId: string;

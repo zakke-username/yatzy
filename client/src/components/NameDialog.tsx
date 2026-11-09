@@ -5,14 +5,12 @@ import "./NameDialog.css";
 const MAX_NAME_LENGTH = 20;
 
 type Props = {
-  title: string;
-  submitLabel: string;
   /** Throw an Error to show its message in the dialog */
   onSubmit: (name: string) => Promise<void>;
   onCancel: () => void;
 };
 
-function NameDialog({ title, submitLabel, onSubmit, onCancel }: Props) {
+function NameDialog({ onSubmit, onCancel }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [name, setName] = useState("");
   const [error, setError] = useState("");
@@ -47,7 +45,7 @@ function NameDialog({ title, submitLabel, onSubmit, onCancel }: Props) {
       }}
     >
       <form onSubmit={handleSubmit}>
-        <h2 id="dialog-title">{title}</h2>
+        <h2 id="dialog-title">Join game</h2>
         <input
           className="input"
           placeholder="Your name"
@@ -68,7 +66,7 @@ function NameDialog({ title, submitLabel, onSubmit, onCancel }: Props) {
             Cancel
           </button>
           <button type="submit" className="button" disabled={busy}>
-            {submitLabel}
+            Join
           </button>
         </div>
       </form>

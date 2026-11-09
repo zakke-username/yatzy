@@ -57,8 +57,6 @@ function LobbyPage() {
   if (!session && joinable) {
     return (
       <NameDialog
-        title="Join game"
-        submitLabel="Join"
         onSubmit={async (name) => setSession(await joinRoom(roomId, name))}
         onCancel={() => navigate("/")}
       />

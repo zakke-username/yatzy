@@ -1,18 +1,20 @@
 import { useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router";
-import NameDialog from "../components/NameDialog.tsx";
 import { createRoom } from "../lib/api.ts";
 import "./HomePage.css";
 
 function HomePage() {
   const navigate = useNavigate();
   const message = (useLocation().state as { message?: string } | null)?.message;
-  const [creating, setCreating] = useState(false);
+  const [error, setError] = useState("");
   const [code, setCode] = useState("");
 
-  async function create(name: string) {
-    const { roomId } = await createRoom(name);
-    navigate(`/lobby/${roomId}`);
+  async function create() {
+    try {
+      navigate(`/lobby/${await createRoom()}`);
+    } catch (err) {
+      setError((err as Error).message);
+    }
   }
 
   function join(event: FormEvent<HTMLFormElement>) {
@@ -30,13 +32,10 @@ function HomePage() {
         </p>
       )}
 
-      <button
-        type="button"
-        className="button"
-        onClick={() => setCreating(true)}
-      >
+      <button type="button" className="button" onClick={create}>
         Create new game
       </button>
+      {error && <p className="error">{error}</p>}
 
       <div className="divider">or</div>
 
@@ -55,15 +54,6 @@ function HomePage() {
           Join
         </button>
       </form>
-
-      {creating && (
-        <NameDialog
-          title="Create game"
-          submitLabel="Create"
-          onSubmit={create}
-          onCancel={() => setCreating(false)}
-        />
-      )}
     </main>
   );
 }
