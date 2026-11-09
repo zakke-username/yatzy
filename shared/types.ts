@@ -78,7 +78,8 @@ export type ApiError =
   | "GAME_STARTED"
   | "NOT_HOST"
   | "NOT_YOUR_TURN"
-  | "NO_ROLLS_LEFT";
+  | "NO_ROLLS_LEFT"
+  | "SERVER_ERROR";
 
 /** The acknowledgement of every client event except room:leave, whose ack carries nothing */
 export type AckResponse = { ok: true } | { ok: false; error: ApiError };

@@ -1,5 +1,5 @@
 import type { DefaultEventsMap, Server } from "socket.io";
-import { toPublicState, type Room } from "../game/engine.ts";
+import { type Room } from "../game/engine.ts";
 import { deleteRoom } from "../store/rooms.ts";
 import { deleteSessions, type Session } from "../store/sessions.ts";
 import type {
@@ -20,16 +20,16 @@ const CLOSE_GRACE_MS = 30_000;
 // Timers are live handles in this process, so they're kept here rather than on the stored room
 const closeTimers = new Map<string, NodeJS.Timeout>();
 
-export function broadcast(io: GameServer, room: Room) {
-  io.to(room.id).emit("room:state", toPublicState(room));
-}
+// export function broadcast(io: GameServer, room: Room) {
+//   io.to(room.id).emit("room:state", toPublicState(room));
+// }
 
-export function closeRoom(io: GameServer, room: Room) {
-  io.to(room.id).emit("room:closed");
-  io.socketsLeave(room.id);
-  cancelCloseTimer(room.id);
-  deleteRoom(room.id);
-  deleteSessions((session) => session.roomId === room.id);
+export function closeRoom(io: GameServer, roomId: string) {
+  io.to(roomId).emit("room:closed");
+  io.socketsLeave(roomId);
+  cancelCloseTimer(roomId);
+  deleteRoom(roomId);
+  deleteSessions((session) => session.roomId === roomId);
 }
 
 // Call after anything that changes who is in the room or connected to it.
@@ -44,7 +44,7 @@ export function updateCloseTimer(io: GameServer, room: Room) {
   if (!abandoned) {
     cancelCloseTimer(room.id);
   } else if (!closeTimers.has(room.id)) {
-    const timer = setTimeout(() => closeRoom(io, room), CLOSE_GRACE_MS);
+    const timer = setTimeout(() => closeRoom(io, room.id), CLOSE_GRACE_MS);
     closeTimers.set(room.id, timer);
   }
 }

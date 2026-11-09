@@ -15,6 +15,8 @@ import {
 import { calculateScores } from "./scores.ts";
 
 export const MAX_PLAYERS = 8;
+const ROOM_ID_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const ROOM_ID_LENGTH = 6;
 
 // Ones to sixes adding up to at least 63 earn a 50 point bonus
 const BONUS_THRESHOLD = 63;
@@ -49,6 +51,14 @@ export type Room = {
   rollsLeft: number;
 };
 
+function newRoomId() {
+  let id = "";
+  for (let i = 0; i < ROOM_ID_LENGTH; i++) {
+    id += ROOM_ID_ALPHABET[randomInt(ROOM_ID_ALPHABET.length)];
+  }
+  return id;
+}
+
 export function createPlayer(name: string): Player {
   const scores = Object.fromEntries(
     CATEGORIES.map((category) => [category, 0]),
@@ -56,9 +66,9 @@ export function createPlayer(name: string): Player {
   return { id: randomUUID(), name, socketId: null, scores, ...totals(scores) };
 }
 
-export function createRoom(id: string, host: Player): Room {
+export function createRoom(host: Player): Room {
   return {
-    id,
+    id: newRoomId(),
     hostId: host.id,
     status: "waiting",
     players: [host],

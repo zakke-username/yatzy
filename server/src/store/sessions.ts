@@ -7,11 +7,12 @@ export type Session = {
 const sessions = new Map<string, Session>();
 
 export function getSession(token: string) {
-  return sessions.get(token);
+  const session = sessions.get(token);
+  return session && structuredClone(session);
 }
 
 export function saveSession(token: string, session: Session) {
-  sessions.set(token, session);
+  sessions.set(token, structuredClone(session));
 }
 
 export function deleteSessions(matches: (session: Session) => boolean) {

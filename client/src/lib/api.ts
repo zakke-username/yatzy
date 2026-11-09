@@ -13,6 +13,7 @@ export const ERROR_MESSAGES: Record<ApiError, string> = {
   NOT_HOST: "Only the host can start the game",
   NOT_YOUR_TURN: "It's not your turn",
   NO_ROLLS_LEFT: "You have no rolls left this turn",
+  SERVER_ERROR: "Something went wrong on the server",
 };
 
 // A GET, or a POST when there's a body. Resolves to the response, or throws an Error with a message to show.
