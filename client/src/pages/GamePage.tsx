@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Navigate, useParams } from "react-router";
 import Dice from "../components/Dice.tsx";
+import ResultsDialog from "../components/ResultsDialog.tsx";
 import Scoreboard from "../components/Scoreboard.tsx";
 import { useRoom } from "../hooks/useRoom.ts";
 import { ERROR_MESSAGES } from "../lib/api.ts";
@@ -72,17 +73,25 @@ function GamePage() {
   if (room.status === "waiting")
     return <Navigate to={`/lobby/${room.id}`} replace />;
 
+  const finished = room.status === "finished";
   const isMyTurn = room.currentPlayerId === session.playerId;
   const hasRolled = room.rollsLeft < ROLLS_PER_TURN;
-  const currentPlayerName = room.players.find(
-    (p) => p.id === room.currentPlayerId,
-  )?.name;
+  const currentPlayer = room.players.find((p) => p.id === room.currentPlayerId);
 
   return (
     <main className="page">
       <h1 className="game-title">
-        {isMyTurn ? <>Your turn!</> : <>{currentPlayerName}'s turn</>}
+        {finished ? (
+          <>Game over</>
+        ) : isMyTurn ? (
+          <>Your turn!</>
+        ) : (
+          <>{currentPlayer?.name}'s turn</>
+        )}
       </h1>
+      {!currentPlayer?.connected && (
+        <h3 className="error">Player disconnected, kicking in 30 seconds...</h3>
+      )}
 
       <section className="stack">
         <Dice
@@ -90,10 +99,8 @@ function GamePage() {
           key={room.rollsLeft}
           values={room.dice}
           held={held}
-          rolling={rolling}
-          // Boolean array: which dice were just rolled. For spin animation.
-          landing={room.held.map((isHeld) => hasRolled && !isHeld)}
-          // Dice are disabled if not your turn, haven't yet rolled, or no rolls left
+          rolling={rolling} // Constant "loading" spin for current turn player, stops when server responds
+          landing={room.held.map((isHeld) => hasRolled && !isHeld)} // Which dice were just rolled: short spin for all players
           disabled={busy || !isMyTurn || !hasRolled || room.rollsLeft === 0}
           onToggle={toggleHeld}
         />
@@ -120,6 +127,15 @@ function GamePage() {
       <button type="button" className="leave" onClick={leave}>
         Leave game
       </button>
+
+      {/* Leaving a finished game keeps the player in everyone's results */}
+      {finished && (
+        <ResultsDialog
+          players={room.players}
+          playerId={session.playerId}
+          onReturn={leave}
+        />
+      )}
     </main>
   );
 }

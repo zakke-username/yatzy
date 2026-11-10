@@ -3,8 +3,7 @@ import "./PlayerList.css";
 
 type Props = {
   room: PublicRoomState;
-  /** The viewing player, marked "(you)" */
-  playerId: string;
+  playerId: string; // "you"
 };
 
 function PlayerList({ room, playerId }: Props) {
@@ -26,6 +25,11 @@ function PlayerList({ room, playerId }: Props) {
               {player.id === playerId && <span className="muted"> (you)</span>}
             </span>
             {player.id === room.hostId && <span className="badge">Host</span>}
+            {!player.connected && (
+              <span className="muted">
+                (disconnected, kicking in 30 seconds...)
+              </span>
+            )}
           </li>
         ))}
       </ul>

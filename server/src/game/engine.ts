@@ -17,7 +17,6 @@ import { calculateScores } from "./scores.ts";
 export const MAX_PLAYERS = 8;
 const ROOM_ID_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const ROOM_ID_LENGTH = 6;
-
 const BONUS_THRESHOLD = 63;
 const BONUS = 50;
 
@@ -88,14 +87,21 @@ export function addPlayer(room: Room, player: Player): ApiError | undefined {
 }
 
 export function removePlayer(room: Room, playerId: string) {
+  if (room.status === "finished") return; // Final results stay visible
   if (room.currentPlayerId === playerId) nextTurn(room);
   room.players = room.players.filter((player) => player.id !== playerId);
+  if (room.hostId === playerId) room.hostId = room.players[0]?.id ?? null; // Change host
+  finishIfDone(room);
 }
 
 export function startGame(room: Room, playerId: string): ApiError | undefined {
   if (playerId !== room.hostId) return "NOT_HOST";
   if (room.status !== "waiting") return "GAME_STARTED";
 
+  // Exclude inactive players
+  for (let p of room.players) {
+    if (p.socketId === null) removePlayer(room, p.id);
+  }
   room.status = "playing";
   room.currentPlayerId = room.players[0].id;
   room.rollsLeft = ROLLS_PER_TURN;
@@ -128,12 +134,12 @@ export function endTurn(
 ): ApiError | undefined {
   if (player.id !== room.currentPlayerId) return "NOT_YOUR_TURN";
   if (room.rollsLeft === ROLLS_PER_TURN) return "NOT_ROLLED";
-  // const player = room.players.find((p) => p.id === playerId)!;
   if (player.scores[category] !== null) return "CATEGORY_TAKEN";
 
   player.scores[category] = calculateScores(room.dice)[category];
   Object.assign(player, totals(player.scores));
   nextTurn(room);
+  finishIfDone(room);
 }
 
 function nextTurn(room: Room) {
@@ -143,6 +149,17 @@ function nextTurn(room: Room) {
   const nextPlayerIndex = (currentPlayerIndex + 1) % room.players.length;
   room.currentPlayerId = room.players[nextPlayerIndex].id;
   room.rollsLeft = ROLLS_PER_TURN;
+}
+
+function finishIfDone(room: Room) {
+  if (room.status !== "playing") return;
+  const done = room.players.every(
+    (player) =>
+      player.socketId === null || !Object.values(player.scores).includes(null),
+  );
+  if (!done) return;
+  room.status = "finished";
+  room.currentPlayerId = null;
 }
 
 export function toPublicState(room: Room): PublicRoomState {

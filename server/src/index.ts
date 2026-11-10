@@ -12,7 +12,7 @@ const httpServer = createServer(app);
 const io: GameServer = new Server(httpServer);
 
 app.use(express.json());
-registerRoomRoutes(app, io);
+registerRoomRoutes(app);
 registerSocketHandlers(io);
 
 httpServer.listen(PORT, () => {

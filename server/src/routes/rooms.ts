@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import type { Express } from "express";
 import { addPlayer, createPlayer, createRoom } from "../game/engine.ts";
-import { updateCloseTimer, type GameServer } from "../socket/io.ts";
+import { updateCloseTimer } from "../socket/io.ts";
 import { getRoom, saveRoom } from "../store/rooms.ts";
 import { saveSession } from "../store/sessions.ts";
 import type {
@@ -17,7 +17,7 @@ const MAX_NAME_LENGTH = 20;
 // }
 
 // HTTP requests for checking, creating and joining rooms, because sockets use an auth token already in the handshake
-export function registerRoomRoutes(app: Express, io: GameServer) {
+export function registerRoomRoutes(app: Express) {
   app.get("/api/rooms/:roomId", (req, res) => {
     try {
       const room = getRoom(req.params.roomId);
@@ -36,7 +36,7 @@ export function registerRoomRoutes(app: Express, io: GameServer) {
         room = createRoom();
       } while (getRoom(room.id));
       saveRoom(room);
-      updateCloseTimer(io, room);
+      updateCloseTimer(room);
 
       res.status(201).json({ roomId: room.id } satisfies CreateRoomResponse);
     } catch (err) {

@@ -8,10 +8,26 @@ import {
 import { getRoom, saveRoom } from "../store/rooms.ts";
 import { deleteSessions, getSession } from "../store/sessions.ts";
 import { CATEGORIES, DICE_COUNT } from "../../../shared/types.ts";
-import { closeRoom, updateCloseTimer, type GameServer } from "./io.ts";
+import { updateCloseTimer, type GameServer } from "./io.ts";
+
+const LEAVE_GRACE_MS = 30_000;
+const leaveTimers = new Map<string, NodeJS.Timeout>();
 
 export function registerSocketHandlers(io: GameServer) {
-  // Client is identified by auth token in socket handshake
+  // Leaving and disconnecting
+  function leaveRoom(roomId: string, playerId: string) {
+    const room = getRoom(roomId);
+    const player = room?.players.find((p) => p.id === playerId);
+    if (!room || !player) return;
+
+    removePlayer(room, player.id);
+    saveRoom(room);
+    deleteSessions((session) => session.playerId === player.id);
+    updateCloseTimer(room);
+    io.to(room.id).emit("room:state", toPublicState(room));
+  }
+
+  // Auth
   io.use((socket, next) => {
     const session = getSession(socket.handshake.auth.token);
     if (!session) return next(new Error("UNAUTHORIZED"));
@@ -27,51 +43,24 @@ export function registerSocketHandlers(io: GameServer) {
     const player = room?.players.find((p) => p.id === playerId);
     if (!room || !player) return socket.disconnect(true);
 
-    // A duplicated tab shares the token, so the newest connection wins and the old one is kicked.
-    // Save first: the kick runs the old socket's disconnect handler straight away, and it must see the new socket ID
+    // Duplicated tab: kick old connection, newest wins
     const previousSocketId = player.socketId;
     player.socketId = socket.id;
     saveRoom(room);
     if (previousSocketId)
       io.sockets.sockets.get(previousSocketId)?.disconnect(true);
 
-    updateCloseTimer(io, room);
+    // Clear auto-leave timeout
+    clearTimeout(leaveTimers.get(playerId));
+    leaveTimers.delete(playerId);
+
+    updateCloseTimer(room);
     socket.join(room.id);
     io.to(room.id).emit("room:state", toPublicState(room));
 
     // Socket handlers
-    // Each one looks up the player & room again, making sure that IDs point to something valid
-    // Each one catches its own errors: Socket.IO runs handlers in process.nextTick, so a throw would crash the server and wipe every room
-    // Acked so the client disconnects only after this has run: Socket.IO drops an event that arrives together with the disconnect
-    socket.on("room:leave", (ack) => {
-      if (typeof ack !== "function") return;
-
-      try {
-        const room = getRoom(roomId);
-        const player = room?.players.find((p) => p.id === playerId);
-        if (!room || !player) return ack();
-
-        socket.leave(room.id);
-        if (room.status === "waiting" && player.id === room.hostId) {
-          // If host leaves a lobby -> close whole room
-          closeRoom(io, room.id);
-        } else {
-          // otherwise just remove player
-          removePlayer(room, player.id);
-          saveRoom(room);
-          deleteSessions((session) => session.playerId === player.id);
-          updateCloseTimer(io, room);
-          io.to(room.id).emit("room:state", toPublicState(room));
-        }
-        ack();
-      } catch (err) {
-        console.error(err);
-        ack();
-      }
-    });
-
+    // Each one looks up the player & room again, making sure that IDs still point to something that exists
     socket.on("game:start", (ack) => {
-      // The ack comes from the client too, and calling a non-function would throw
       if (typeof ack !== "function") return;
 
       try {
@@ -98,7 +87,7 @@ export function registerSocketHandlers(io: GameServer) {
       try {
         const held = payload?.held;
 
-        // Validate input: array of booleans of right length
+        // Validate input: held dice is an array of booleans of right length
         const isHeldArray =
           Array.isArray(held) &&
           held.length === DICE_COUNT &&
@@ -147,6 +136,19 @@ export function registerSocketHandlers(io: GameServer) {
       }
     });
 
+    socket.on("room:leave", (ack) => {
+      if (typeof ack !== "function") return;
+
+      try {
+        socket.leave(roomId);
+        leaveRoom(roomId, playerId);
+        ack();
+      } catch (err) {
+        console.error(err);
+        ack();
+      }
+    });
+
     socket.on("disconnect", () => {
       try {
         const room = getRoom(roomId);
@@ -156,8 +158,21 @@ export function registerSocketHandlers(io: GameServer) {
 
         player.socketId = null;
         saveRoom(room);
-        updateCloseTimer(io, room);
+        updateCloseTimer(room);
         io.to(room.id).emit("room:state", toPublicState(room));
+
+        // Automatically remove player after some time
+        leaveTimers.set(
+          playerId,
+          setTimeout(() => {
+            leaveTimers.delete(playerId);
+            try {
+              leaveRoom(roomId, playerId);
+            } catch (err) {
+              console.error(err);
+            }
+          }, LEAVE_GRACE_MS),
+        );
       } catch (err) {
         console.error(err);
       }

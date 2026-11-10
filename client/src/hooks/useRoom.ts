@@ -23,8 +23,6 @@ export function useRoom(roomId: string) {
       navigate("/", { replace: true, state: { message } });
     };
 
-    const onClosed = () => exit("Lobby closed: host has left");
-
     // Server refused token
     const onConnectError = () => {
       if (!socket.active) exit("This lobby no longer exists");
@@ -38,14 +36,12 @@ export function useRoom(roomId: string) {
 
     socket.auth = { token: session.token };
     socket.on("room:state", setRoom);
-    socket.on("room:closed", onClosed);
     socket.on("connect_error", onConnectError);
     socket.on("disconnect", onDisconnect);
     socket.connect();
 
     return () => {
       socket.off("room:state", setRoom);
-      socket.off("room:closed", onClosed);
       socket.off("connect_error", onConnectError);
       socket.off("disconnect", onDisconnect);
       socket.disconnect();

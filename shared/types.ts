@@ -48,7 +48,7 @@ export type PublicPlayer = {
 /** A room is both a lobby and a game */
 export type PublicRoomState = {
   id: string;
-  /** The first player to join, so null only while the room is empty */
+  /** The earliest joiner still in the room, so null only while it's empty */
   hostId: string | null;
   status: RoomStatus;
   maxPlayers: number;
@@ -96,7 +96,6 @@ export type AckResponse = { ok: true } | { ok: false; error: ApiError };
 
 export type ServerToClientEvents = {
   "room:state": (state: PublicRoomState) => void;
-  "room:closed": () => void;
 };
 
 export type ClientToServerEvents = {

@@ -14,38 +14,25 @@ export type GameServer = Server<
   Session
 >;
 
-// How long a room may stay abandoned before it closes
-const CLOSE_GRACE_MS = 5 * 60_000;
+// How long a room may have nobody connected before it closes
+const CLOSE_GRACE_MS = 10 * 60_000;
 
 // Timers are live handles in this process, so they're kept here rather than on the stored room
 const closeTimers = new Map<string, NodeJS.Timeout>();
 
-export function closeRoom(io: GameServer, roomId: string) {
-  io.to(roomId).emit("room:closed");
-  io.socketsLeave(roomId);
-  cancelCloseTimer(roomId);
-  deleteRoom(roomId);
-  deleteSessions((session) => session.roomId === roomId);
-}
-
 // Call after anything that changes who is in the room or connected to it.
-// A waiting room is abandoned without its host, and a started game without any connected player.
-export function updateCloseTimer(io: GameServer, room: Room) {
-  const connected = room.players.filter((player) => player.socketId !== null);
-  const abandoned =
-    room.status === "waiting"
-      ? !connected.some((player) => player.id === room.hostId)
-      : connected.length === 0;
+export function updateCloseTimer(room: Room) {
+  const abandoned = !room.players.some((player) => player.socketId !== null);
 
   if (!abandoned) {
-    cancelCloseTimer(room.id);
+    clearTimeout(closeTimers.get(room.id));
+    closeTimers.delete(room.id);
   } else if (!closeTimers.has(room.id)) {
-    const timer = setTimeout(() => closeRoom(io, room.id), CLOSE_GRACE_MS);
+    const timer = setTimeout(() => {
+      closeTimers.delete(room.id);
+      deleteRoom(room.id);
+      deleteSessions((session) => session.roomId === room.id);
+    }, CLOSE_GRACE_MS);
     closeTimers.set(room.id, timer);
   }
-}
-
-function cancelCloseTimer(roomId: string) {
-  clearTimeout(closeTimers.get(roomId));
-  closeTimers.delete(roomId);
 }
