@@ -13,6 +13,8 @@ export const ERROR_MESSAGES: Record<ApiError, string> = {
   NOT_HOST: "Only the host can start the game",
   NOT_YOUR_TURN: "It's not your turn",
   NO_ROLLS_LEFT: "You have no rolls left this turn",
+  NOT_ROLLED: "Roll the dice before scoring",
+  CATEGORY_TAKEN: "You have already scored that category",
   SERVER_ERROR: "Something went wrong on the server",
 };
 

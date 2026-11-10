@@ -7,7 +7,7 @@ import {
 } from "../game/engine.ts";
 import { getRoom, saveRoom } from "../store/rooms.ts";
 import { deleteSessions, getSession } from "../store/sessions.ts";
-import { DICE_COUNT } from "../../../shared/types.ts";
+import { CATEGORIES, DICE_COUNT } from "../../../shared/types.ts";
 import { closeRoom, updateCloseTimer, type GameServer } from "./io.ts";
 
 export function registerSocketHandlers(io: GameServer) {
@@ -122,16 +122,20 @@ export function registerSocketHandlers(io: GameServer) {
       }
     });
 
-    socket.on("turn:end", (ack) => {
+    socket.on("turn:end", (payload, ack) => {
       if (typeof ack !== "function") return;
 
       try {
+        const category = payload?.category;
+        if (!CATEGORIES.includes(category))
+          return ack({ ok: false, error: "BAD_INPUT" });
+
         const room = getRoom(roomId);
         const player = room?.players.find((p) => p.id === playerId);
         if (!room || !player)
           return ack({ ok: false, error: "ROOM_NOT_FOUND" });
 
-        const error = endTurn(room, player.id);
+        const error = endTurn(room, player, category);
         if (error) return ack({ ok: false, error });
 
         saveRoom(room);

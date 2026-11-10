@@ -30,8 +30,8 @@ export type Category = (typeof CATEGORIES)[number];
 export const DICE_COUNT = 5;
 export const ROLLS_PER_TURN = 3;
 
-/** Player's score */
-export type Scores = Record<Category, number>;
+/** A score per category, null until scored */
+export type Scores = Record<Category, number | null>;
 
 export type PublicPlayer = {
   id: string;
@@ -87,6 +87,8 @@ export type ApiError =
   | "NOT_HOST"
   | "NOT_YOUR_TURN"
   | "NO_ROLLS_LEFT"
+  | "NOT_ROLLED"
+  | "CATEGORY_TAKEN"
   | "SERVER_ERROR";
 
 /** The acknowledgement of every client event except room:leave, whose ack carries nothing */
@@ -104,5 +106,8 @@ export type ClientToServerEvents = {
     payload: { held: boolean[] },
     ack: (response: AckResponse) => void,
   ) => void;
-  "turn:end": (ack: (response: AckResponse) => void) => void;
+  "turn:end": (
+    payload: { category: Category },
+    ack: (response: AckResponse) => void,
+  ) => void;
 };

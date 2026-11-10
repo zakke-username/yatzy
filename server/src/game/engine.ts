@@ -18,7 +18,6 @@ export const MAX_PLAYERS = 8;
 const ROOM_ID_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const ROOM_ID_LENGTH = 6;
 
-// Ones to sixes adding up to at least 63 earn a 50 point bonus
 const BONUS_THRESHOLD = 63;
 const BONUS = 50;
 
@@ -35,7 +34,7 @@ export type Player = {
 // The sum, bonus and total follow from the scores, so recompute them whenever a score changes
 function totals(scores: Scores) {
   const add = (categories: readonly Category[]) =>
-    categories.reduce((sum, category) => sum + scores[category], 0);
+    categories.reduce((sum, category) => sum + (scores[category] ?? 0), 0);
   const sum = add(UPPER_CATEGORIES);
   const bonus = sum >= BONUS_THRESHOLD ? BONUS : 0;
   return { sum, bonus, total: sum + bonus + add(LOWER_CATEGORIES) };
@@ -62,7 +61,7 @@ function newRoomId() {
 
 export function createPlayer(name: string): Player {
   const scores = Object.fromEntries(
-    CATEGORIES.map((category) => [category, 0]),
+    CATEGORIES.map((category) => [category, null]),
   ) as Scores;
   return { id: randomUUID(), name, socketId: null, scores, ...totals(scores) };
 }
@@ -121,12 +120,19 @@ export function rollDice(
   room.rollsLeft--;
 }
 
-// Todo here when adding scoring:
-// - takes the selected category as parameter
-// - checks that player has rolled at least once, and that the selected category is empty. before calling next turn.
-// - sets the score, then updates the player's sum, bonus and total: Object.assign(player, totals(player.scores))
-export function endTurn(room: Room, playerId: string): ApiError | undefined {
-  if (playerId !== room.currentPlayerId) return "NOT_YOUR_TURN";
+// Scores the category with the current dice and passes the turn on
+export function endTurn(
+  room: Room,
+  player: Player,
+  category: Category,
+): ApiError | undefined {
+  if (player.id !== room.currentPlayerId) return "NOT_YOUR_TURN";
+  if (room.rollsLeft === ROLLS_PER_TURN) return "NOT_ROLLED";
+  // const player = room.players.find((p) => p.id === playerId)!;
+  if (player.scores[category] !== null) return "CATEGORY_TAKEN";
+
+  player.scores[category] = calculateScores(room.dice)[category];
+  Object.assign(player, totals(player.scores));
   nextTurn(room);
 }
 

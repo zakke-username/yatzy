@@ -37,9 +37,31 @@
   color: #fff;
 }
 
-/* What the current player's dice would score, greyed so it isn't mistaken for a score */
+/* A cell with a potential score hands its padding to the button, so the whole cell is clickable */
+.scoreboard td:has(> .potential) {
+  padding: 0;
+}
+
+/* What the current player's dice would score, greyed so it isn't mistaken for a score. Clicking one scores it.
+   The colour is set explicitly so disabled buttons look the same to every player. */
 .scoreboard .potential {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.625rem;
+  border: none;
+  background: none;
   color: var(--muted);
+  text-align: inherit;
+  cursor: pointer;
+}
+
+.scoreboard .potential:enabled:hover {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+.scoreboard .potential:disabled {
+  cursor: default;
 }
 
 /* A disconnected player's whole column is faded, like their row in the player list */

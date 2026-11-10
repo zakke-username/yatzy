@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import {
   LOWER_CATEGORIES,
   UPPER_CATEGORIES,
@@ -8,13 +7,24 @@ import {
 } from "../../../shared/types.ts";
 import "./Scoreboard.css";
 
-const LABELS: Record<Category, string> = {
+// The scorecard's rows, top to bottom
+const ROWS = [
+  ...UPPER_CATEGORIES,
+  "sum",
+  "bonus",
+  ...LOWER_CATEGORIES,
+  "total",
+] as const;
+
+const LABELS: Record<(typeof ROWS)[number], string> = {
   ones: "Ones",
   twos: "Twos",
   threes: "Threes",
   fours: "Fours",
   fives: "Fives",
   sixes: "Sixes",
+  sum: "Sum",
+  bonus: "Bonus",
   onePair: "One pair",
   twoPairs: "Two pairs",
   threeOfAKind: "Three of a kind",
@@ -24,46 +34,26 @@ const LABELS: Record<Category, string> = {
   fullHouse: "Full house",
   chance: "Chance",
   yatzy: "Yatzy",
+  total: "Total",
 };
 
 type Props = {
   players: PublicPlayer[];
   currentPlayerId: string | null;
   potentialScores: Scores | null;
+  disabled: boolean;
+  onScore: (category: Category) => void;
 };
 
-function Scoreboard({ players, currentPlayerId, potentialScores }: Props) {
-  const row = (
-    label: string,
-    score: (player: PublicPlayer) => ReactNode,
-    className?: string,
-  ) => (
-    <tr key={label} className={className}>
-      <th scope="row">{label}</th>
-      {players.map((player) => (
-        <td
-          key={player.id}
-          data-current={player.id === currentPlayerId}
-          data-offline={!player.connected}
-        >
-          {score(player)}
-        </td>
-      ))}
-    </tr>
-  );
-
-  const categoryRow = (category: Category) =>
-    row(LABELS[category], (player) =>
-      potentialScores && player.id === currentPlayerId ? (
-        <span className="potential">{potentialScores[category]}</span>
-      ) : (
-        player.scores[category]
-      ),
-    );
-
+function Scoreboard({
+  players,
+  currentPlayerId,
+  potentialScores,
+  disabled,
+  onScore,
+}: Props) {
   return (
     <section className="stack">
-      <h2 className="label">Scoreboard</h2>
       <div className="scoreboard">
         <table>
           <thead>
@@ -82,11 +72,44 @@ function Scoreboard({ players, currentPlayerId, potentialScores }: Props) {
             </tr>
           </thead>
           <tbody>
-            {UPPER_CATEGORIES.map(categoryRow)}
-            {row("Sum", (player) => player.sum, "summary")}
-            {row("Bonus", (player) => player.bonus, "summary")}
-            {LOWER_CATEGORIES.map(categoryRow)}
-            {row("Total", (player) => player.total, "summary")}
+            {ROWS.map((row) => {
+              const isSummary =
+                row === "sum" || row === "bonus" || row === "total";
+              return (
+                <tr key={row} className={isSummary ? "summary" : undefined}>
+                  <th scope="row">{LABELS[row]}</th>
+                  {players.map((player) => {
+                    const score = isSummary ? player[row] : player.scores[row];
+                    // The current player's empty categories show what their dice would score, as a button that scores it
+                    const showPotential =
+                      !isSummary &&
+                      score === null &&
+                      potentialScores &&
+                      player.id === currentPlayerId;
+                    return (
+                      <td
+                        key={player.id}
+                        data-current={player.id === currentPlayerId}
+                        data-offline={!player.connected}
+                      >
+                        {showPotential ? (
+                          <button
+                            type="button"
+                            className="potential"
+                            disabled={disabled}
+                            onClick={() => onScore(row)}
+                          >
+                            {potentialScores[row]}
+                          </button>
+                        ) : (
+                          score
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

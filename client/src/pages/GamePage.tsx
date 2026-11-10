@@ -9,12 +9,13 @@ import {
   DICE_COUNT,
   ROLLS_PER_TURN,
   type AckResponse,
+  type Category,
 } from "../../../shared/types.ts";
 import "./GamePage.css";
 
 const NONE_HELD = Array<boolean>(DICE_COUNT).fill(false);
 
-// No scoring yet: the current player rolls the dice and ends their turn
+// The current player rolls the dice, then picks a category to score, which ends their turn
 function GamePage() {
   const roomId = useParams().roomId!.toUpperCase();
   const { session, room, leave } = useRoom(roomId);
@@ -43,9 +44,10 @@ function GamePage() {
     setRolling(false);
   }
 
-  async function handleEndTurn() {
+  async function handleScore(category: Category) {
     // The next turn starts with nothing held. This can't wait for currentPlayerId to change: in a one-player game it doesn't.
-    if (await send(socket.emitWithAck("turn:end"))) setHeld(NONE_HELD);
+    if (await send(socket.emitWithAck("turn:end", { category })))
+      setHeld(NONE_HELD);
   }
 
   // No session = player not in this game, redirect to home page
@@ -72,10 +74,15 @@ function GamePage() {
 
   const isMyTurn = room.currentPlayerId === session.playerId;
   const hasRolled = room.rollsLeft < ROLLS_PER_TURN;
+  const currentPlayerName = room.players.find(
+    (p) => p.id === room.currentPlayerId,
+  )?.name;
 
   return (
     <main className="page">
-      <h1 className="game-title">Game in progress</h1>
+      <h1 className="game-title">
+        {isMyTurn ? <>Your turn!</> : <>{currentPlayerName}'s turn</>}
+      </h1>
 
       <section className="stack">
         <Dice
@@ -105,16 +112,9 @@ function GamePage() {
         players={room.players}
         currentPlayerId={room.currentPlayerId}
         potentialScores={hasRolled ? room.potentialScores : null}
-      />
-
-      <button
-        type="button"
-        className="button"
         disabled={busy || !isMyTurn}
-        onClick={handleEndTurn}
-      >
-        End turn
-      </button>
+        onScore={handleScore}
+      />
       {error && <p className="error">{error}</p>}
 
       <button type="button" className="leave" onClick={leave}>
