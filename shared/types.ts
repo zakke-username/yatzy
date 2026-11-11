@@ -89,6 +89,7 @@ export type ApiError =
   | "NO_ROLLS_LEFT"
   | "NOT_ROLLED"
   | "CATEGORY_TAKEN"
+  | "RATE_LIMITED"
   | "SERVER_ERROR";
 
 /** The acknowledgement of every client event except room:leave, whose ack carries nothing */

@@ -30,8 +30,7 @@ export function useRoom(roomId: string) {
 
     // Duplicate tab
     const onDisconnect = (reason: string) => {
-      if (reason === "io server disconnect")
-        exit("This lobby was opened in another tab");
+      if (reason === "io server disconnect") exit("Disconnected by server");
     };
 
     socket.auth = { token: session.token };

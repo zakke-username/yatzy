@@ -3,8 +3,8 @@ export type Session = {
   playerId: string;
 };
 
-// Tokens live only here, never on a room, so broadcasting room state can't leak them
 const sessions = new Map<string, Session>();
+const roomTokens = new Map<string, Map<string, string>>();
 
 export function getSession(token: string) {
   const session = sessions.get(token);
@@ -13,10 +13,22 @@ export function getSession(token: string) {
 
 export function saveSession(token: string, session: Session) {
   sessions.set(token, structuredClone(session));
+  const tokens = roomTokens.get(session.roomId) ?? new Map<string, string>();
+  tokens.set(session.playerId, token);
+  roomTokens.set(session.roomId, tokens);
 }
 
-export function deleteSessions(matches: (session: Session) => boolean) {
-  for (const [token, session] of sessions) {
-    if (matches(session)) sessions.delete(token);
+export function deleteSession(roomId: string, playerId: string) {
+  const tokens = roomTokens.get(roomId);
+  const token = tokens?.get(playerId);
+  if (!tokens || !token) return;
+  sessions.delete(token);
+  tokens.delete(playerId);
+}
+
+export function deleteRoomSessions(roomId: string) {
+  for (const token of roomTokens.get(roomId)?.values() ?? []) {
+    sessions.delete(token);
   }
+  roomTokens.delete(roomId);
 }

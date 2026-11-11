@@ -15,6 +15,7 @@ export const ERROR_MESSAGES: Record<ApiError, string> = {
   NO_ROLLS_LEFT: "You have no rolls left this turn",
   NOT_ROLLED: "Roll the dice before scoring",
   CATEGORY_TAKEN: "You have already scored that category",
+  RATE_LIMITED: "Too many requests, please try again in a minute",
   SERVER_ERROR: "Something went wrong on the server",
 };
 

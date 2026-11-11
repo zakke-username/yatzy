@@ -1,32 +1,16 @@
-import {
-  endTurn,
-  removePlayer,
-  rollDice,
-  startGame,
-  toPublicState,
-} from "../game/engine.ts";
+import { endTurn, rollDice, startGame, toPublicState } from "../game/engine.ts";
 import { getRoom, saveRoom } from "../store/rooms.ts";
-import { deleteSessions, getSession } from "../store/sessions.ts";
+import { getSession } from "../store/sessions.ts";
 import { CATEGORIES, DICE_COUNT } from "../../../shared/types.ts";
-import { updateCloseTimer, type GameServer } from "./io.ts";
-
-const LEAVE_GRACE_MS = 30_000;
-const leaveTimers = new Map<string, NodeJS.Timeout>();
+import {
+  cancelLeaveTimer,
+  leaveRoom,
+  startLeaveTimer,
+  updateCloseTimer,
+  type GameServer,
+} from "./io.ts";
 
 export function registerSocketHandlers(io: GameServer) {
-  // Leaving and disconnecting
-  function leaveRoom(roomId: string, playerId: string) {
-    const room = getRoom(roomId);
-    const player = room?.players.find((p) => p.id === playerId);
-    if (!room || !player) return;
-
-    removePlayer(room, player.id);
-    saveRoom(room);
-    deleteSessions((session) => session.playerId === player.id);
-    updateCloseTimer(room);
-    io.to(room.id).emit("room:state", toPublicState(room));
-  }
-
   // Auth
   io.use((socket, next) => {
     const session = getSession(socket.handshake.auth.token);
@@ -37,26 +21,6 @@ export function registerSocketHandlers(io: GameServer) {
 
   io.on("connection", (socket) => {
     const { roomId, playerId } = socket.data;
-
-    // Make sure that player belongs to a room
-    const room = getRoom(roomId);
-    const player = room?.players.find((p) => p.id === playerId);
-    if (!room || !player) return socket.disconnect(true);
-
-    // Duplicated tab: kick old connection, newest wins
-    const previousSocketId = player.socketId;
-    player.socketId = socket.id;
-    saveRoom(room);
-    if (previousSocketId)
-      io.sockets.sockets.get(previousSocketId)?.disconnect(true);
-
-    // Clear auto-leave timeout
-    clearTimeout(leaveTimers.get(playerId));
-    leaveTimers.delete(playerId);
-
-    updateCloseTimer(room);
-    socket.join(room.id);
-    io.to(room.id).emit("room:state", toPublicState(room));
 
     // Socket handlers
     // Each one looks up the player & room again, making sure that IDs still point to something that exists
@@ -141,7 +105,7 @@ export function registerSocketHandlers(io: GameServer) {
 
       try {
         socket.leave(roomId);
-        leaveRoom(roomId, playerId);
+        leaveRoom(io, roomId, playerId);
         ack();
       } catch (err) {
         console.error(err);
@@ -160,22 +124,33 @@ export function registerSocketHandlers(io: GameServer) {
         saveRoom(room);
         updateCloseTimer(room);
         io.to(room.id).emit("room:state", toPublicState(room));
-
-        // Automatically remove player after some time
-        leaveTimers.set(
-          playerId,
-          setTimeout(() => {
-            leaveTimers.delete(playerId);
-            try {
-              leaveRoom(roomId, playerId);
-            } catch (err) {
-              console.error(err);
-            }
-          }, LEAVE_GRACE_MS),
-        );
+        startLeaveTimer(io, roomId, playerId);
       } catch (err) {
         console.error(err);
       }
     });
+
+    // Connection handler
+    try {
+      // Make sure that player belongs to a room
+      const room = getRoom(roomId);
+      const player = room?.players.find((p) => p.id === playerId);
+      if (!room || !player) return socket.disconnect(true);
+
+      // Duplicated tab: kick old connection, newest wins
+      const previousSocketId = player.socketId;
+      player.socketId = socket.id;
+      saveRoom(room);
+      if (previousSocketId)
+        io.sockets.sockets.get(previousSocketId)?.disconnect(true);
+
+      cancelLeaveTimer(playerId);
+      updateCloseTimer(room);
+      socket.join(room.id);
+      io.to(room.id).emit("room:state", toPublicState(room));
+    } catch (err) {
+      console.error(err);
+      socket.disconnect(true);
+    }
   });
 }

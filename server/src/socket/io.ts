@@ -1,7 +1,11 @@
 import type { DefaultEventsMap, Server } from "socket.io";
-import { type Room } from "../game/engine.ts";
-import { deleteRoom } from "../store/rooms.ts";
-import { deleteSessions, type Session } from "../store/sessions.ts";
+import { removePlayer, toPublicState, type Room } from "../game/engine.ts";
+import { deleteRoom, getRoom, saveRoom } from "../store/rooms.ts";
+import {
+  deleteRoomSessions,
+  deleteSession,
+  type Session,
+} from "../store/sessions.ts";
 import type {
   ClientToServerEvents,
   ServerToClientEvents,
@@ -14,11 +18,13 @@ export type GameServer = Server<
   Session
 >;
 
-// How long a room may have nobody connected before it closes
+// Timeout to close empty room
 const CLOSE_GRACE_MS = 10 * 60_000;
+// Timeout to kick a disconnected player
+const LEAVE_GRACE_MS = 30_000;
 
-// Timers are live handles in this process, so they're kept here rather than on the stored room
 const closeTimers = new Map<string, NodeJS.Timeout>();
+const leaveTimers = new Map<string, NodeJS.Timeout>();
 
 // Call after anything that changes who is in the room or connected to it.
 export function updateCloseTimer(room: Room) {
@@ -31,8 +37,43 @@ export function updateCloseTimer(room: Room) {
     const timer = setTimeout(() => {
       closeTimers.delete(room.id);
       deleteRoom(room.id);
-      deleteSessions((session) => session.roomId === room.id);
+      deleteRoomSessions(room.id);
     }, CLOSE_GRACE_MS);
     closeTimers.set(room.id, timer);
   }
+}
+
+// Leaving, disconnecting and leave timer both end here
+export function leaveRoom(io: GameServer, roomId: string, playerId: string) {
+  const room = getRoom(roomId);
+  const player = room?.players.find((p) => p.id === playerId);
+  if (!room || !player) return;
+
+  removePlayer(room, player.id);
+  saveRoom(room);
+  deleteSession(room.id, player.id);
+  updateCloseTimer(room);
+  io.to(room.id).emit("room:state", toPublicState(room));
+}
+
+export function startLeaveTimer(
+  io: GameServer,
+  roomId: string,
+  playerId: string,
+) {
+  cancelLeaveTimer(playerId);
+  const timer = setTimeout(() => {
+    leaveTimers.delete(playerId);
+    try {
+      leaveRoom(io, roomId, playerId);
+    } catch (err) {
+      console.error(err);
+    }
+  }, LEAVE_GRACE_MS);
+  leaveTimers.set(playerId, timer);
+}
+
+export function cancelLeaveTimer(playerId: string) {
+  clearTimeout(leaveTimers.get(playerId));
+  leaveTimers.delete(playerId);
 }
