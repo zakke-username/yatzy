@@ -3,6 +3,7 @@
   margin: 1rem auto;
   font-size: 4rem;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .notice {
@@ -31,4 +32,10 @@
 
 .code-input:not(:placeholder-shown) {
   text-transform: uppercase;
+}
+
+@media (width < 512px) {
+  .home-title {
+    font-size: 3rem;
+  }
 }

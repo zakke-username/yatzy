@@ -21,7 +21,6 @@ function LobbyInvite({ roomId }: Props) {
 
   return (
     <section className="stack">
-      <h1 className="label">Lobby</h1>
       <div className="row invite">
         {/* <input
           className="input"
@@ -30,7 +29,9 @@ function LobbyInvite({ roomId }: Props) {
           value={link}
           onFocus={(event) => event.target.select()}
         /> */}
-        <h1 className="lobby-code">{roomId}</h1>
+        <p className="lobby-code">
+          Lobby: <b>{roomId}</b>
+        </p>
         <button type="button" className="button" onClick={copyLink}>
           {copied ? "Copied!" : "Copy link"}
         </button>

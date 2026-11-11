@@ -46,7 +46,7 @@ function HomePage() {
       <form className="row" onSubmit={join}>
         <input
           className="input code-input"
-          placeholder="Lobby code"
+          placeholder="Enter lobby code"
           aria-label="Lobby code"
           autoComplete="off"
           spellCheck={false}
@@ -59,9 +59,6 @@ function HomePage() {
         </button>
       </form>
     </div>
-    // <main className="page">
-
-    // </main>
   );
 }
 

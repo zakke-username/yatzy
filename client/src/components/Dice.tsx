@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import rollSoundUrl from "../assets/dice-roll.wav";
 import one from "../assets/dice/1.svg";
 import two from "../assets/dice/2.svg";
 import three from "../assets/dice/3.svg";
@@ -7,6 +9,7 @@ import six from "../assets/dice/6.svg";
 import "./Dice.css";
 
 const FACES = [one, two, three, four, five, six];
+const ROLL_SOUND = new Audio(rollSoundUrl);
 
 type Props = {
   values: number[];
@@ -20,6 +23,15 @@ type Props = {
 };
 
 function Dice({ values, held, rolling, landing, disabled, onToggle }: Props) {
+  // Roll sound
+  const anyLanding = landing.some(Boolean);
+  useEffect(() => {
+    if (!anyLanding) return;
+    ROLL_SOUND.currentTime = 0;
+    ROLL_SOUND.volume = 0.5;
+    ROLL_SOUND.play().catch(() => {});
+  }, [anyLanding]);
+
   return (
     <div className="dice">
       {values.map((value, index) => (
