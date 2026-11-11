@@ -1,14 +1,16 @@
 .dice {
   display: flex;
+  flex-direction: row;
   justify-content: center;
   /* Wide enough that neighbouring dice don't touch when turned 45° */
   gap: 1.25rem;
+  user-select: none;
 }
 
 .die {
   position: relative;
   flex: 1;
-  max-width: 4rem;
+  width: 4rem;
   padding: 0;
   border: none;
   background: none;

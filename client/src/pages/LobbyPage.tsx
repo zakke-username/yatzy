@@ -60,7 +60,7 @@ function LobbyPage() {
   if (!session || !room) {
     return (
       <main className="page">
-        <p className="muted">Connecting…</p>
+        <p>Connecting to lobby...</p>
       </main>
     );
   }
@@ -70,21 +70,23 @@ function LobbyPage() {
 
   return (
     <main className="page">
-      <LobbyInvite roomId={room.id} />
-      <PlayerList room={room} playerId={session.playerId} />
+      <div className="container">
+        <LobbyInvite roomId={room.id} />
+        <PlayerList room={room} playerId={session.playerId} />
 
-      {room.hostId === session.playerId ? (
-        <button type="button" className="button" onClick={startGame}>
-          Start game
+        {room.hostId === session.playerId ? (
+          <button type="button" className="button" onClick={startGame}>
+            Start game
+          </button>
+        ) : (
+          <p className="waiting">Waiting for host to start the game…</p>
+        )}
+        {error && <p className="error">{error}</p>}
+
+        <button type="button" className="leave" onClick={leave}>
+          Leave lobby
         </button>
-      ) : (
-        <p className="waiting">Waiting for host to start the game…</p>
-      )}
-      {error && <p className="error">{error}</p>}
-
-      <button type="button" className="leave" onClick={leave}>
-        Leave lobby
-      </button>
+      </div>
     </main>
   );
 }

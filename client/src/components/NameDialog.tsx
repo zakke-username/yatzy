@@ -48,7 +48,7 @@ function NameDialog({ onSubmit, onCancel }: Props) {
         <h2 id="dialog-title">Join game</h2>
         <input
           className="input"
-          placeholder="Your name"
+          placeholder="Enter your name"
           aria-label="Your name"
           autoComplete="nickname"
           required

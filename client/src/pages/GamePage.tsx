@@ -65,7 +65,7 @@ function GamePage() {
   if (!room) {
     return (
       <main className="page">
-        <p className="muted">Connecting to game...</p>
+        <p>Connecting to game...</p>
       </main>
     );
   }
@@ -89,46 +89,49 @@ function GamePage() {
           <>{currentPlayer?.name}'s turn</>
         )}
       </h1>
-      {!currentPlayer?.connected && (
-        <h3 className="error">Player disconnected, kicking in 30 seconds...</h3>
+      {currentPlayer && !currentPlayer?.connected && (
+        <h3 className="error">
+          Player disconnected: kicking within 30 seconds...
+        </h3>
       )}
 
-      <section className="stack">
-        <Dice
-          // A roll always changes rollsLeft, so the new key rebuilds the dice and replays their landing spin
-          key={room.rollsLeft}
-          values={room.dice}
-          held={held}
-          rolling={rolling} // Constant "loading" spin for current turn player, stops when server responds
-          landing={room.held.map((isHeld) => hasRolled && !isHeld)} // Which dice were just rolled: short spin for all players
-          disabled={busy || !isMyTurn || !hasRolled || room.rollsLeft === 0}
-          onToggle={toggleHeld}
+      <div className="row">
+        <Scoreboard
+          players={room.players}
+          currentPlayerId={room.currentPlayerId}
+          potentialScores={hasRolled ? room.potentialScores : null}
+          disabled={busy || !isMyTurn}
+          onScore={handleScore}
         />
-        <button
-          type="button"
-          className="button"
-          // Roll button disabled if not your turn or no rolls left
-          disabled={busy || !isMyTurn || room.rollsLeft === 0}
-          onClick={handleRoll}
-        >
-          Roll ({room.rollsLeft} left)
-        </button>
-      </section>
+        <section className="stack">
+          <Dice
+            // A roll always changes rollsLeft, so the new key rebuilds the dice and replays their landing spin
+            key={room.rollsLeft}
+            values={room.dice}
+            held={held}
+            rolling={rolling} // Constant "loading" spin for current turn player, stops when server responds
+            landing={room.held.map((isHeld) => hasRolled && !isHeld)} // Which dice were just rolled: short spin for all players
+            disabled={busy || !isMyTurn || !hasRolled || room.rollsLeft === 0}
+            onToggle={toggleHeld}
+          />
+          <button
+            type="button"
+            className="button"
+            // Roll button disabled if not your turn or no rolls left
+            disabled={busy || !isMyTurn || room.rollsLeft === 0}
+            onClick={handleRoll}
+          >
+            Roll ({room.rollsLeft} left)
+          </button>
+        </section>
+      </div>
 
-      <Scoreboard
-        players={room.players}
-        currentPlayerId={room.currentPlayerId}
-        potentialScores={hasRolled ? room.potentialScores : null}
-        disabled={busy || !isMyTurn}
-        onScore={handleScore}
-      />
       {error && <p className="error">{error}</p>}
 
       <button type="button" className="leave" onClick={leave}>
         Leave game
       </button>
 
-      {/* Leaving a finished game keeps the player in everyone's results */}
       {finished && (
         <ResultsDialog
           players={room.players}

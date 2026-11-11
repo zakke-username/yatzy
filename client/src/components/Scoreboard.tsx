@@ -53,7 +53,7 @@ function Scoreboard({
   onScore,
 }: Props) {
   return (
-    <section className="stack">
+    <section className="container stack">
       <div className="scoreboard">
         <table>
           <thead>

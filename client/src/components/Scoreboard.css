@@ -6,14 +6,15 @@
 .scoreboard table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-variant-numeric: tabular-nums;
 }
 
 .scoreboard th,
 .scoreboard td {
-  padding: 0.5rem 0.625rem;
+  padding: 0.5rem 1rem;
   border-bottom: 1px solid var(--border);
+  font-weight: bold;
 }
 
 .scoreboard tbody th {
@@ -24,7 +25,9 @@
 
 /* Sum, bonus and total */
 .scoreboard .summary > * {
-  font-weight: 600;
+  font-weight: bold;
+  border-top: 2px solid black;
+  border-bottom: 2px solid black;
 }
 
 /* The column of the player whose turn it is, with their name styled like the host badge */
@@ -47,11 +50,13 @@
 .scoreboard .potential {
   display: block;
   width: 100%;
-  padding: 0.5rem 0.625rem;
+  padding: 0.5rem 1rem;
   border: none;
   background: none;
   color: var(--muted);
   text-align: inherit;
+  font-style: italic;
+  font-weight: normal;
   cursor: pointer;
 }
 

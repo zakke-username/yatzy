@@ -21,7 +21,7 @@ type Props = {
 
 function Dice({ values, held, rolling, landing, disabled, onToggle }: Props) {
   return (
-    <div className="dice">
+    <div className="container dice">
       {values.map((value, index) => (
         <button
           key={index}
@@ -32,11 +32,13 @@ function Dice({ values, held, rolling, landing, disabled, onToggle }: Props) {
           data-spinning={rolling && !held[index]}
           data-landing={landing[index]}
           onClick={() => onToggle(index)}
+          draggable="false"
         >
           <img
             className="die-face"
             src={FACES[value - 1]}
             alt={String(value)}
+            draggable="false"
           />
           {held[index] && (
             <span className="die-lock" aria-hidden="true">

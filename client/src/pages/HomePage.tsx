@@ -8,12 +8,16 @@ function HomePage() {
   const message = (useLocation().state as { message?: string } | null)?.message;
   const [error, setError] = useState("");
   const [code, setCode] = useState("");
+  const [creating, setCreating] = useState(false);
 
   async function create() {
+    setCreating(true);
     try {
       navigate(`/lobby/${await createRoom()}`);
     } catch (err) {
       setError((err as Error).message);
+    } finally {
+      setCreating(false);
     }
   }
 
@@ -23,7 +27,7 @@ function HomePage() {
   }
 
   return (
-    <main className="page">
+    <div className="container">
       <h1 className="home-title">Yatzy</h1>
 
       {message && (
@@ -33,7 +37,7 @@ function HomePage() {
       )}
 
       <button type="button" className="button" onClick={create}>
-        Create new game
+        {!creating ? <>New game</> : <>Loading...</>}
       </button>
       {error && <p className="error">{error}</p>}
 
@@ -54,7 +58,10 @@ function HomePage() {
           Join
         </button>
       </form>
-    </main>
+    </div>
+    // <main className="page">
+
+    // </main>
   );
 }
 

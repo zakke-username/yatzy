@@ -1,12 +1,14 @@
 .lobby-code {
-  margin: 0;
-  font-family: ui-monospace, monospace;
-  font-size: clamp(2.5rem, 11vw, 3.5rem);
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  margin: auto;
+  /* font-family: ui-monospace, monospace; */
+  font-size: 3rem;
 }
 
-.invite .input,
+.invite {
+  justify-content: center;
+  gap: 2rem;
+}
+
 .invite .button {
-  font-size: 1.125rem;
+  font-size: medium;
 }

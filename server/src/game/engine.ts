@@ -72,7 +72,6 @@ export function createRoom(): Room {
     status: "waiting",
     players: [],
     currentPlayerId: null,
-    // The game starts with these, and each turn starts with the dice the last one left
     dice: Array.from({ length: DICE_COUNT }, () => randomInt(1, 7)),
     held: Array<boolean>(DICE_COUNT).fill(false),
     rollsLeft: 0,
@@ -98,10 +97,6 @@ export function startGame(room: Room, playerId: string): ApiError | undefined {
   if (playerId !== room.hostId) return "NOT_HOST";
   if (room.status !== "waiting") return "GAME_STARTED";
 
-  // Exclude inactive players
-  for (let p of room.players) {
-    if (p.socketId === null) removePlayer(room, p.id);
-  }
   room.status = "playing";
   room.currentPlayerId = room.players[0].id;
   room.rollsLeft = ROLLS_PER_TURN;
@@ -112,11 +107,9 @@ export function rollDice(
   playerId: string,
   held: boolean[],
 ): ApiError | undefined {
-  // currentPlayerId is null outside a game, so this also rejects the lobby
   if (playerId !== room.currentPlayerId) return "NOT_YOUR_TURN";
   if (room.rollsLeft === 0) return "NO_ROLLS_LEFT";
 
-  // The first roll rerolls all five, whatever is held. The holds that applied are kept, so every client knows which dice were rerolled.
   const firstRoll = room.rollsLeft === ROLLS_PER_TURN;
   room.held = held.map((isHeld) => isHeld && !firstRoll);
   room.dice = room.dice.map((value, i) =>

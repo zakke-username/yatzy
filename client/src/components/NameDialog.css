@@ -1,7 +1,7 @@
 .dialog form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 2rem;
 }
 
 .dialog-actions .button {
