@@ -14,7 +14,10 @@ const PORT = Number(process.env.PORT) || 3000;
 
 const app = express();
 const httpServer = createServer(app);
-const io: GameServer = new Server(httpServer);
+const io: GameServer = new Server(httpServer, {
+  maxHttpBufferSize: 10_000,
+  serveClient: false,
+});
 
 app.set("trust proxy", 1);
 app.disable("x-powered-by");
@@ -28,7 +31,7 @@ app.use(
     message: { error: "RATE_LIMITED" },
   }),
 );
-app.use(express.json());
+app.use(express.json({ limit: "1kb" }));
 registerRoomRoutes(app, io);
 
 // Error handling

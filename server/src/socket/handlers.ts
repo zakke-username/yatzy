@@ -20,6 +20,19 @@ export function registerSocketHandlers(io: GameServer) {
   });
 
   io.on("connection", (socket) => {
+    // Socket rate limiting
+    let windowStart = Date.now();
+    let events = 0;
+    socket.use((_packet, next) => {
+      const now = Date.now();
+      if (now - windowStart >= 1000) {
+        windowStart = now;
+        events = 0;
+      }
+      if (++events > 10) return socket.disconnect(true);
+      next();
+    });
+
     const { roomId, playerId } = socket.data;
 
     // Socket handlers

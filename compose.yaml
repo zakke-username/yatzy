@@ -1,0 +1,24 @@
+name: free-yatzy
+
+services:
+  server:
+    build:
+      context: .
+      target: server
+    restart: unless-stopped
+    init: true
+    ports:
+      # Only reachable from this machine (nginx). Docker's port rules bypass ufw.
+      - "127.0.0.1:3000:3000"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 256m
+    pids_limit: 100
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
