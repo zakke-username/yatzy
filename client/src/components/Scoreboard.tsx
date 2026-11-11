@@ -53,8 +53,8 @@ function Scoreboard({
   onScore,
 }: Props) {
   return (
-    <section className="container stack">
-      <div className="scoreboard">
+    <section className="container stack scoreboard">
+      <div className="scoreboard-scroll">
         <table>
           <thead>
             <tr>
@@ -65,8 +65,10 @@ function Scoreboard({
                   scope="col"
                   data-current={player.id === currentPlayerId}
                   data-offline={!player.connected}
+                  title={player.name}
                 >
-                  {player.name}
+                  {/* Spread splits by character rather than UTF-16 unit, so an emoji isn't cut in half */}
+                  {[...player.name].slice(0, 3).join("")}
                 </th>
               ))}
             </tr>

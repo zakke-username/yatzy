@@ -16,7 +16,7 @@
   background-color: white;
   box-shadow: 0 0 16px rgba(0, 0, 0, 0.33);
   /* Keeps the shadow above the scrolled content */
-  z-index: 1;
+  z-index: 2;
   gap: 1rem;
 }
 
@@ -36,7 +36,7 @@
   justify-content: safe center;
   align-items: safe center;
   gap: 2rem;
-  padding: 1rem;
+  padding: 1rem 0;
   overflow: auto;
 }
 
@@ -50,6 +50,29 @@
   margin: auto;
   gap: 2rem;
   max-width: 100%;
+}
+
+.leave-game-button {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  margin: 0.5rem;
+  padding: 0.5rem;
+  border: 2px solid black;
+  border-radius: 8px;
+  background-color: transparent;
+  box-shadow: 4px 4px black;
+}
+
+.leave-game-button:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px black;
+  cursor: pointer;
+}
+
+.leave-game-button:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
 }
 
 @media (width < 768px) {

@@ -57,11 +57,12 @@ input {
   /* align-items: center; */
   gap: 2rem;
   border: 2px solid black;
-  border-right: 6px solid black;
-  border-bottom: 6px solid black;
+  box-shadow: 4px 4px black;
   padding: 32px;
   border-radius: 16px;
   background-color: white;
+  /* vw, not %: #root is only as wide as its content, so a % would never shrink the box */
+  max-width: calc(100vw - 2rem);
 }
 
 .stack {
@@ -107,8 +108,12 @@ input {
   color: var(--text);
   font-weight: bold;
   font-size: large;
-  text-decoration: underline;
   cursor: pointer;
+}
+
+.leave:hover {
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 .button {

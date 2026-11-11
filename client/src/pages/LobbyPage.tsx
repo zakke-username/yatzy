@@ -84,7 +84,7 @@ function LobbyPage() {
         {error && <p className="error">{error}</p>}
 
         <button type="button" className="leave" onClick={leave}>
-          Leave lobby
+          ❌ Exit
         </button>
       </div>
     </main>

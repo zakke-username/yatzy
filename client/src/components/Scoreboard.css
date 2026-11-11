@@ -1,5 +1,9 @@
-/* Scrolls sideways when there are more players than fit the page */
+/* No wider than the page, so the scores scroll sideways inside it rather than the page scrolling */
 .scoreboard {
+  max-width: 100%;
+}
+
+.scoreboard-scroll {
   overflow-x: auto;
 }
 
@@ -16,16 +20,39 @@
   font-weight: bold;
 }
 
+.scoreboard tbody td {
+  border: 1px solid var(--border);
+}
+
+.scoreboard thead th,
+.scoreboard thead td {
+  border-right: 1px solid var(--border);
+}
+
 .scoreboard tbody th {
   font-weight: normal;
   text-align: left;
   white-space: nowrap;
 }
 
+/* The categories stay put while the scores scroll sideways under them.
+   z-index keeps them above faded offline columns, which opacity paints like positioned boxes. */
+.scoreboard tbody th,
+.scoreboard thead td {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--surface);
+}
+
 /* Sum, bonus and total */
 .scoreboard .summary > * {
   font-weight: bold;
-  border-top: 2px solid black;
+}
+
+/* Thick lines above and below sum, bonus and total. With separate borders, the line above is the previous row's bottom border. */
+.scoreboard .summary > *,
+.scoreboard tr:has(+ .summary) > * {
   border-bottom: 2px solid black;
 }
 

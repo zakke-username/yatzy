@@ -11,6 +11,7 @@
   border-radius: 0.75rem;
   background: var(--accent-soft);
   font-size: 1.125rem;
+  text-align: center;
 }
 
 .divider {

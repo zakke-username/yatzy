@@ -95,6 +95,9 @@ function GamePage() {
             Player disconnected: kicking within 30 seconds...
           </h3>
         )}
+        <button type="button" className="leave-game-button" onClick={leave}>
+          ❌ Exit
+        </button>
       </header>
 
       <div className="game-content">
@@ -128,14 +131,10 @@ function GamePage() {
             disabled={busy || !isMyTurn || room.rollsLeft === 0}
             onClick={handleRoll}
           >
-            Roll ({room.rollsLeft} left)
+            Roll ({room.rollsLeft}/3)
           </button>
         </div>
       </footer>
-
-      {/* <button type="button" className="leave" onClick={leave}>
-        Leave game
-      </button> */}
 
       {finished && (
         <ResultsDialog
