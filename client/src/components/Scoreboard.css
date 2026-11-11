@@ -6,7 +6,6 @@
 .scoreboard table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 1rem;
   font-variant-numeric: tabular-nums;
 }
 

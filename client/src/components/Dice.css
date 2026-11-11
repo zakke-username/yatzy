@@ -2,8 +2,7 @@
   display: flex;
   flex-direction: row;
   justify-content: center;
-  /* Wide enough that neighbouring dice don't touch when turned 45° */
-  gap: 1.25rem;
+  gap: 1rem;
   user-select: none;
 }
 

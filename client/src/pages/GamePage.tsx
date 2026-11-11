@@ -79,23 +79,25 @@ function GamePage() {
   const currentPlayer = room.players.find((p) => p.id === room.currentPlayerId);
 
   return (
-    <main className="page">
-      <h1 className="game-title">
-        {finished ? (
-          <>Game over</>
-        ) : isMyTurn ? (
-          <>Your turn!</>
-        ) : (
-          <>{currentPlayer?.name}'s turn</>
+    <main className="game">
+      <header>
+        <h1 className="game-title">
+          {finished ? (
+            <>Game over</>
+          ) : isMyTurn ? (
+            <>Your turn!</>
+          ) : (
+            <>{currentPlayer?.name}'s turn</>
+          )}
+        </h1>
+        {currentPlayer && !currentPlayer?.connected && (
+          <h3 className="error">
+            Player disconnected: kicking within 30 seconds...
+          </h3>
         )}
-      </h1>
-      {currentPlayer && !currentPlayer?.connected && (
-        <h3 className="error">
-          Player disconnected: kicking within 30 seconds...
-        </h3>
-      )}
+      </header>
 
-      <div className="row">
+      <div className="game-content">
         <Scoreboard
           players={room.players}
           currentPlayerId={room.currentPlayerId}
@@ -103,7 +105,12 @@ function GamePage() {
           disabled={busy || !isMyTurn}
           onScore={handleScore}
         />
-        <section className="stack">
+
+        {error && <p className="error">{error}</p>}
+      </div>
+
+      <footer>
+        <div className="controls">
           <Dice
             // A roll always changes rollsLeft, so the new key rebuilds the dice and replays their landing spin
             key={room.rollsLeft}
@@ -123,14 +130,12 @@ function GamePage() {
           >
             Roll ({room.rollsLeft} left)
           </button>
-        </section>
-      </div>
+        </div>
+      </footer>
 
-      {error && <p className="error">{error}</p>}
-
-      <button type="button" className="leave" onClick={leave}>
+      {/* <button type="button" className="leave" onClick={leave}>
         Leave game
-      </button>
+      </button> */}
 
       {finished && (
         <ResultsDialog

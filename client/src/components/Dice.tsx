@@ -21,7 +21,7 @@ type Props = {
 
 function Dice({ values, held, rolling, landing, disabled, onToggle }: Props) {
   return (
-    <div className="container dice">
+    <div className="dice">
       {values.map((value, index) => (
         <button
           key={index}
