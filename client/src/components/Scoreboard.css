@@ -28,16 +28,16 @@
 .scoreboard thead th,
 .scoreboard thead td {
   border-right: 1px solid var(--border);
+  border-bottom: 2px solid black;
 }
 
 .scoreboard tbody th {
   font-weight: normal;
   text-align: left;
   white-space: nowrap;
+  /* box-shadow: 0 4px black; */
 }
 
-/* The categories stay put while the scores scroll sideways under them.
-   z-index keeps them above faded offline columns, which opacity paints like positioned boxes. */
 .scoreboard tbody th,
 .scoreboard thead td {
   position: sticky;
@@ -46,18 +46,20 @@
   background: var(--surface);
 }
 
-/* Sum, bonus and total */
 .scoreboard .summary > * {
   font-weight: bold;
 }
 
-/* Thick lines above and below sum, bonus and total. With separate borders, the line above is the previous row's bottom border. */
 .scoreboard .summary > *,
 .scoreboard tr:has(+ .summary) > * {
   border-bottom: 2px solid black;
 }
 
-/* The column of the player whose turn it is, with their name styled like the host badge */
+.scoreboard tbody tr:last-child > * {
+  border-bottom: none;
+}
+
+/* Current player */
 .scoreboard [data-current="true"] {
   background: var(--accent-soft);
 }
@@ -67,13 +69,10 @@
   color: #fff;
 }
 
-/* A cell with a potential score hands its padding to the button, so the whole cell is clickable */
 .scoreboard td:has(> .potential) {
   padding: 0;
 }
 
-/* What the current player's dice would score, greyed so it isn't mistaken for a score. Clicking one scores it.
-   The colour is set explicitly so disabled buttons look the same to every player. */
 .scoreboard .potential {
   display: block;
   width: 100%;
@@ -103,7 +102,7 @@
 
 .turn-info {
   margin: 0 0 0.5rem 0;
-  text-align: left;
+  text-align: center;
 }
 
 .turn-info[data-my-turn="true"] {

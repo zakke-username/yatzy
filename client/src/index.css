@@ -1,3 +1,13 @@
+@font-face {
+  font-family: "PlaypenSans";
+  src: url("./assets/fonts/PlaypenSans-VariableFont_wght.ttf")
+    format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0020-007E; /* only ASCII, no emojis */
+}
+
 :root {
   --accent: hsl(120, 50%, 30%);
   --accent-hover: #a93226;
@@ -9,7 +19,7 @@
   --bg: #ffe;
   --surface: #fff;
 
-  font-family: system-ui, sans-serif;
+  font-family: "PlaypenSans", system-ui, sans-serif;
   color: var(--text);
   background: var(--bg);
   background-image: url("./assets/paper-background.webp");
@@ -64,8 +74,10 @@ a {
   border: 2px solid black;
   box-shadow: 4px 4px black;
   padding: 32px;
+  /* margin: 1rem; */
   border-radius: 16px;
   background-color: white;
+  max-width: calc(100vw - 2rem);
 }
 
 .stack {

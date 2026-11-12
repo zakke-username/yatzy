@@ -3,7 +3,6 @@ import { Navigate, useParams } from "react-router";
 import notificationSoundUrl from "../assets/notification.mp3";
 import Dice from "../components/Dice.tsx";
 import ResultsDialog from "../components/ResultsDialog.tsx";
-import RulesDialog from "../components/RulesDialog.tsx";
 import Scoreboard from "../components/Scoreboard.tsx";
 import { useRoom } from "../hooks/useRoom.ts";
 import { ERROR_MESSAGES } from "../lib/api.ts";
@@ -27,7 +26,6 @@ function GamePage() {
   const [busy, setBusy] = useState(false);
   const [rolling, setRolling] = useState(false);
   const [held, setHeld] = useState(NONE_HELD);
-  const [showRules, setShowRules] = useState(false);
 
   // Warn before closing
   const playing = room?.status === "playing";
@@ -152,8 +150,6 @@ function GamePage() {
             </button>
           )}
         </div>
-
-        {showRules && <RulesDialog onClose={() => setShowRules(false)} />}
 
         {finished && (
           <ResultsDialog
