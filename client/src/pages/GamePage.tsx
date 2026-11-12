@@ -96,7 +96,7 @@ function GamePage() {
 
   const finished = room.status === "finished";
   const hasRolled = room.rollsLeft < ROLLS_PER_TURN;
-  const currentPlayer = room.players.find((p) => p.id === room.currentPlayerId);
+  // const currentPlayer = room.players.find((p) => p.id === room.currentPlayerId);
 
   return (
     <main>
@@ -162,6 +162,8 @@ function GamePage() {
             onReturn={leave}
           />
         )}
+
+        {error && <div className="error">⚠️ {error}</div>}
       </div>
     </main>
   );

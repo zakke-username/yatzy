@@ -98,12 +98,16 @@ a {
 }
 
 .error {
-  /* margin: 1rem; */
-  padding: 0.5rem;
-  color: black;
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 1rem;
+  padding: 1rem;
+  color: white;
   font-size: 1rem;
   background-color: rgba(255, 0, 0, 0.5);
   border-radius: 8px;
+  font-weight: bold;
 }
 
 .leave {
