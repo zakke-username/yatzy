@@ -1,6 +1,9 @@
 import { useEffect, useRef } from "react";
+import fanfareSoundUrl from "../assets/fanfare.mp3";
 import type { PublicPlayer } from "../../../shared/types.ts";
 import "./ResultsDialog.css";
+
+const FANFARE_SOUND = new Audio(fanfareSoundUrl);
 
 type Props = {
   players: PublicPlayer[];
@@ -14,6 +17,7 @@ function ResultsDialog({ players, playerId, onReturn }: Props) {
   useEffect(() => {
     const dialog = dialogRef.current;
     if (dialog && !dialog.open) dialog.showModal();
+    FANFARE_SOUND.play().catch(() => {});
   }, []);
 
   const ranked = players.toSorted((a, b) => b.total - a.total);
@@ -40,6 +44,9 @@ function ResultsDialog({ players, playerId, onReturn }: Props) {
                 <tr key={player.id} data-winner={place === 1}>
                   <td>{place}.</td>
                   <th scope="row">
+                    {place === 1 && <>🥇 </>}
+                    {place === 2 && <>🥈 </>}
+                    {place === 3 && <>🥉 </>}
                     {player.name}
                     {player.id === playerId && (
                       <span className="muted"> (you)</span>
@@ -52,7 +59,7 @@ function ResultsDialog({ players, playerId, onReturn }: Props) {
           </tbody>
         </table>
         <button type="button" className="button" onClick={onReturn}>
-          Return to home page
+          Back to main menu
         </button>
       </div>
     </dialog>

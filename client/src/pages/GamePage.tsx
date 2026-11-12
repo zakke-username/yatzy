@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router";
+import notificationSoundUrl from "../assets/notification.mp3";
 import Dice from "../components/Dice.tsx";
 import ResultsDialog from "../components/ResultsDialog.tsx";
 import RulesDialog from "../components/RulesDialog.tsx";
@@ -16,6 +17,7 @@ import {
 import "./GamePage.css";
 
 const NONE_HELD = Array<boolean>(DICE_COUNT).fill(false);
+const NOTIFICATION_SOUND = new Audio(notificationSoundUrl);
 
 // The current player rolls the dice, then picks a category to score, which ends their turn
 function GamePage() {
@@ -37,6 +39,12 @@ function GamePage() {
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
   });
+
+  // Turn notification sound
+  const isMyTurn = !!session && room?.currentPlayerId === session.playerId;
+  useEffect(() => {
+    if (isMyTurn) NOTIFICATION_SOUND.play().catch(() => {});
+  }, [isMyTurn]);
 
   function toggleHeld(index: number) {
     setHeld(held.map((isHeld, i) => (i === index ? !isHeld : isHeld)));
@@ -87,7 +95,6 @@ function GamePage() {
     return <Navigate to={`/lobby/${room.id}`} replace />;
 
   const finished = room.status === "finished";
-  const isMyTurn = room.currentPlayerId === session.playerId;
   const hasRolled = room.rollsLeft < ROLLS_PER_TURN;
   const currentPlayer = room.players.find((p) => p.id === room.currentPlayerId);
 

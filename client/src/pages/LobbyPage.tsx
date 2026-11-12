@@ -60,7 +60,9 @@ function LobbyPage() {
   if (!session || !room) {
     return (
       <main className="page">
-        <p>Connecting to lobby...</p>
+        <p>
+          <b>Connecting to lobby...</b>
+        </p>
       </main>
     );
   }
