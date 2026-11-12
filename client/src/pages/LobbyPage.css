@@ -3,3 +3,7 @@
   color: var(--muted);
   font-size: 1.25rem;
 }
+
+.exit-button {
+  background-color: hsl(0, 75%, 50%);
+}

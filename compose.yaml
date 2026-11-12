@@ -8,14 +8,14 @@ services:
     restart: unless-stopped
     init: true
     ports:
-      # Only reachable from this machine (nginx). Docker's port rules bypass ufw.
+      # Only reachable from this machine (nginx)
       - "127.0.0.1:3000:3000"
     read_only: true
     cap_drop:
       - ALL
     security_opt:
       - no-new-privileges:true
-    mem_limit: 256m
+    mem_limit: 512m
     pids_limit: 100
     logging:
       driver: json-file

@@ -1,6 +1,7 @@
 /* No wider than the page, so the scores scroll sideways inside it rather than the page scrolling */
 .scoreboard {
   max-width: 100%;
+  z-index: 1;
 }
 
 .scoreboard-scroll {
@@ -98,4 +99,18 @@
 /* A disconnected player's whole column is faded, like their row in the player list */
 .scoreboard [data-offline="true"] {
   opacity: 0.45;
+}
+
+.turn-info {
+  margin: 0 0 0.5rem 0;
+  text-align: left;
+}
+
+.turn-info[data-my-turn="true"] {
+  color: var(--accent);
+}
+
+.turn-info[data-connected="false"] {
+  color: red;
+  font-size: large;
 }

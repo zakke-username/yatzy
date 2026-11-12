@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router";
 import Dice from "../components/Dice.tsx";
 import ResultsDialog from "../components/ResultsDialog.tsx";
@@ -26,6 +26,17 @@ function GamePage() {
   const [rolling, setRolling] = useState(false);
   const [held, setHeld] = useState(NONE_HELD);
   const [showRules, setShowRules] = useState(false);
+
+  // Warn before closing
+  const playing = room?.status === "playing";
+  useEffect(() => {
+    if (!playing) return;
+    function warn(event: BeforeUnloadEvent) {
+      event.preventDefault();
+    }
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  });
 
   function toggleHeld(index: number) {
     setHeld(held.map((isHeld, i) => (i === index ? !isHeld : isHeld)));
@@ -81,27 +92,16 @@ function GamePage() {
   const currentPlayer = room.players.find((p) => p.id === room.currentPlayerId);
 
   return (
-    <main className="game">
-      <header>
-        <button
-          type="button"
+    <main>
+      <div className="menu-buttons">
+        <a
           className="small-button"
-          aria-label="Help"
-          title="Help"
-          onClick={() => setShowRules(true)}
+          href="https://en.wikipedia.org/wiki/Yatzy#Gameplay"
+          target="_blank"
+          rel="noreferrer"
         >
           ❓
-        </button>
-        <h1 className="game-title">
-          {finished ? (
-            <>Game over</>
-          ) : isMyTurn ? (
-            <>Your turn!</>
-          ) : (
-            <>{currentPlayer?.name}'s turn</>
-          )}
-        </h1>
-
+        </a>
         <button
           type="button"
           className="small-button"
@@ -111,28 +111,18 @@ function GamePage() {
         >
           ❌
         </button>
-      </header>
-
-      {currentPlayer && !currentPlayer?.connected && (
-        <h3 className="error">
-          Player disconnected: kicking within 30 seconds...
-        </h3>
-      )}
-
-      <div className="game-content">
+      </div>
+      <div className="game">
         <Scoreboard
           players={room.players}
           currentPlayerId={room.currentPlayerId}
+          isMyTurn={isMyTurn}
           potentialScores={hasRolled ? room.potentialScores : null}
           disabled={busy || !isMyTurn}
           onScore={handleScore}
         />
 
-        {error && <p className="error">{error}</p>}
-      </div>
-
-      <footer>
-        <div className="controls">
+        <div className="container controls">
           <Dice
             // A roll always changes rollsLeft, so the new key rebuilds the dice and replays their landing spin
             key={room.rollsLeft}
@@ -143,27 +133,29 @@ function GamePage() {
             disabled={busy || !isMyTurn || !hasRolled || room.rollsLeft === 0}
             onToggle={toggleHeld}
           />
-          <button
-            type="button"
-            className="button"
-            // Roll button disabled if not your turn or no rolls left
-            disabled={busy || !isMyTurn || room.rollsLeft === 0}
-            onClick={handleRoll}
-          >
-            Roll ({room.rollsLeft}/3)
-          </button>
+          {isMyTurn && (
+            <button
+              type="button"
+              className="button"
+              // Roll button disabled if not your turn or no rolls left
+              disabled={busy || !isMyTurn || room.rollsLeft === 0}
+              onClick={handleRoll}
+            >
+              Roll ({room.rollsLeft}/3)
+            </button>
+          )}
         </div>
-      </footer>
 
-      {showRules && <RulesDialog onClose={() => setShowRules(false)} />}
+        {showRules && <RulesDialog onClose={() => setShowRules(false)} />}
 
-      {finished && (
-        <ResultsDialog
-          players={room.players}
-          playerId={session.playerId}
-          onReturn={leave}
-        />
-      )}
+        {finished && (
+          <ResultsDialog
+            players={room.players}
+            playerId={session.playerId}
+            onReturn={leave}
+          />
+        )}
+      </div>
     </main>
   );
 }

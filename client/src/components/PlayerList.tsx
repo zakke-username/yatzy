@@ -9,9 +9,6 @@ type Props = {
 function PlayerList({ room, playerId }: Props) {
   return (
     <section className="stack">
-      <h2 className="label">
-        Players {room.players.length}/{room.maxPlayers}
-      </h2>
       <ul className="players">
         {room.players.map((player) => (
           <li

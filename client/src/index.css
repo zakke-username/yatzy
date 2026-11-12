@@ -6,7 +6,7 @@
   --text: #1d1d1f;
   --muted: #6e6e73;
   --border: #d2d2d7;
-  --bg: #fafafa;
+  --bg: #ffe;
   --surface: #fff;
 
   font-family: system-ui, sans-serif;
@@ -35,6 +35,15 @@ input {
   font: inherit;
 }
 
+hr {
+  width: 100%;
+  color: rgba(0, 0, 0, 0.33);
+}
+
+a {
+  text-decoration: none;
+}
+
 .page {
   display: flex;
   flex-direction: column;
@@ -42,9 +51,6 @@ input {
   align-items: center;
   gap: 2rem;
   width: 100vw;
-  /* height: 100vh; */
-  /* width: min(100% - 3rem, 28rem);
-  min-height: 100dvh; */
   margin-inline: auto;
   padding-block: 2rem;
   text-align: center;
@@ -54,15 +60,12 @@ input {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /* align-items: center; */
-  gap: 2rem;
+  gap: 1.5rem;
   border: 2px solid black;
   box-shadow: 4px 4px black;
   padding: 32px;
   border-radius: 16px;
   background-color: white;
-  /* vw, not %: #root is only as wide as its content, so a % would never shrink the box */
-  max-width: calc(100vw - 2rem);
 }
 
 .stack {

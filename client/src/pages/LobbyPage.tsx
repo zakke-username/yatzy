@@ -72,7 +72,9 @@ function LobbyPage() {
     <main className="page">
       <div className="container">
         <LobbyInvite roomId={room.id} />
+        <hr></hr>
         <PlayerList room={room} playerId={session.playerId} />
+        <hr></hr>
 
         {room.hostId === session.playerId ? (
           <button type="button" className="button" onClick={startGame}>
@@ -83,8 +85,8 @@ function LobbyPage() {
         )}
         {error && <p className="error">{error}</p>}
 
-        <button type="button" className="leave" onClick={leave}>
-          ❌ Exit
+        <button type="button" className="button exit-button" onClick={leave}>
+          Exit lobby
         </button>
       </div>
     </main>
