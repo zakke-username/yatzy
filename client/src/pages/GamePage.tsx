@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Navigate, useParams } from "react-router";
 import Dice from "../components/Dice.tsx";
 import ResultsDialog from "../components/ResultsDialog.tsx";
+import RulesDialog from "../components/RulesDialog.tsx";
 import Scoreboard from "../components/Scoreboard.tsx";
 import { useRoom } from "../hooks/useRoom.ts";
 import { ERROR_MESSAGES } from "../lib/api.ts";
@@ -24,6 +25,7 @@ function GamePage() {
   const [busy, setBusy] = useState(false);
   const [rolling, setRolling] = useState(false);
   const [held, setHeld] = useState(NONE_HELD);
+  const [showRules, setShowRules] = useState(false);
 
   function toggleHeld(index: number) {
     setHeld(held.map((isHeld, i) => (i === index ? !isHeld : isHeld)));
@@ -81,6 +83,15 @@ function GamePage() {
   return (
     <main className="game">
       <header>
+        <button
+          type="button"
+          className="small-button"
+          aria-label="Help"
+          title="Help"
+          onClick={() => setShowRules(true)}
+        >
+          ❓
+        </button>
         <h1 className="game-title">
           {finished ? (
             <>Game over</>
@@ -90,15 +101,23 @@ function GamePage() {
             <>{currentPlayer?.name}'s turn</>
           )}
         </h1>
-        {currentPlayer && !currentPlayer?.connected && (
-          <h3 className="error">
-            Player disconnected: kicking within 30 seconds...
-          </h3>
-        )}
-        <button type="button" className="leave-game-button" onClick={leave}>
-          ❌ Exit
+
+        <button
+          type="button"
+          className="small-button"
+          aria-label="Exit"
+          title="Exit"
+          onClick={leave}
+        >
+          ❌
         </button>
       </header>
+
+      {currentPlayer && !currentPlayer?.connected && (
+        <h3 className="error">
+          Player disconnected: kicking within 30 seconds...
+        </h3>
+      )}
 
       <div className="game-content">
         <Scoreboard
@@ -135,6 +154,8 @@ function GamePage() {
           </button>
         </div>
       </footer>
+
+      {showRules && <RulesDialog onClose={() => setShowRules(false)} />}
 
       {finished && (
         <ResultsDialog
