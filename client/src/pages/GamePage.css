@@ -1,12 +1,33 @@
+.game-page {
+  min-height: 100dvh;
+}
+
+.game-header {
+  position: sticky;
+  width: 100%;
+  top: 0;
+  background-color: white;
+  border-bottom: 2px solid black;
+  z-index: 3;
+  height: 4rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.turn-info {
+  margin: 0;
+}
+
 .game {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
-  margin-bottom: 4rem;
+  padding: 2rem;
   text-align: center;
-  gap: 3rem;
+  gap: 2rem;
 }
 
 .controls {
@@ -15,18 +36,15 @@
 }
 
 .side-panels {
-  position: sticky;
-  top: 2rem;
   align-self: stretch;
   gap: inherit;
-  max-height: calc(100vh - 7rem);
+  scroll-margin-top: 6rem;
 }
 
 .menu-buttons {
   display: flex;
-  justify-content: end;
   gap: 1rem;
-  padding: 1rem;
+  font-size: small;
 }
 
 .small-button {
@@ -51,11 +69,5 @@
   50% {
     outline-color: hsl(50, 100%, 50%, 0);
     outline-offset: 4px;
-  }
-}
-
-@media (width < 800px) {
-  .game {
-    gap: 2rem;
   }
 }

@@ -27,38 +27,40 @@ function HomePage() {
   }
 
   return (
-    <div className="container">
-      <h1 className="home-title">🎲 Yatzy 🎲</h1>
+    <main className="page">
+      <div className="container">
+        <h1 className="home-title">🎲 Yatzy 🎲</h1>
 
-      {message && (
-        <p className="notice" role="status">
-          {message}
-        </p>
-      )}
+        {message && (
+          <p className="notice" role="status">
+            {message}
+          </p>
+        )}
 
-      <button type="button" className="button" onClick={create}>
-        {!creating ? <>New game</> : <>Loading...</>}
-      </button>
-      {error && <p className="error">{error}</p>}
-
-      <div className="divider">or</div>
-
-      <form className="row" onSubmit={join}>
-        <input
-          className="input code-input"
-          placeholder="Enter lobby code"
-          aria-label="Lobby code"
-          autoComplete="off"
-          spellCheck={false}
-          required
-          value={code}
-          onChange={(event) => setCode(event.target.value)}
-        />
-        <button type="submit" className="button">
-          Join
+        <button type="button" className="button" onClick={create}>
+          {!creating ? <>New game</> : <>Loading...</>}
         </button>
-      </form>
-    </div>
+        {error && <p className="error">{error}</p>}
+
+        <div className="divider">or</div>
+
+        <form className="row" onSubmit={join}>
+          <input
+            className="input code-input"
+            placeholder="Enter lobby code"
+            aria-label="Lobby code"
+            autoComplete="off"
+            spellCheck={false}
+            required
+            value={code}
+            onChange={(event) => setCode(event.target.value)}
+          />
+          <button type="submit" className="button">
+            Join
+          </button>
+        </form>
+      </div>
+    </main>
   );
 }
 

@@ -18,6 +18,7 @@ import "./GamePage.css";
 
 const NONE_HELD = Array<boolean>(DICE_COUNT).fill(false);
 const NOTIFICATION_SOUND = new Audio(notificationSoundUrl);
+NOTIFICATION_SOUND.volume = 0.4;
 
 // The current player rolls the dice, then picks a category to score, which ends their turn
 function GamePage() {
@@ -45,11 +46,21 @@ function GamePage() {
     if (isMyTurn) NOTIFICATION_SOUND.play().catch(() => {});
   }, [isMyTurn]);
 
+  // // Scroll to dice on turn start
+  // const sidePanelsRef = useRef<HTMLDivElement>(null);
+  // const turnStart = isMyTurn && room?.rollsLeft === ROLLS_PER_TURN;
+  // useEffect(() => {
+  //   if (!turnStart) return;
+  //   sidePanelsRef.current?.scrollIntoView({
+  //     behavior: "smooth",
+  //   });
+  // }, [turnStart]);
+
   function toggleHeld(index: number) {
     setHeld(held.map((isHeld, i) => (i === index ? !isHeld : isHeld)));
   }
 
-  // Disables the buttons until the server answers or the connection drops, so a double click sends only one request
+  // Disables buttons until the server answers or the connection drops, so a double click sends only one request
   async function send(request: Promise<AckResponse>) {
     setBusy(true);
     // Rejects if the connection drops before the server answers
@@ -59,14 +70,15 @@ function GamePage() {
     return response?.ok;
   }
 
+  // Roll dice. rolling = spin dice at constant pace until server responds ("loading")
   async function handleRoll() {
     setRolling(true);
     await send(socket.emitWithAck("turn:roll", { held }));
     setRolling(false);
   }
 
+  // Send scoring category
   async function handleScore(category: Category) {
-    // The next turn starts with nothing held. This can't wait for currentPlayerId to change: in a one-player game it doesn't.
     if (await send(socket.emitWithAck("turn:end", { category })))
       setHeld(NONE_HELD);
   }
@@ -97,34 +109,49 @@ function GamePage() {
 
   const finished = room.status === "finished";
   const hasRolled = room.rollsLeft < ROLLS_PER_TURN;
-  // const currentPlayer = room.players.find((p) => p.id === room.currentPlayerId);
+  const currentPlayer = room.players.find((p) => p.id === room.currentPlayerId);
 
   return (
-    <main>
-      <div className="menu-buttons">
-        <a
-          className="button small-button"
-          href="https://en.wikipedia.org/wiki/Yatzy#Gameplay"
-          target="_blank"
-          rel="noreferrer"
+    <main className="game-page">
+      <header className="game-header">
+        <h2
+          className="turn-info"
+          data-my-turn={isMyTurn}
+          data-connected={currentPlayer?.connected}
         >
-          ❓
-        </a>
-        <button
-          type="button"
-          className="button small-button"
-          aria-label="Exit"
-          title="Exit"
-          onClick={leave}
-        >
-          ❌
-        </button>
-      </div>
+          🎲{" "}
+          {currentPlayer?.connected ? (
+            <>
+              {isMyTurn ? <>Your turn!</> : <>{currentPlayer?.name}'s turn</>}
+            </>
+          ) : (
+            <>{currentPlayer?.name} has disconnected: kicking in 30 s...</>
+          )}
+        </h2>
+        <div className="menu-buttons">
+          <a
+            className="button small-button"
+            href="https://en.wikipedia.org/wiki/Yatzy#Gameplay"
+            target="_blank"
+            rel="noreferrer"
+          >
+            ❓
+          </a>
+          <button
+            type="button"
+            className="button small-button"
+            aria-label="Exit"
+            title="Exit"
+            onClick={leave}
+          >
+            ❌
+          </button>
+        </div>
+      </header>
       <div className="game">
         <Scoreboard
           players={room.players}
           currentPlayerId={room.currentPlayerId}
-          isMyTurn={isMyTurn}
           potentialScores={hasRolled ? room.potentialScores : null}
           disabled={busy || !isMyTurn}
           onScore={handleScore}
@@ -146,8 +173,12 @@ function GamePage() {
               <button
                 type="button"
                 className="button roll-button"
-                // Roll button disabled if not your turn or no rolls left
-                disabled={busy || !isMyTurn || room.rollsLeft === 0}
+                disabled={
+                  busy ||
+                  !isMyTurn ||
+                  room.rollsLeft === 0 ||
+                  held.every((isHeld) => isHeld)
+                }
                 data-highlight={isMyTurn && !hasRolled}
                 onClick={handleRoll}
               >

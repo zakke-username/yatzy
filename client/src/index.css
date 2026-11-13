@@ -40,6 +40,10 @@ body {
   min-height: 100dvh;
 }
 
+#root {
+  width: 100%;
+}
+
 button,
 input {
   font: inherit;

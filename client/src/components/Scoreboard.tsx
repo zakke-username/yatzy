@@ -40,7 +40,6 @@ const LABELS: Record<(typeof ROWS)[number], string> = {
 type Props = {
   players: PublicPlayer[];
   currentPlayerId: string | null;
-  isMyTurn: boolean;
   potentialScores: Scores | null;
   disabled: boolean;
   onScore: (category: Category) => void;
@@ -49,27 +48,12 @@ type Props = {
 function Scoreboard({
   players,
   currentPlayerId,
-  isMyTurn,
   potentialScores,
   disabled,
   onScore,
 }: Props) {
-  const currentPlayer = players.find((p) => p.id === currentPlayerId);
-
   return (
     <section className="container stack scoreboard">
-      <h2
-        className="turn-info"
-        data-my-turn={isMyTurn}
-        data-connected={currentPlayer?.connected}
-      >
-        {currentPlayer?.connected ? (
-          <>{isMyTurn ? <>Your turn!</> : <>{currentPlayer?.name}'s turn</>}</>
-        ) : (
-          <>{currentPlayer?.name} has disconnected: kicking in 30 s...</>
-        )}
-      </h2>
-
       <div className="scoreboard-scroll">
         <table>
           <thead>
@@ -83,7 +67,6 @@ function Scoreboard({
                   data-offline={!player.connected}
                   title={player.name}
                 >
-                  {/* Spread splits by character rather than UTF-16 unit, so an emoji isn't cut in half */}
                   {[...player.name].slice(0, 3).join("")}
                 </th>
               ))}
