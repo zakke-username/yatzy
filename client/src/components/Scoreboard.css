@@ -1,4 +1,3 @@
-/* No wider than the page, so the scores scroll sideways inside it rather than the page scrolling */
 .scoreboard {
   max-width: 100%;
   z-index: 1;

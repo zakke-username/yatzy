@@ -95,8 +95,20 @@ export type ApiError =
 /** The acknowledgement of every client event except room:leave, whose ack carries nothing */
 export type AckResponse = { ok: true } | { ok: false; error: ApiError };
 
+export const MAX_MESSAGE_LENGTH = 200;
+
+/** Relayed to the room as it's sent; the server keeps no history */
+export type ChatMessage = {
+  id: string;
+  playerId: string;
+  /** The sender's name, so the message stays readable after they leave */
+  name: string;
+  text: string;
+};
+
 export type ServerToClientEvents = {
   "room:state": (state: PublicRoomState) => void;
+  "chat:message": (message: ChatMessage) => void;
 };
 
 export type ClientToServerEvents = {
@@ -108,6 +120,10 @@ export type ClientToServerEvents = {
   ) => void;
   "turn:end": (
     payload: { category: Category },
+    ack: (response: AckResponse) => void,
+  ) => void;
+  "chat:send": (
+    payload: { text: string },
     ack: (response: AckResponse) => void,
   ) => void;
 };

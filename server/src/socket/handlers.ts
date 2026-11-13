@@ -1,7 +1,12 @@
+import { randomUUID } from "node:crypto";
 import { endTurn, rollDice, startGame, toPublicState } from "../game/engine.ts";
 import { getRoom, saveRoom } from "../store/rooms.ts";
 import { getSession } from "../store/sessions.ts";
-import { CATEGORIES, DICE_COUNT } from "../../../shared/types.ts";
+import {
+  CATEGORIES,
+  DICE_COUNT,
+  MAX_MESSAGE_LENGTH,
+} from "../../../shared/types.ts";
 import {
   cancelLeaveTimer,
   leaveRoom,
@@ -106,6 +111,34 @@ export function registerSocketHandlers(io: GameServer) {
 
         saveRoom(room);
         io.to(room.id).emit("room:state", toPublicState(room));
+        ack({ ok: true });
+      } catch (err) {
+        console.error(err);
+        ack({ ok: false, error: "SERVER_ERROR" });
+      }
+    });
+
+    // Chat changes nothing in the room, so the message is only relayed
+    socket.on("chat:send", (payload, ack) => {
+      if (typeof ack !== "function") return;
+
+      try {
+        const text =
+          typeof payload?.text === "string" ? payload.text.trim() : "";
+        if (!text || text.length > MAX_MESSAGE_LENGTH)
+          return ack({ ok: false, error: "BAD_INPUT" });
+
+        const room = getRoom(roomId);
+        const player = room?.players.find((p) => p.id === playerId);
+        if (!room || !player)
+          return ack({ ok: false, error: "ROOM_NOT_FOUND" });
+
+        io.to(room.id).emit("chat:message", {
+          id: randomUUID(),
+          playerId: player.id,
+          name: player.name,
+          text,
+        });
         ack({ ok: true });
       } catch (err) {
         console.error(err);

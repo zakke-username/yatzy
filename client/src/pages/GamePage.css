@@ -1,13 +1,14 @@
 .game {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   padding: 1rem;
+  margin-bottom: 2rem;
   text-align: center;
   width: 100dvw;
-  gap: 3rem;
+  gap: 4rem;
 }
 
 .game header,
@@ -51,25 +52,29 @@
 .controls {
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
   gap: 1rem;
   max-width: 100%;
-  /* margin: 1rem; */
-  padding: 1.25rem;
-  position: sticky;
-  bottom: 1rem;
   z-index: 2;
 }
 
+.side-panels {
+  position: sticky;
+  top: 1rem;
+  display: flex;
+  align-self: stretch;
+  gap: 4rem;
+  max-height: calc(100vh - 8rem);
+  max-width: 100%;
+}
+
 .menu-buttons {
-  position: fixed;
   display: flex;
   width: 100%;
   justify-content: end;
-  top: 0;
-  right: 0;
-  padding: 1rem;
   gap: 1rem;
   z-index: 0;
+  padding: 1rem;
 }
 
 .small-button {
@@ -91,20 +96,23 @@
   transform: translate(4px, 4px);
   box-shadow: none;
 }
-
+/* 
 @media (height < 70rem) {
   .game {
     flex-direction: row;
   }
 
-  .controls {
-    align-self: flex-start;
-    top: calc(50dvh - 4rem);
+  .side-panels {
+    align-self: stretch;
   }
-}
+} */
 
 @media (width < 768px) {
-  .menu-buttons {
-    position: relative;
+  .game {
+    gap: 2rem;
+  }
+
+  .side-panels {
+    gap: 2rem;
   }
 }

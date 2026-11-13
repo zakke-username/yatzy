@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router";
 import notificationSoundUrl from "../assets/notification.mp3";
+import Chat from "../components/Chat.tsx";
 import Dice from "../components/Dice.tsx";
 import ResultsDialog from "../components/ResultsDialog.tsx";
 import Scoreboard from "../components/Scoreboard.tsx";
@@ -84,7 +85,9 @@ function GamePage() {
   if (!room) {
     return (
       <main className="page">
-        <p>Connecting to game...</p>
+        <p>
+          <b>Connecting to game...</b>
+        </p>
       </main>
     );
   }
@@ -127,28 +130,31 @@ function GamePage() {
           onScore={handleScore}
         />
 
-        <div className="container controls">
-          <Dice
-            // A roll always changes rollsLeft, so the new key rebuilds the dice and replays their landing spin
-            key={room.rollsLeft}
-            values={room.dice}
-            held={held}
-            rolling={rolling} // Constant "loading" spin for current turn player, stops when server responds
-            landing={room.held.map((isHeld) => hasRolled && !isHeld)} // Which dice were just rolled: short spin for all players
-            disabled={busy || !isMyTurn || !hasRolled || room.rollsLeft === 0}
-            onToggle={toggleHeld}
-          />
-          {isMyTurn && (
-            <button
-              type="button"
-              className="button"
-              // Roll button disabled if not your turn or no rolls left
-              disabled={busy || !isMyTurn || room.rollsLeft === 0}
-              onClick={handleRoll}
-            >
-              Roll ({room.rollsLeft}/3)
-            </button>
-          )}
+        <div className="stack side-panels">
+          <div className="container controls">
+            <Dice
+              // A roll always changes rollsLeft, so the new key rebuilds the dice and replays their landing spin
+              key={room.rollsLeft}
+              values={room.dice}
+              held={held}
+              rolling={rolling} // Constant "loading" spin for current turn player, stops when server responds
+              landing={room.held.map((isHeld) => hasRolled && !isHeld)} // Which dice were just rolled: short spin for all players
+              disabled={busy || !isMyTurn || !hasRolled || room.rollsLeft === 0}
+              onToggle={toggleHeld}
+            />
+            {isMyTurn && (
+              <button
+                type="button"
+                className="button"
+                // Roll button disabled if not your turn or no rolls left
+                disabled={busy || !isMyTurn || room.rollsLeft === 0}
+                onClick={handleRoll}
+              >
+                Roll ({room.rollsLeft}/3)
+              </button>
+            )}
+          </div>
+          <Chat playerId={session.playerId} />
         </div>
 
         {finished && (
