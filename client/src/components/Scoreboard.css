@@ -1,5 +1,4 @@
 .scoreboard {
-  max-width: 100%;
   z-index: 1;
 }
 
@@ -16,25 +15,15 @@
 .scoreboard th,
 .scoreboard td {
   padding: 0.5rem 1rem;
+  border-right: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   font-weight: bold;
-}
-
-.scoreboard tbody td {
-  border: 1px solid var(--border);
-}
-
-.scoreboard thead th,
-.scoreboard thead td {
-  border-right: 1px solid var(--border);
-  border-bottom: 2px solid black;
 }
 
 .scoreboard tbody th {
   font-weight: normal;
   text-align: left;
   white-space: nowrap;
-  /* box-shadow: 0 4px black; */
 }
 
 .scoreboard tbody th,
@@ -45,10 +34,11 @@
   background: var(--surface);
 }
 
-.scoreboard .summary > * {
+.scoreboard .summary th {
   font-weight: bold;
 }
 
+.scoreboard thead tr > *,
 .scoreboard .summary > *,
 .scoreboard tr:has(+ .summary) > * {
   border-bottom: 2px solid black;
@@ -79,19 +69,14 @@
   border: none;
   background: none;
   color: var(--muted);
-  text-align: inherit;
   font-style: italic;
   font-weight: normal;
-  cursor: pointer;
 }
 
 .scoreboard .potential:enabled:hover {
   color: var(--accent);
   font-weight: bold;
-}
-
-.scoreboard .potential:disabled {
-  cursor: default;
+  cursor: pointer;
 }
 
 /* A disconnected player's whole column is faded, like their row in the player list */
@@ -100,8 +85,7 @@
 }
 
 .turn-info {
-  margin: 0 0 0.5rem 0;
-  text-align: center;
+  margin: 0 0 0.5rem;
 }
 
 .turn-info[data-my-turn="true"] {

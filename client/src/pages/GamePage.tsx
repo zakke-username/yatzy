@@ -103,7 +103,7 @@ function GamePage() {
     <main>
       <div className="menu-buttons">
         <a
-          className="small-button"
+          className="button small-button"
           href="https://en.wikipedia.org/wiki/Yatzy#Gameplay"
           target="_blank"
           rel="noreferrer"
@@ -112,7 +112,7 @@ function GamePage() {
         </a>
         <button
           type="button"
-          className="small-button"
+          className="button small-button"
           aria-label="Exit"
           title="Exit"
           onClick={leave}

@@ -1,6 +1,5 @@
 .game {
   display: flex;
-  flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
@@ -11,108 +10,35 @@
   gap: 4rem;
 }
 
-.game header,
-.game footer {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 1rem;
-  background-color: white;
-  box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
-  z-index: 2;
-  gap: 1rem;
-}
-
-.game header {
-  border-bottom: 2px solid black;
-}
-
-.game footer {
-  border-top: 2px solid black;
-}
-
-.game-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: safe center;
-  align-items: safe center;
-  gap: 2rem;
-  padding: 1rem 0;
-  overflow: auto;
-}
-
-.game-title {
-  margin: 0 auto;
-  font-size: 1.5rem;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
 .controls {
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  gap: 1rem;
-  max-width: 100%;
-  z-index: 2;
+  padding: 1.5rem;
+  gap: 2rem;
 }
 
 .side-panels {
   position: sticky;
-  top: 1rem;
-  display: flex;
+  top: 2rem;
   align-self: stretch;
-  gap: 4rem;
+  gap: inherit;
   max-height: calc(100vh - 8rem);
-  max-width: 100%;
 }
 
 .menu-buttons {
   display: flex;
-  width: 100%;
   justify-content: end;
   gap: 1rem;
-  z-index: 0;
   padding: 1rem;
 }
 
 .small-button {
   padding: 0.5rem;
-  border: 2px solid black;
-  border-radius: 8px;
-  background-color: transparent;
-  box-shadow: 4px 4px black;
   background-color: white;
+  color: inherit;
+  font: inherit;
 }
 
-.small-button:hover {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px black;
-  cursor: pointer;
-}
-
-.small-button:active {
-  transform: translate(4px, 4px);
-  box-shadow: none;
-}
-/* 
-@media (height < 70rem) {
+@media (width < 800px) {
   .game {
-    flex-direction: row;
-  }
-
-  .side-panels {
-    align-self: stretch;
-  }
-} */
-
-@media (width < 768px) {
-  .game {
-    gap: 2rem;
-  }
-
-  .side-panels {
     gap: 2rem;
   }
 }

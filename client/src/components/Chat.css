@@ -1,21 +1,23 @@
 .chat {
+  padding: 1.5rem;
   flex: 1;
-  min-height: 16rem;
+  min-height: 20rem;
   contain: size;
-  /* padding: 1rem; */
   gap: 1rem;
+  text-align: left;
+}
+
+.chat h3 {
+  margin: 0;
 }
 
 .chat-messages {
   flex: 1;
-  display: flex;
-  flex-direction: column;
   justify-content: safe flex-end;
   gap: 0.5rem;
   margin: 0;
   padding: 0;
   list-style: none;
-  text-align: left;
   overflow-y: auto;
   overscroll-behavior: contain;
   overflow-wrap: anywhere;
@@ -31,10 +33,10 @@
 }
 
 .chat-form {
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
-.title {
-  text-align: left;
-  margin: 0;
+.chat-form input,
+.chat-form button {
+  padding: 0.5rem;
 }

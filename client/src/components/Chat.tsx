@@ -42,8 +42,8 @@ function Chat({ playerId }: Props) {
 
   return (
     <section className="container chat" aria-label="Chat">
-      <h3 className="title">Chat</h3>
-      <ul ref={listRef} className="chat-messages">
+      <h3>Chat</h3>
+      <ul ref={listRef} className="stack chat-messages">
         {messages.map((message) => (
           <li key={message.id}>
             <strong
