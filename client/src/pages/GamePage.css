@@ -4,10 +4,9 @@
   justify-content: center;
   align-items: center;
   padding: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 4rem;
   text-align: center;
-  width: 100dvw;
-  gap: 4rem;
+  gap: 3rem;
 }
 
 .controls {
@@ -20,7 +19,7 @@
   top: 2rem;
   align-self: stretch;
   gap: inherit;
-  max-height: calc(100vh - 8rem);
+  max-height: calc(100vh - 7rem);
 }
 
 .menu-buttons {
@@ -35,6 +34,24 @@
   background-color: white;
   color: inherit;
   font: inherit;
+}
+
+.roll-button[data-highlight="true"]:enabled {
+  outline: 4px solid hsl(50, 100%, 50%);
+  outline-offset: 8px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .roll-button[data-highlight="true"]:enabled {
+    animation: roll-pulse 1s ease-in-out infinite;
+  }
+}
+
+@keyframes roll-pulse {
+  50% {
+    outline-color: hsl(50, 100%, 50%, 0);
+    outline-offset: 4px;
+  }
 }
 
 @media (width < 800px) {

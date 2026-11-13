@@ -145,9 +145,10 @@ function GamePage() {
             {isMyTurn && (
               <button
                 type="button"
-                className="button"
+                className="button roll-button"
                 // Roll button disabled if not your turn or no rolls left
                 disabled={busy || !isMyTurn || room.rollsLeft === 0}
+                data-highlight={isMyTurn && !hasRolled}
                 onClick={handleRoll}
               >
                 Roll ({room.rollsLeft}/3)

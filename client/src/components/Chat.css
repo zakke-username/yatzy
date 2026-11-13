@@ -1,7 +1,7 @@
 .chat {
   padding: 1.5rem;
   flex: 1;
-  min-height: 20rem;
+  min-height: 12rem;
   contain: size;
   gap: 1rem;
   text-align: left;
@@ -9,6 +9,7 @@
 
 .chat h3 {
   margin: 0;
+  text-align: center;
 }
 
 .chat-messages {
@@ -39,4 +40,22 @@
 .chat-form input,
 .chat-form button {
   padding: 0.5rem;
+}
+
+/* Phone screen: taller chat window at bottom of screen */
+@media (width < 800px) {
+  .chat {
+    min-height: 24rem;
+  }
+}
+
+/* Chat window shrinks with screen height: make more visible */
+@media (height < 600px) {
+  .chat {
+    font-size: small;
+  }
+
+  .chat h3 {
+    display: none;
+  }
 }

@@ -66,7 +66,7 @@ function Scoreboard({
         {currentPlayer?.connected ? (
           <>{isMyTurn ? <>Your turn!</> : <>{currentPlayer?.name}'s turn</>}</>
         ) : (
-          <>{currentPlayer?.name} has disconnected, kicking in 30 s...</>
+          <>{currentPlayer?.name} has disconnected: kicking in 30 s...</>
         )}
       </h2>
 

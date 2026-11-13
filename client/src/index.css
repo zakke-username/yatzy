@@ -21,7 +21,7 @@
 
   font-family: "PlaypenSans", system-ui, sans-serif;
   color: var(--text);
-  background: var(--bg);
+  background-color: var(--bg);
   background-image: url("./assets/paper-background.webp");
 }
 
