@@ -1,34 +1,40 @@
+import { redis } from "./redis.ts";
+
 export type Session = {
   roomId: string;
   playerId: string;
 };
 
-const sessions = new Map<string, Session>();
-const roomTokens = new Map<string, Map<string, string>>();
+const sessionKey = (token: string) => `session:${token}`;
 
-export function getSession(token: string) {
-  const session = sessions.get(token);
-  return session && structuredClone(session);
+// Map rooms (incl. player id) to tokens: otherwise you'd have to scan through all sessions whenever deleting rooms
+const tokensKey = (roomId: string) => `room:${roomId}:tokens`;
+
+export async function getSession(token: string): Promise<Session | undefined> {
+  const json = await redis.get(sessionKey(token));
+  return json ? JSON.parse(json) : undefined;
 }
 
-export function saveSession(token: string, session: Session) {
-  sessions.set(token, structuredClone(session));
-  const tokens = roomTokens.get(session.roomId) ?? new Map<string, string>();
-  tokens.set(session.playerId, token);
-  roomTokens.set(session.roomId, tokens);
+// multi/exec (atomic write) keeps sessions and rooms synchronized
+export async function saveSession(token: string, session: Session) {
+  await redis
+    .multi()
+    .set(sessionKey(token), JSON.stringify(session))
+    .hSet(tokensKey(session.roomId), session.playerId, token)
+    .exec();
 }
 
-export function deleteSession(roomId: string, playerId: string) {
-  const tokens = roomTokens.get(roomId);
-  const token = tokens?.get(playerId);
-  if (!tokens || !token) return;
-  sessions.delete(token);
-  tokens.delete(playerId);
+export async function deleteSession(roomId: string, playerId: string) {
+  const token = await redis.hGet(tokensKey(roomId), playerId);
+  if (!token) return;
+  await redis
+    .multi()
+    .del(sessionKey(token))
+    .hDel(tokensKey(roomId), playerId)
+    .exec();
 }
 
-export function deleteRoomSessions(roomId: string) {
-  for (const token of roomTokens.get(roomId)?.values() ?? []) {
-    sessions.delete(token);
-  }
-  roomTokens.delete(roomId);
+export async function deleteRoomSessions(roomId: string) {
+  const tokens = await redis.hVals(tokensKey(roomId));
+  await redis.del([tokensKey(roomId), ...tokens.map(sessionKey)]);
 }

@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { createAdapter } from "@socket.io/redis-adapter";
 import express, {
   type NextFunction,
   type Request,
@@ -8,15 +9,24 @@ import { rateLimit } from "express-rate-limit";
 import { Server } from "socket.io";
 import { registerRoomRoutes } from "./routes/rooms.ts";
 import { registerSocketHandlers } from "./socket/handlers.ts";
-import type { GameServer } from "./socket/io.ts";
+import { startTimerSweep, type GameServer } from "./socket/io.ts";
+import { redis } from "./store/redis.ts";
 
 const PORT = Number(process.env.PORT) || 3000;
+
+// Redis subscriber connection
+const subscriber = await redis
+  .duplicate()
+  .on("error", (err) => console.error(err))
+  .connect();
 
 const app = express();
 const httpServer = createServer(app);
 const io: GameServer = new Server(httpServer, {
   maxHttpBufferSize: 10_000,
   serveClient: false,
+  transports: ["websocket"], // connection stays on one instance
+  adapter: createAdapter(redis, subscriber),
 });
 
 app.set("trust proxy", 1);
@@ -32,9 +42,9 @@ app.use(
   }),
 );
 app.use(express.json({ limit: "1kb" }));
-registerRoomRoutes(app, io);
+registerRoomRoutes(app);
 
-// Error handling
+// HTTP route error handling
 app.use(
   (
     err: { status?: number },
@@ -50,6 +60,7 @@ app.use(
 );
 
 registerSocketHandlers(io);
+startTimerSweep(io);
 
 httpServer.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);

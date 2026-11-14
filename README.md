@@ -1,41 +1,42 @@
-# Free Yatzy
+# Yatzy
 
-Multiplayer browser Yatzy. React + Vite client and Express + Socket.IO server in an npm workspaces monorepo.
+Multiplayer browser Yatzy written in TypeScript.
+
+Play: **[freeyatzy.com](https://freeyatzy.com/)**
+
+Simple, quick, easy. No login. Start a game for 1-8 players with a couple of clicks.
+
+## Tech stack
+
+- **React + Vite** front-end
+- **Express** HTTP routing
+- **Socket.io** for real time communication
+- **Redis** as state storage, to allow for multiple server instances
 
 ## Requirements
 
-Node.js 26 LTS (22.22+ also works).
+- Node.js (22.22+)
+- Redis 7+
 
-## Getting started
+## Setup
+
+Start Redis, using Docker for example:
+
+```sh
+docker run -d --name free-yatzy-redis -p 127.0.0.1:6379:6379 redis:8-alpine
+```
+
+Then run from repository's root:
 
 ```sh
 npm install
 npm run dev
 ```
 
-- Client: http://localhost:5173
-- Server: http://localhost:3000
-
-In development, Vite proxies `/api` and `/socket.io` to the server, so the client only ever talks to its own origin. To simulate several players, open the client in multiple tabs. Each tab is a separate player.
-
-## Scripts
-
-Run from the repo root:
-
-| Script              | Description                                                    |
-| ------------------- | -------------------------------------------------------------- |
-| `npm run dev`       | Start server (auto-restart) and client (HMR) together          |
-| `npm run build`     | Typecheck and build the client to `client/dist`                |
-| `npm run typecheck` | Typecheck both workspaces                                      |
-| `npm run lint`      | Lint everything with Oxlint                                    |
-| `npm run format`    | Format everything with Prettier (`format:check` to only check) |
-
-## Structure
+## Repo structure
 
 ```
-client/   React + Vite app (pages, components, hooks, lib)
-server/   Express + Socket.IO (game engine, routes, socket, store; TypeScript run directly by Node, no build step)
-shared/   API types used by both (types.ts)
+client/   Front end app: pages, components, hooks, etc. (pages, components, hooks, lib)
+server/   Express + Socket.IO: game engine, routes, sockets, store
+shared/   Types used by both
 ```
-
-See [NOTES.md](NOTES.md) for the design.

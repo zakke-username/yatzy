@@ -4,8 +4,7 @@ import type {
   ServerToClientEvents,
 } from "../../../shared/types.ts";
 
-// Connects to the page's own origin; Vite proxies /socket.io to the server in development.
-// useRoom connects it once the player has a session token.
 export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io({
   autoConnect: false,
+  transports: ["websocket"],
 });

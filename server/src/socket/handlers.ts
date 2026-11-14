@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { endTurn, rollDice, startGame, toPublicState } from "../game/engine.ts";
-import { getRoom, saveRoom } from "../store/rooms.ts";
+import { getRoom, lockRoom, saveRoom } from "../store/rooms.ts";
 import { getSession } from "../store/sessions.ts";
 import {
   CATEGORIES,
@@ -17,14 +17,19 @@ import {
 
 export function registerSocketHandlers(io: GameServer) {
   // Auth
-  io.use((socket, next) => {
-    const session = getSession(socket.handshake.auth.token);
-    if (!session) return next(new Error("UNAUTHORIZED"));
-    socket.data = session;
-    next();
+  io.use(async (socket, next) => {
+    try {
+      const session = await getSession(socket.handshake.auth.token);
+      if (!session) return next(new Error("UNAUTHORIZED"));
+      socket.data = session;
+      next();
+    } catch (err) {
+      console.error(err);
+      next(new Error("SERVER_ERROR"));
+    }
   });
 
-  io.on("connection", (socket) => {
+  io.on("connection", async (socket) => {
     // Socket rate limiting
     let windowStart = Date.now();
     let events = 0;
@@ -42,28 +47,30 @@ export function registerSocketHandlers(io: GameServer) {
 
     // Socket handlers
     // Each one looks up the player & room again, making sure that IDs still point to something that exists
-    socket.on("game:start", (ack) => {
+    socket.on("game:start", async (ack) => {
       if (typeof ack !== "function") return;
 
       try {
-        const room = getRoom(roomId);
-        const player = room?.players.find((p) => p.id === playerId);
-        if (!room || !player)
-          return ack({ ok: false, error: "ROOM_NOT_FOUND" });
+        await lockRoom(roomId, async () => {
+          const room = await getRoom(roomId);
+          const player = room?.players.find((p) => p.id === playerId);
+          if (!room || !player)
+            return ack({ ok: false, error: "ROOM_NOT_FOUND" });
 
-        const error = startGame(room, player.id);
-        if (error) return ack({ ok: false, error });
+          const error = startGame(room, player.id);
+          if (error) return ack({ ok: false, error });
 
-        saveRoom(room);
-        io.to(room.id).emit("room:state", toPublicState(room));
-        ack({ ok: true });
+          await saveRoom(room);
+          io.to(room.id).emit("room:state", toPublicState(room));
+          ack({ ok: true });
+        });
       } catch (err) {
         console.error(err);
         ack({ ok: false, error: "SERVER_ERROR" });
       }
     });
 
-    socket.on("turn:roll", (payload, ack) => {
+    socket.on("turn:roll", async (payload, ack) => {
       if (typeof ack !== "function") return;
 
       try {
@@ -76,24 +83,26 @@ export function registerSocketHandlers(io: GameServer) {
           held.every((item) => typeof item === "boolean");
         if (!isHeldArray) return ack({ ok: false, error: "BAD_INPUT" });
 
-        const room = getRoom(roomId);
-        const player = room?.players.find((p) => p.id === playerId);
-        if (!room || !player)
-          return ack({ ok: false, error: "ROOM_NOT_FOUND" });
+        await lockRoom(roomId, async () => {
+          const room = await getRoom(roomId);
+          const player = room?.players.find((p) => p.id === playerId);
+          if (!room || !player)
+            return ack({ ok: false, error: "ROOM_NOT_FOUND" });
 
-        const error = rollDice(room, player.id, held);
-        if (error) return ack({ ok: false, error });
+          const error = rollDice(room, player.id, held);
+          if (error) return ack({ ok: false, error });
 
-        saveRoom(room);
-        io.to(room.id).emit("room:state", toPublicState(room));
-        ack({ ok: true });
+          await saveRoom(room);
+          io.to(room.id).emit("room:state", toPublicState(room));
+          ack({ ok: true });
+        });
       } catch (err) {
         console.error(err);
         ack({ ok: false, error: "SERVER_ERROR" });
       }
     });
 
-    socket.on("turn:end", (payload, ack) => {
+    socket.on("turn:end", async (payload, ack) => {
       if (typeof ack !== "function") return;
 
       try {
@@ -101,25 +110,26 @@ export function registerSocketHandlers(io: GameServer) {
         if (!CATEGORIES.includes(category))
           return ack({ ok: false, error: "BAD_INPUT" });
 
-        const room = getRoom(roomId);
-        const player = room?.players.find((p) => p.id === playerId);
-        if (!room || !player)
-          return ack({ ok: false, error: "ROOM_NOT_FOUND" });
+        await lockRoom(roomId, async () => {
+          const room = await getRoom(roomId);
+          const player = room?.players.find((p) => p.id === playerId);
+          if (!room || !player)
+            return ack({ ok: false, error: "ROOM_NOT_FOUND" });
 
-        const error = endTurn(room, player, category);
-        if (error) return ack({ ok: false, error });
+          const error = endTurn(room, player, category);
+          if (error) return ack({ ok: false, error });
 
-        saveRoom(room);
-        io.to(room.id).emit("room:state", toPublicState(room));
-        ack({ ok: true });
+          await saveRoom(room);
+          io.to(room.id).emit("room:state", toPublicState(room));
+          ack({ ok: true });
+        });
       } catch (err) {
         console.error(err);
         ack({ ok: false, error: "SERVER_ERROR" });
       }
     });
 
-    // Chat changes nothing in the room, so the message is only relayed
-    socket.on("chat:send", (payload, ack) => {
+    socket.on("chat:send", async (payload, ack) => {
       if (typeof ack !== "function") return;
 
       try {
@@ -128,7 +138,7 @@ export function registerSocketHandlers(io: GameServer) {
         if (!text || text.length > MAX_MESSAGE_LENGTH)
           return ack({ ok: false, error: "BAD_INPUT" });
 
-        const room = getRoom(roomId);
+        const room = await getRoom(roomId);
         const player = room?.players.find((p) => p.id === playerId);
         if (!room || !player)
           return ack({ ok: false, error: "ROOM_NOT_FOUND" });
@@ -146,12 +156,12 @@ export function registerSocketHandlers(io: GameServer) {
       }
     });
 
-    socket.on("room:leave", (ack) => {
+    socket.on("room:leave", async (ack) => {
       if (typeof ack !== "function") return;
 
       try {
         socket.leave(roomId);
-        leaveRoom(io, roomId, playerId);
+        await lockRoom(roomId, () => leaveRoom(io, roomId, playerId));
         ack();
       } catch (err) {
         console.error(err);
@@ -159,41 +169,48 @@ export function registerSocketHandlers(io: GameServer) {
       }
     });
 
-    socket.on("disconnect", () => {
+    socket.on("disconnect", async () => {
       try {
-        const room = getRoom(roomId);
-        const player = room?.players.find((p) => p.id === playerId);
-        // Ignore players who already left, and sockets replaced by a newer connection
-        if (!room || !player || player.socketId !== socket.id) return;
+        await lockRoom(roomId, async () => {
+          const room = await getRoom(roomId);
+          const player = room?.players.find((p) => p.id === playerId);
+          // Ignore players who already left and sockets replaced by a newer connection
+          if (!room || !player || player.socketId !== socket.id) return;
 
-        player.socketId = null;
-        saveRoom(room);
-        updateCloseTimer(room);
-        io.to(room.id).emit("room:state", toPublicState(room));
-        startLeaveTimer(io, roomId, playerId);
+          player.socketId = null;
+          await saveRoom(room);
+          await updateCloseTimer(room);
+          await startLeaveTimer(roomId, playerId);
+          io.to(room.id).emit("room:state", toPublicState(room));
+        });
       } catch (err) {
         console.error(err);
       }
     });
 
     // Connection handler
+    // Last, because this uses the handlers defined above
     try {
-      // Make sure that player belongs to a room
-      const room = getRoom(roomId);
-      const player = room?.players.find((p) => p.id === playerId);
-      if (!room || !player) return socket.disconnect(true);
+      await lockRoom(roomId, async () => {
+        // Make sure that player belongs to a room
+        const room = await getRoom(roomId);
+        const player = room?.players.find((p) => p.id === playerId);
+        if (!room || !player) return socket.disconnect(true);
 
-      // Duplicated tab: kick old connection, newest wins
-      const previousSocketId = player.socketId;
-      player.socketId = socket.id;
-      saveRoom(room);
-      if (previousSocketId)
-        io.sockets.sockets.get(previousSocketId)?.disconnect(true);
+        // Dropped while waiting for lock
+        if (socket.disconnected) return;
 
-      cancelLeaveTimer(playerId);
-      updateCloseTimer(room);
-      socket.join(room.id);
-      io.to(room.id).emit("room:state", toPublicState(room));
+        // Duplicated tab: kick old connection, newest wins
+        const previousSocketId = player.socketId;
+        player.socketId = socket.id;
+        await saveRoom(room);
+        if (previousSocketId) io.in(previousSocketId).disconnectSockets(true);
+
+        await cancelLeaveTimer(roomId, playerId);
+        await updateCloseTimer(room);
+        socket.join(room.id);
+        io.to(room.id).emit("room:state", toPublicState(room));
+      });
     } catch (err) {
       console.error(err);
       socket.disconnect(true);
