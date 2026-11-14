@@ -26,23 +26,18 @@
   border-radius: 18%;
 }
 
-.die:not(:disabled, [aria-pressed="true"]):hover .die-face {
-  outline: 2px solid var(--border);
-  outline-offset: 2px;
-}
-
-.die[aria-pressed="true"] .die-face {
-  outline: 2px solid var(--accent);
+.die-face:hover {
+  outline: 2px solid gray;
   outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* The roller's dice, while waiting for the server */
+  /* "Loading" spin, constant */
   .die[data-spinning="true"] {
     animation: die-spin 0.25s linear infinite;
   }
 
-  /* Every player's rerolled dice, once the new values arrive */
+  /* Every player's rerolled dice spin, once the new values arrive */
   .die[data-landing="true"] .die-face {
     animation: die-land 1s ease-out;
   }
@@ -63,8 +58,17 @@
 
 .die-lock {
   position: absolute;
-  top: -1.75rem;
-  right: -1.25rem;
+  top: -1.5rem;
+  right: -1rem;
   font-size: 1.75rem;
   z-index: 2;
+  text-shadow: 2px 2px black;
+}
+
+.die:disabled .die-face {
+  outline: none;
+}
+
+.die:disabled .die-lock {
+  visibility: hidden;
 }

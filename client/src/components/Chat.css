@@ -1,7 +1,8 @@
 .chat {
   padding: 1.5rem;
   flex: 1;
-  min-height: 24rem;
+  width: 24rem;
+  min-height: 20rem;
   contain: size;
   gap: 1rem;
   text-align: left;
@@ -9,7 +10,6 @@
 
 .chat h3 {
   margin: 0;
-  text-align: center;
 }
 
 .chat-messages {

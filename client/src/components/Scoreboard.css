@@ -48,6 +48,10 @@
   border-bottom: none;
 }
 
+.scoreboard tr > :last-child {
+  border-right: none;
+}
+
 /* Current player */
 .scoreboard [data-current="true"] {
   background: var(--accent-soft);
@@ -82,17 +86,4 @@
 /* A disconnected player's whole column is faded, like their row in the player list */
 .scoreboard [data-offline="true"] {
   opacity: 0.45;
-}
-
-.turn-info {
-  margin: 0 0 0.5rem;
-}
-
-.turn-info[data-my-turn="true"] {
-  color: var(--accent);
-}
-
-.turn-info[data-connected="false"] {
-  color: red;
-  font-size: large;
 }

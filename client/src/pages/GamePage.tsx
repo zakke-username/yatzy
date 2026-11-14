@@ -114,12 +114,19 @@ function GamePage() {
   return (
     <main className="game-page">
       <header className="game-header">
+        <a
+          className="button small-button"
+          href="https://en.wikipedia.org/wiki/Yatzy#Gameplay"
+          target="_blank"
+          rel="noreferrer"
+        >
+          ❓
+        </a>
         <h2
           className="turn-info"
           data-my-turn={isMyTurn}
           data-connected={currentPlayer?.connected}
         >
-          🎲{" "}
           {currentPlayer?.connected ? (
             <>
               {isMyTurn ? <>Your turn!</> : <>{currentPlayer?.name}'s turn</>}
@@ -128,25 +135,15 @@ function GamePage() {
             <>{currentPlayer?.name} has disconnected: kicking in 30 s...</>
           )}
         </h2>
-        <div className="menu-buttons">
-          <a
-            className="button small-button"
-            href="https://en.wikipedia.org/wiki/Yatzy#Gameplay"
-            target="_blank"
-            rel="noreferrer"
-          >
-            ❓
-          </a>
-          <button
-            type="button"
-            className="button small-button"
-            aria-label="Exit"
-            title="Exit"
-            onClick={leave}
-          >
-            ❌
-          </button>
-        </div>
+        <button
+          type="button"
+          className="button small-button"
+          aria-label="Exit"
+          title="Exit"
+          onClick={leave}
+        >
+          ❌
+        </button>
       </header>
       <div className="game">
         <Scoreboard
@@ -156,36 +153,7 @@ function GamePage() {
           disabled={busy || !isMyTurn}
           onScore={handleScore}
         />
-
-        <div className="stack side-panels">
-          <div className="container controls">
-            <Dice
-              // A roll always changes rollsLeft, so the new key rebuilds the dice and replays their landing spin
-              key={room.rollsLeft}
-              values={room.dice}
-              held={held}
-              rolling={rolling} // Constant "loading" spin for current turn player, stops when server responds
-              landing={room.held.map((isHeld) => hasRolled && !isHeld)} // Which dice were just rolled: short spin for all players
-              disabled={busy || !isMyTurn || !hasRolled || room.rollsLeft === 0}
-              onToggle={toggleHeld}
-            />
-            {isMyTurn && (
-              <button
-                type="button"
-                className="button roll-button"
-                disabled={
-                  busy ||
-                  !isMyTurn ||
-                  room.rollsLeft === 0 ||
-                  held.every((isHeld) => isHeld)
-                }
-                data-highlight={isMyTurn && !hasRolled}
-                onClick={handleRoll}
-              >
-                Roll ({room.rollsLeft}/3)
-              </button>
-            )}
-          </div>
+        <div className="chat-container">
           <Chat playerId={session.playerId} />
         </div>
 
@@ -199,6 +167,36 @@ function GamePage() {
 
         {error && <div className="error">⚠️ {error}</div>}
       </div>
+      <footer className="game-footer">
+        <div className="controls">
+          <Dice
+            // A roll always changes rollsLeft, so the new key rebuilds the dice and replays their landing spin
+            key={room.rollsLeft}
+            values={room.dice}
+            held={held}
+            rolling={rolling} // Constant "loading" spin for current turn player, stops when server responds
+            landing={room.held.map((isHeld) => hasRolled && !isHeld)} // Which dice were just rolled: short spin for all players
+            disabled={busy || !isMyTurn || !hasRolled || room.rollsLeft === 0}
+            onToggle={toggleHeld}
+          />
+          {isMyTurn && (
+            <button
+              type="button"
+              className="button roll-button"
+              disabled={
+                busy ||
+                !isMyTurn ||
+                room.rollsLeft === 0 ||
+                held.every((isHeld) => isHeld)
+              }
+              data-highlight={isMyTurn && !hasRolled}
+              onClick={handleRoll}
+            >
+              Roll ({room.rollsLeft}/3)
+            </button>
+          )}
+        </div>
+      </footer>
     </main>
   );
 }
