@@ -5,7 +5,7 @@ import { redis } from "./redis.ts";
 
 const LOCK_MS = 5_000;
 
-// Lua script to release lock atomically
+// Lua script to release room lock atomically
 const RELEASE_LOCK = `if redis.call("GET", KEYS[1]) == ARGV[1] then redis.call("DEL", KEYS[1]) end`;
 
 const roomKey = (id: string) => `room:${id}`;
@@ -31,7 +31,7 @@ export async function deleteRoom(id: string) {
   await redis.del(roomKey(id));
 }
 
-// Runs function while holding a per-room lock
+// Runs a function while holding a per-room lock
 export async function lockRoom<T>(id: string, fn: () => Promise<T>) {
   const key = `${roomKey(id)}:lock`;
   const owner = randomUUID();

@@ -1,6 +1,8 @@
-// API contract between server and client
+// Shared contract between server and client
+
 export type RoomStatus = "waiting" | "playing" | "finished";
 
+// Separate upper and lower categories, for ease of calculating sums
 export const UPPER_CATEGORIES = [
   "ones",
   "twos",
@@ -22,7 +24,7 @@ export const LOWER_CATEGORIES = [
   "yatzy",
 ] as const;
 
-/** Yatzy scoring categories, in scorecard order */
+// All scoring categories combined
 export const CATEGORIES = [...UPPER_CATEGORIES, ...LOWER_CATEGORIES] as const;
 
 export type Category = (typeof CATEGORIES)[number];
@@ -30,7 +32,7 @@ export type Category = (typeof CATEGORIES)[number];
 export const DICE_COUNT = 5;
 export const ROLLS_PER_TURN = 3;
 
-/** A score per category, null until scored */
+// Category and score pair. Null if not scored yet.
 export type Scores = Record<Category, number | null>;
 
 export type PublicPlayer = {
@@ -38,43 +40,38 @@ export type PublicPlayer = {
   name: string;
   connected: boolean;
   scores: Scores;
-  /** Ones to sixes */
-  sum: number;
+  sum: number; // upper sum (1s to 6s)
   bonus: number;
-  /** Every score plus the bonus */
   total: number;
 };
 
-/** A room is both a lobby and a game */
+// Lobby or game
 export type PublicRoomState = {
   id: string;
-  /** The earliest joiner still in the room, so null only while it's empty */
-  hostId: string | null;
+  hostId: string | null; // first player to join becomes host. null until that
   status: RoomStatus;
   maxPlayers: number;
   players: PublicPlayer[];
   currentPlayerId: string | null;
   dice: number[];
-  /** The dice the latest roll kept; the rest were rerolled. Like the dice, only meaningful once the current player has rolled. */
   held: boolean[];
   rollsLeft: number;
-  /** What the dice would score in each category. Like the dice, only meaningful once the current player has rolled. */
   potentialScores: Scores;
 };
 
-/** Returned by POST /api/rooms, which creates an empty room. Its creator then joins it like anyone else. */
+// Returned by POST /api/rooms
 export type CreateRoomResponse = {
   roomId: string;
 };
 
-/** Returned when joining a room. */
+// Returned by joining a room (POST /api/rooms/:roomId/player)
 export type JoinResponse = {
   roomId: string;
   playerId: string;
   token: string;
 };
 
-/** Returned by GET /api/rooms/:roomId, which needs no token, so it tells nothing more */
+// Returned by GET /api/rooms/:roomId
 export type RoomStatusResponse = {
   status: RoomStatus;
 };
@@ -92,20 +89,20 @@ export type ApiError =
   | "RATE_LIMITED"
   | "SERVER_ERROR";
 
-/** The acknowledgement of every client event except room:leave, whose ack carries nothing */
+// Every client event except room:leave
 export type AckResponse = { ok: true } | { ok: false; error: ApiError };
 
+// Chat
 export const MAX_MESSAGE_LENGTH = 200;
 
-/** Relayed to the room as it's sent; the server keeps no history */
 export type ChatMessage = {
   id: string;
   playerId: string;
-  /** The sender's name, so the message stays readable after they leave */
   name: string;
   text: string;
 };
 
+// Socket events
 export type ServerToClientEvents = {
   "room:state": (state: PublicRoomState) => void;
   "chat:message": (message: ChatMessage) => void;

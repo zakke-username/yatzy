@@ -30,7 +30,7 @@ export type Player = {
   total: number;
 };
 
-// The sum, bonus and total follow from the scores, so recompute them whenever a score changes
+// Calculate upper section sum and total
 function totals(scores: Scores) {
   const add = (categories: readonly Category[]) =>
     categories.reduce((sum, category) => sum + (scores[category] ?? 0), 0);
@@ -81,7 +81,9 @@ export function createRoom(): Room {
 export function addPlayer(room: Room, player: Player): ApiError | undefined {
   if (room.status !== "waiting") return "GAME_STARTED";
   if (room.players.length >= MAX_PLAYERS) return "ROOM_FULL";
+
   room.players.push(player);
+  // No host = next player to join becomes host
   room.hostId ??= player.id;
 }
 
@@ -89,7 +91,8 @@ export function removePlayer(room: Room, playerId: string) {
   if (room.status === "finished") return; // Final results stay visible
   if (room.currentPlayerId === playerId) nextTurn(room);
   room.players = room.players.filter((player) => player.id !== playerId);
-  if (room.hostId === playerId) room.hostId = room.players[0]?.id ?? null; // Change host
+  // If host leaves, next player becomes host
+  if (room.hostId === playerId) room.hostId = room.players[0]?.id ?? null;
   finishIfDone(room);
 }
 
@@ -110,6 +113,7 @@ export function rollDice(
   if (playerId !== room.currentPlayerId) return "NOT_YOUR_TURN";
   if (room.rollsLeft === 0) return "NO_ROLLS_LEFT";
 
+  // If first roll, roll all dice
   const firstRoll = room.rollsLeft === ROLLS_PER_TURN;
   room.held = held.map((isHeld) => isHeld && !firstRoll);
   room.dice = room.dice.map((value, i) =>
@@ -144,6 +148,7 @@ function nextTurn(room: Room) {
   room.rollsLeft = ROLLS_PER_TURN;
 }
 
+// If all players have filled all scores, game is over
 function finishIfDone(room: Room) {
   if (room.status !== "playing") return;
   const done = room.players.every(

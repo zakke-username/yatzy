@@ -1,5 +1,5 @@
-// Timers are stored as sorted sets in Redis (string-number pair)
-// Each timer stores a "score", which is a timestamp after which it's "run out"
+// Timers are stored as a sorted set in Redis ("timers" -> string-number pair)
+// Each timer stores a "score", which is a timestamp after which it's run out
 
 import { redis } from "./redis.ts";
 

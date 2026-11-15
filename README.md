@@ -29,7 +29,7 @@ Requirements: Node (22.22+) and Redis (7+).
 Start Redis, using Docker for example:
 
 ```sh
-docker run -d --name free-yatzy-redis -p 127.0.0.1:6379:6379 redis:8-alpine
+docker run -d --name yatzy-redis -p 127.0.0.1:6379:6379 redis:8-alpine
 ```
 
 Run from repository's root:

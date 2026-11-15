@@ -1,13 +1,15 @@
 import { redis } from "./redis.ts";
 
+// Stores key-value pairs:
+// Token -> session (room id and player id).
+// Room ID -> player IDs and tokens (hash). Helps with deleting rooms, don't have to scan all stored tokens.
+
 export type Session = {
   roomId: string;
   playerId: string;
 };
 
 const sessionKey = (token: string) => `session:${token}`;
-
-// Map rooms (incl. player id) to tokens: otherwise you'd have to scan through all sessions whenever deleting rooms
 const tokensKey = (roomId: string) => `room:${roomId}:tokens`;
 
 export async function getSession(token: string): Promise<Session | undefined> {

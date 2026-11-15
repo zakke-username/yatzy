@@ -43,14 +43,17 @@ export function registerSocketHandlers(io: GameServer) {
       next();
     });
 
+    // Get IDs always from socket data (saved on server during handshake)
     const { roomId, playerId } = socket.data;
 
-    // Socket handlers
-    // Each one looks up the player & room again, making sure that IDs still point to something that exists
+    // SOCKET HANDLERS: each one looks up the player & room again, making sure that IDs still point to something that exists
+
+    // Start game
     socket.on("game:start", async (ack) => {
       if (typeof ack !== "function") return;
 
       try {
+        // Read-modify-write room state inside lock (pass the fn)
         await lockRoom(roomId, async () => {
           const room = await getRoom(roomId);
           const player = room?.players.find((p) => p.id === playerId);
@@ -70,6 +73,7 @@ export function registerSocketHandlers(io: GameServer) {
       }
     });
 
+    // Roll dice. Includes boolean array: which dice are not rolled
     socket.on("turn:roll", async (payload, ack) => {
       if (typeof ack !== "function") return;
 
@@ -83,6 +87,7 @@ export function registerSocketHandlers(io: GameServer) {
           held.every((item) => typeof item === "boolean");
         if (!isHeldArray) return ack({ ok: false, error: "BAD_INPUT" });
 
+        // Read-modify-write room state inside lock (pass the fn)
         await lockRoom(roomId, async () => {
           const room = await getRoom(roomId);
           const player = room?.players.find((p) => p.id === playerId);
@@ -102,14 +107,17 @@ export function registerSocketHandlers(io: GameServer) {
       }
     });
 
+    // End turn, select scoring category
     socket.on("turn:end", async (payload, ack) => {
       if (typeof ack !== "function") return;
 
       try {
+        // Payload includes valid category?
         const category = payload?.category;
         if (!CATEGORIES.includes(category))
           return ack({ ok: false, error: "BAD_INPUT" });
 
+        // Read-modify-write room state inside lock (pass the fn)
         await lockRoom(roomId, async () => {
           const room = await getRoom(roomId);
           const player = room?.players.find((p) => p.id === playerId);
@@ -129,6 +137,7 @@ export function registerSocketHandlers(io: GameServer) {
       }
     });
 
+    // Send chat message. Messages aren't stored on server, just validated and emitted forward
     socket.on("chat:send", async (payload, ack) => {
       if (typeof ack !== "function") return;
 
@@ -156,6 +165,7 @@ export function registerSocketHandlers(io: GameServer) {
       }
     });
 
+    // Leave room
     socket.on("room:leave", async (ack) => {
       if (typeof ack !== "function") return;
 
@@ -169,6 +179,7 @@ export function registerSocketHandlers(io: GameServer) {
       }
     });
 
+    // ON DISCONNECT
     socket.on("disconnect", async () => {
       try {
         await lockRoom(roomId, async () => {
@@ -188,7 +199,7 @@ export function registerSocketHandlers(io: GameServer) {
       }
     });
 
-    // Connection handler
+    // CONNECTION HANDLER
     // Last, because this uses the handlers defined above
     try {
       await lockRoom(roomId, async () => {
