@@ -38,7 +38,7 @@ function GamePage() {
     }
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  });
+  }, [playing]);
 
   // Turn notification sound
   const isMyTurn = !!session && room?.currentPlayerId === session.playerId;
@@ -160,7 +160,6 @@ function GamePage() {
             onReturn={leave}
           />
         )}
-
       </div>
       <footer>
         <div className={styles.controls}>
@@ -192,7 +191,7 @@ function GamePage() {
           )}
         </div>
       </footer>
-        {error && <div className="error">⚠️ {error}</div>}
+      {error && <div className="error">⚠️ {error}</div>}
     </main>
   );
 }

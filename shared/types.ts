@@ -64,7 +64,7 @@ export type CreateRoomResponse = {
   roomId: string;
 };
 
-// Returned by joining a room (POST /api/rooms/:roomId/player)
+// Returned by joining a room (POST /api/rooms/:roomId/players)
 export type JoinResponse = {
   roomId: string;
   playerId: string;
