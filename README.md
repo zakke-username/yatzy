@@ -1,6 +1,6 @@
 # 🎲 Yatzy
 
-A multiplayer browser Yatzy game written in TypeScript. A monorepo using npm workspaces.
+A multiplayer browser game written in TypeScript. A monorepo using npm workspaces.
 
 **[Play now](https://freeyatzy.com/)**
 
@@ -8,11 +8,11 @@ Spin up a game of Yatzy quickly and easily, without needing to log in. Open a ne
 
 ### Features
 
-The client is a React SPA, using Vite as the build tool. Using WebSockets, clients emit only intent and render the updated state.
+The client is a React single page app. Styling is done using plain CSS modules, and the layout is fully responsive. Using WebSockets, clients emit only intent and render the updated state.
 
-The server is the only source of truth, including scores and security. Players are authenticated by a secret token issued by the server. Tokens, IDs and dice rolls use cryptographic randomness.
+The server (node, express, socket.io) is the only source of truth, including scores and security. Players are authenticated by a secret token issued by the server, and it's validated only during a socket connection handshake. Tokens, IDs and dice rolls use cryptographic randomness.
 
-A Redis database is used as state storage for games, players and timers. A separate in-memory database allows for scaling to multiple server instances and fast operations.
+A Redis database is used as state storage for games, players and timers, as well as a pub/sub adapter for socket.io. This allows for scaling to multiple server instances and fast operations.
 
 ## Tech stack
 
@@ -39,13 +39,31 @@ npm install
 npm run dev
 ```
 
-## Repo structure
+## Flow
 
-```
-client/   Front end app: pages, components, hooks, etc.
-server/   Express + Socket.IO: game engine, routes, sockets, store
-shared/   Types used by both
-```
+### HTTP routes
+
+Room creation and players joining use HTTP, because sockets need a valid auth token from the beginning. This is returned from the POST join route.
+
+| Route                             | Body       | Response                      |
+| --------------------------------- | ---------- | ----------------------------- |
+| `GET /api/rooms/:roomId`          |            | `{ status }`                  |
+| `POST /api/rooms`                 |            | `{ roomId }`                  |
+| `POST /api/rooms/:roomId/players` | `{ name }` | `{ roomId, playerId, token }` |
+
+### Socket events
+
+Everything else uses WebSockets.
+
+| Event          | Payload               | Direction        |                                                  |
+| -------------- | --------------------- | ---------------- | ------------------------------------------------ |
+| `game:start`   |                       | Client to server | Host only                                        |
+| `turn:roll`    | `{ held: boolean[] }` | Client to server | Rolls the dice that aren't held                  |
+| `turn:end`     | `{ category }`        | Client to server | End turn and select scoring category             |
+| `chat:send`    | `{ text }`            | Client to server | Character limit: 200                             |
+| `room:leave`   |                       | Client to server | Removes player and wipes session                 |
+| `room:state`   | `PublicRoomState`     | Server to client | Sent to the whole room after every change        |
+| `chat:message` | `ChatMessage`         | Server to client | Not stored on server, just validated and emitted |
 
 ## Screenshots
 

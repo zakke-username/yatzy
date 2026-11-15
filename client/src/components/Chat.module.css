@@ -1,0 +1,49 @@
+.chat {
+  width: 24rem;
+  min-height: 20rem;
+  padding: 1.5rem;
+  gap: 1rem;
+  text-align: left;
+  /* New messages scroll instead of stretching window */
+  contain: size;
+}
+
+.chat > h3 {
+  margin: 0;
+}
+
+/* Messages list */
+.chat > ul {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: safe flex-end;
+  gap: 0.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  overflow-wrap: anywhere;
+}
+
+.chat > ul:empty::before {
+  content: "No messages";
+  color: var(--gray);
+}
+
+.own {
+  color: var(--green);
+}
+
+.chat > form {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.chat input,
+.chat button {
+  padding: 0.5rem;
+}
+
+.chat input {
+  flex: 1;
+}

@@ -1,5 +1,4 @@
-.home-title {
-  /* margin: 0 0 1rem; */
+.home > h1 {
   margin: 1rem auto;
   font-size: 4rem;
   line-height: 1;
@@ -8,34 +7,43 @@
 
 .notice {
   margin: 0;
-  padding: 0.875rem 1rem;
+  padding: 1rem;
   border-radius: 0.75rem;
-  background: var(--accent-soft);
-  font-size: 1.125rem;
-  text-align: center;
+  background: var(--pink);
+  font-size: 1rem;
 }
 
 .divider {
   display: flex;
   align-items: center;
   gap: 1rem;
-  color: var(--muted);
-  font-size: 1.25rem;
+  color: var(--gray);
+  font-size: 1rem;
 }
 
 .divider::before,
 .divider::after {
   content: "";
   flex: 1;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--light-gray);
 }
 
-.code-input:not(:placeholder-shown) {
+.home > form {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.home input {
+  flex: 1;
+}
+
+.home input:not(:placeholder-shown) {
   text-transform: uppercase;
 }
 
 @media (width < 512px) {
-  .home-title {
+  .home > h1 {
     font-size: 3rem;
   }
 }

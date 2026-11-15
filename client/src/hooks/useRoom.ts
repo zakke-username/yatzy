@@ -17,7 +17,6 @@ export function useRoom(roomId: string) {
   useEffect(() => {
     if (!session) return;
 
-    // The seat is gone, so forget the token and go home
     const exit = (message: string) => {
       sessionStorage.removeItem(roomId);
       navigate("/", { replace: true, state: { message } });
@@ -54,7 +53,7 @@ export function useRoom(roomId: string) {
   }
 
   async function leave() {
-    // Waits for the server to handle it, since disconnecting straight away can drop it. Offline, there's nobody to tell.
+    // Waits for the server to handle it, since disconnecting straight away can drop it
     if (socket.connected)
       await socket.emitWithAck("room:leave").catch(() => undefined);
     sessionStorage.removeItem(roomId);

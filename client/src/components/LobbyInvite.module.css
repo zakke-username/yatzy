@@ -1,0 +1,15 @@
+.invite {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.invite > p {
+  margin: auto;
+  font-size: 2rem;
+}
+
+.invite > button {
+  padding: 0.5rem;
+  font-size: medium;
+}

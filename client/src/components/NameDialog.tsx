@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import "./NameDialog.css";
+import styles from "./NameDialog.module.css";
 
-// The server enforces the same limit
 const MAX_NAME_LENGTH = 20;
 
 type Props = {
-  /** Throw an Error to show its message in the dialog */
   onSubmit: (name: string) => Promise<void>;
   onCancel: () => void;
 };
@@ -36,18 +34,16 @@ function NameDialog({ onSubmit, onCancel }: Props) {
   return (
     <dialog
       ref={dialogRef}
-      className="dialog"
       aria-labelledby="dialog-title"
       onCancel={(event) => {
-        // Let the parent close the dialog (by unmounting it) when Escape is pressed
+        // Close dialog with esc
         event.preventDefault();
         onCancel();
       }}
     >
-      <form onSubmit={handleSubmit}>
+      <form className={styles.form} onSubmit={handleSubmit}>
         <h2 id="dialog-title">Join game</h2>
         <input
-          className="input"
           placeholder="Enter your name"
           aria-label="Your name"
           autoComplete="nickname"
@@ -57,18 +53,16 @@ function NameDialog({ onSubmit, onCancel }: Props) {
           onChange={(event) => setName(event.target.value)}
         />
         {error && <p className="error">{error}</p>}
-        <div className="row dialog-actions">
-          <button
-            type="button"
-            className="button button-secondary"
-            onClick={onCancel}
-          >
-            Cancel
-          </button>
-          <button type="submit" className="button" disabled={busy}>
-            Join
-          </button>
-        </div>
+        <button
+          type="button"
+          className={`button ${styles.cancel}`}
+          onClick={onCancel}
+        >
+          Cancel
+        </button>
+        <button type="submit" className="button" disabled={busy}>
+          Join
+        </button>
       </form>
     </dialog>
   );

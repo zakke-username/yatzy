@@ -1,9 +1,0 @@
-.dialog form {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.dialog-actions .button {
-  flex: 1;
-}

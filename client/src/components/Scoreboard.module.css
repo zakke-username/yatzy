@@ -2,28 +2,31 @@
   z-index: 1;
 }
 
-.scoreboard-scroll {
+.scroll {
   overflow-x: auto;
 }
 
 .scoreboard table {
   width: 100%;
-  border-collapse: collapse;
-  font-variant-numeric: tabular-nums;
 }
 
 .scoreboard th,
 .scoreboard td {
   padding: 0.5rem 1rem;
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--light-gray);
+  border-bottom: 1px solid var(--light-gray);
   font-weight: bold;
 }
 
+/* Category names */
 .scoreboard tbody th {
   font-weight: normal;
   text-align: left;
   white-space: nowrap;
+}
+
+.scoreboard .summary th {
+  font-weight: bold;
 }
 
 .scoreboard tbody th,
@@ -31,17 +34,14 @@
   position: sticky;
   left: 0;
   z-index: 1;
-  background: var(--surface);
+  background: var(--white);
 }
 
-.scoreboard .summary th {
-  font-weight: bold;
-}
-
+/* Thick borders */
 .scoreboard thead tr > *,
 .scoreboard .summary > *,
 .scoreboard tr:has(+ .summary) > * {
-  border-bottom: 2px solid black;
+  border-bottom: 2px solid var(--black);
 }
 
 .scoreboard tbody tr:last-child > * {
@@ -52,38 +52,33 @@
   border-right: none;
 }
 
-/* Current player */
 .scoreboard [data-current="true"] {
-  background: var(--accent-soft);
+  background: var(--pink);
 }
 
 .scoreboard thead [data-current="true"] {
-  background: var(--accent);
-  color: #fff;
+  background: var(--green);
+  color: var(--white);
 }
 
-.scoreboard td:has(> .potential) {
+/* Score button */
+.scoreboard td:has(> button) {
   padding: 0;
 }
 
-.scoreboard .potential {
+.scoreboard td > button {
   display: block;
   width: 100%;
   padding: 0.5rem 1rem;
   border: none;
   background: none;
-  color: rgba(0, 0, 0, 0.4);
+  color: color-mix(in srgb, var(--black) 40%, transparent);
   font-style: italic;
   font-weight: normal;
 }
 
-.scoreboard .potential:enabled:hover {
-  color: var(--accent);
+.scoreboard td > button:enabled:hover {
+  color: var(--green);
   font-weight: bold;
   cursor: pointer;
-}
-
-/* A disconnected player's whole column is faded, like their row in the player list */
-.scoreboard [data-offline="true"] {
-  opacity: 0.45;
 }

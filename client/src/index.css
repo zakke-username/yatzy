@@ -1,3 +1,5 @@
+/* Global styles: the font, colors, HTML element defaults, and the classes shared by several components */
+
 @font-face {
   font-family: "PlaypenSans";
   src: url("./assets/fonts/PlaypenSans-VariableFont_wght.ttf")
@@ -9,20 +11,20 @@
 }
 
 :root {
-  --accent: hsl(120, 50%, 30%);
-  --accent-hover: #a93226;
-  --accent-soft: #fbeceb;
-  --error: #c0392b;
-  --text: #1d1d1f;
-  --muted: #6e6e73;
-  --border: #d2d2d7;
-  --bg: #ffe;
-  --surface: #fff;
+  --black: #000;
+  --white: #fff;
+  --gray: #6e6e73;
+  --light-gray: #d2d2d7;
+  --green: hsl(120, 50%, 30%);
+  --red: hsl(0, 75%, 50%);
+  --yellow: hsl(50, 100%, 50%);
+  --light-yellow: #ffe;
+  --pink: #fbeceb;
 
   font-family: "PlaypenSans", system-ui, sans-serif;
-  color: var(--text);
-  background-color: var(--bg);
-  background-image: url("./assets/paper-background.webp");
+  color: var(--black);
+  text-align: center;
+  background: var(--light-yellow) url("./assets/paper-background.webp");
 }
 
 *,
@@ -32,12 +34,10 @@
 }
 
 body {
-  margin: 0;
   display: flex;
-  justify-content: center;
   align-items: center;
-  /* dvh, not vh: on phones vh includes the space under the browser's toolbars */
   min-height: 100dvh;
+  margin: 0;
 }
 
 #root {
@@ -49,114 +49,96 @@ input {
   font: inherit;
 }
 
+input {
+  min-width: 0;
+  padding: 1rem;
+  border: 2px solid var(--light-gray);
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font-size: large;
+}
+
+input:focus {
+  border-color: var(--green);
+  outline: none;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+table {
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
 hr {
   width: 100%;
-  color: rgba(0, 0, 0, 0.33);
+  color: color-mix(in srgb, var(--black) 33%, transparent);
 }
 
-a {
-  text-decoration: none;
-}
-
-.page {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 2rem;
-  width: 100vw;
-  margin-inline: auto;
-  padding-block: 2rem;
-  text-align: center;
-}
-
-.container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1.5rem;
-  border: 2px solid black;
-  box-shadow: 4px 4px black;
+.card,
+dialog {
   padding: 2rem;
-  /* margin: 1rem; */
+  border: 2px solid var(--black);
   border-radius: 16px;
-  background-color: white;
+  box-shadow: 4px 4px var(--black);
+  background: var(--white);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
   max-width: calc(100vw - 2rem);
 }
 
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+/* Home and lobby screens */
+main.card {
+  width: fit-content;
+  margin: 2rem auto;
 }
 
-.row {
+dialog {
+  width: min(100% - 2rem, 26rem);
+  color: inherit;
+  text-align: left;
+}
+
+dialog[open] {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 2rem;
 }
 
-.row .input {
-  flex: 1;
+dialog::backdrop {
+  background: color-mix(in srgb, var(--black) 50%, transparent);
 }
 
-.label {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.muted {
-  color: var(--muted);
-}
-
-.error {
-  position: fixed;
-  top: 0;
-  left: 0;
-  margin: 1rem;
-  padding: 1rem;
-  color: white;
-  font-size: 1rem;
-  background-color: rgba(255, 0, 0, 0.5);
-  border-radius: 8px;
-  font-weight: bold;
-}
-
-.leave {
-  align-self: center;
-  padding: 0.25rem;
-  border: none;
-  background: none;
-  color: var(--text);
-  font-weight: bold;
-  font-size: large;
-  cursor: pointer;
-}
-
-.leave:hover {
-  cursor: pointer;
-  text-decoration: underline;
+dialog h2 {
+  margin: auto;
+  font-size: 2rem;
 }
 
 .button {
   padding: 1rem;
-  border: 2px solid black;
-  box-shadow: 4px 4px black;
+  border: 2px solid var(--black);
   border-radius: 8px;
-  background: var(--accent);
-  color: #fff;
+  box-shadow: 4px 4px var(--black);
+  background: var(--green);
+  color: var(--white);
   font-size: large;
   font-weight: 600;
+  text-decoration: none;
   cursor: pointer;
 }
 
 .button:hover {
   transform: translate(2px, 2px);
-  box-shadow: 2px 2px black;
+  box-shadow: 2px 2px var(--black);
 }
 
 .button:active {
@@ -169,42 +151,23 @@ a {
   cursor: default;
 }
 
-.button-secondary {
-  background-color: gray;
+.muted {
+  color: var(--gray);
 }
 
-.input {
-  min-width: 0;
+.error {
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 1rem;
   padding: 1rem;
-  border: 2px solid var(--border);
   border-radius: 8px;
-  background: transparent;
-  color: inherit;
-  font-size: large;
+  background-color: var(--red);
+  color: var(--white);
+  font-weight: bold;
+  z-index: 4;
 }
 
-.input:focus {
-  border-color: var(--accent);
-  outline: none;
-}
-
-.dialog {
-  width: min(100% - 2rem, 26rem);
-  padding: 2rem;
-  border: 2px solid black;
-  border-radius: 16px;
-  background: var(--surface);
-  color: var(--text);
-  text-align: left;
-  box-shadow: 4px 4px black;
-  /* box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 0.3); */
-}
-
-.dialog::backdrop {
-  background: rgb(0 0 0 / 0.5);
-}
-
-.dialog h2 {
-  margin: auto;
-  font-size: 2rem;
+[data-offline="true"] {
+  opacity: 0.5;
 }

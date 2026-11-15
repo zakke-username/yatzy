@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./LobbyInvite.css";
+import styles from "./LobbyInvite.module.css";
 
 type Props = {
   roomId: string;
@@ -14,29 +14,18 @@ function LobbyInvite({ roomId }: Props) {
       await navigator.clipboard.writeText(link);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // The clipboard needs a secure context (https or localhost); the link can still be copied by hand
-    }
+    } catch {}
   }
 
   return (
-    <section className="stack">
-      <div className="row invite">
-        {/* <input
-          className="input"
-          aria-label="Invite link"
-          readOnly
-          value={link}
-          onFocus={(event) => event.target.select()}
-        /> */}
-        <p className="lobby-code">
-          Lobby: <b>{roomId}</b>
-        </p>
-        <button type="button" className="button" onClick={copyLink}>
-          {copied ? "Copied!" : "Copy link"}
-        </button>
-      </div>
-    </section>
+    <div className={styles.invite}>
+      <p>
+        Lobby: <b>{roomId}</b>
+      </p>
+      <button type="button" className="button" onClick={copyLink}>
+        {copied ? "Copied!" : "Copy link"}
+      </button>
+    </div>
   );
 }
 

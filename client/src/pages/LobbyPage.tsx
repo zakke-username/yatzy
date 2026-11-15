@@ -6,7 +6,7 @@ import PlayerList from "../components/PlayerList.tsx";
 import { useRoom } from "../hooks/useRoom.ts";
 import { ERROR_MESSAGES, getRoomStatus } from "../lib/api.ts";
 import { socket } from "../lib/socket.ts";
-import "./LobbyPage.css";
+import styles from "./LobbyPage.module.css";
 
 function LobbyPage() {
   const roomId = useParams().roomId!.toUpperCase();
@@ -59,10 +59,8 @@ function LobbyPage() {
 
   if (!session || !room) {
     return (
-      <main className="page">
-        <p>
-          <b>Connecting to lobby...</b>
-        </p>
+      <main>
+        <b>Connecting to lobby...</b>
       </main>
     );
   }
@@ -71,26 +69,24 @@ function LobbyPage() {
     return <Navigate to={`/game/${room.id}`} replace />;
 
   return (
-    <main className="page">
-      <div className="container">
-        <LobbyInvite roomId={room.id} />
-        <hr></hr>
-        <PlayerList room={room} playerId={session.playerId} />
-        <hr></hr>
+    <main className="card">
+      <LobbyInvite roomId={room.id} />
+      <hr />
+      <PlayerList room={room} playerId={session.playerId} />
+      <hr />
 
-        {room.hostId === session.playerId ? (
-          <button type="button" className="button" onClick={startGame}>
-            Start game
-          </button>
-        ) : (
-          <p className="waiting">Waiting for host to start the game…</p>
-        )}
-        {error && <p className="error">{error}</p>}
-
-        <button type="button" className="button exit-button" onClick={leave}>
-          Exit lobby
+      {room.hostId === session.playerId ? (
+        <button type="button" className="button" onClick={startGame}>
+          Start game
         </button>
-      </div>
+      ) : (
+        <p className={styles.waiting}>Waiting for host to start the game…</p>
+      )}
+      {error && <p className="error">{error}</p>}
+
+      <button type="button" className={`button ${styles.exit}`} onClick={leave}>
+        Exit lobby
+      </button>
     </main>
   );
 }

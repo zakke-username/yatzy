@@ -1,21 +1,14 @@
-.results {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
 .results table {
-  border-collapse: collapse;
   font-size: 1.25rem;
-  font-variant-numeric: tabular-nums;
 }
 
 .results th,
 .results td {
   padding: 1rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--light-gray);
 }
 
+/* The names take the space that's left */
 .results th {
   width: 100%;
   font-weight: normal;

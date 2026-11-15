@@ -5,7 +5,7 @@ import {
   type PublicPlayer,
   type Scores,
 } from "../../../shared/types.ts";
-import "./Scoreboard.css";
+import styles from "./Scoreboard.module.css";
 
 // The scorecard's rows, top to bottom
 const ROWS = [
@@ -53,8 +53,8 @@ function Scoreboard({
   onScore,
 }: Props) {
   return (
-    <section className="container stack scoreboard">
-      <div className="scoreboard-scroll">
+    <section className={`card ${styles.scoreboard}`}>
+      <div className={styles.scroll}>
         <table>
           <thead>
             <tr>
@@ -77,7 +77,10 @@ function Scoreboard({
               const isSummary =
                 row === "sum" || row === "bonus" || row === "total";
               return (
-                <tr key={row} className={isSummary ? "summary" : undefined}>
+                <tr
+                  key={row}
+                  className={isSummary ? styles.summary : undefined}
+                >
                   <th scope="row">{LABELS[row]}</th>
                   {players.map((player) => {
                     const score = isSummary ? player[row] : player.scores[row];
@@ -96,7 +99,6 @@ function Scoreboard({
                         {showPotential ? (
                           <button
                             type="button"
-                            className="potential"
                             disabled={disabled}
                             onClick={() => onScore(row)}
                           >

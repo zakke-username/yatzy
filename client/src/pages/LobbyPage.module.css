@@ -1,0 +1,9 @@
+.waiting {
+  margin: 0;
+  color: var(--gray);
+  font-size: 1rem;
+}
+
+.exit {
+  background: var(--red);
+}

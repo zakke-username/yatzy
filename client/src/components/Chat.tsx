@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { socket } from "../lib/socket.ts";
 import { MAX_MESSAGE_LENGTH, type ChatMessage } from "../../../shared/types.ts";
-import "./Chat.css";
+import styles from "./Chat.module.css";
 
 type Props = {
   playerId: string; // you
+  className?: string;
 };
 
-function Chat({ playerId }: Props) {
+function Chat({ playerId, className = "" }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
@@ -41,13 +42,13 @@ function Chat({ playerId }: Props) {
   }
 
   return (
-    <section className="container chat" aria-label="Chat">
+    <section className={`card ${styles.chat} ${className}`} aria-label="Chat">
       <h3>Chat</h3>
-      <ul ref={listRef} className="stack chat-messages">
+      <ul ref={listRef}>
         {messages.map((message) => (
           <li key={message.id}>
             <strong
-              className={message.playerId === playerId ? "chat-own" : undefined}
+              className={message.playerId === playerId ? styles.own : undefined}
             >
               {message.name}:
             </strong>{" "}
@@ -55,19 +56,18 @@ function Chat({ playerId }: Props) {
           </li>
         ))}
       </ul>
-      <form className="row chat-form" onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <input
-          className="input"
           aria-label="Message"
           placeholder="Message"
           value={text}
           maxLength={MAX_MESSAGE_LENGTH}
           onChange={(event) => setText(event.target.value)}
         />
-        {/* Disabled, it also stops Enter from submitting, so only one message is in flight */}
         <button
           type="submit"
           className="button"
+          // Stops enter from submitting, only one message at a time
           disabled={sending || !text.trim()}
         >
           Send

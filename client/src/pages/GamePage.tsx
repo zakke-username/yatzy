@@ -14,7 +14,7 @@ import {
   type AckResponse,
   type Category,
 } from "../../../shared/types.ts";
-import "./GamePage.css";
+import styles from "./GamePage.module.css";
 
 const NONE_HELD = Array<boolean>(DICE_COUNT).fill(false);
 const NOTIFICATION_SOUND = new Audio(notificationSoundUrl);
@@ -96,10 +96,8 @@ function GamePage() {
 
   if (!room) {
     return (
-      <main className="page">
-        <p>
-          <b>Connecting to game...</b>
-        </p>
+      <main>
+        <b>Connecting to game...</b>
       </main>
     );
   }
@@ -112,10 +110,10 @@ function GamePage() {
   const currentPlayer = room.players.find((p) => p.id === room.currentPlayerId);
 
   return (
-    <main className="game-page">
-      <header className="game-header">
+    <main className={styles.page}>
+      <header>
         <a
-          className="button small-button"
+          className={`button ${styles.small}`}
           href="https://en.wikipedia.org/wiki/Yatzy#Gameplay"
           target="_blank"
           rel="noreferrer"
@@ -123,7 +121,7 @@ function GamePage() {
           ❓
         </a>
         <h2
-          className="turn-info"
+          className={styles.turn}
           data-my-turn={isMyTurn}
           data-connected={currentPlayer?.connected}
         >
@@ -137,7 +135,7 @@ function GamePage() {
         </h2>
         <button
           type="button"
-          className="button small-button"
+          className={`button ${styles.small}`}
           aria-label="Exit"
           title="Exit"
           onClick={leave}
@@ -145,7 +143,7 @@ function GamePage() {
           ❌
         </button>
       </header>
-      <div className="game">
+      <div className={styles.game}>
         <Scoreboard
           players={room.players}
           currentPlayerId={room.currentPlayerId}
@@ -153,9 +151,7 @@ function GamePage() {
           disabled={busy || !isMyTurn}
           onScore={handleScore}
         />
-        <div className="chat-container">
-          <Chat playerId={session.playerId} />
-        </div>
+        <Chat className={styles.chat} playerId={session.playerId} />
 
         {finished && (
           <ResultsDialog
@@ -165,10 +161,9 @@ function GamePage() {
           />
         )}
 
-        {error && <div className="error">⚠️ {error}</div>}
       </div>
-      <footer className="game-footer">
-        <div className="controls">
+      <footer>
+        <div className={styles.controls}>
           <Dice
             // A roll always changes rollsLeft, so the new key rebuilds the dice and replays their landing spin
             key={room.rollsLeft}
@@ -182,7 +177,7 @@ function GamePage() {
           {isMyTurn && (
             <button
               type="button"
-              className="button roll-button"
+              className="button"
               disabled={
                 busy ||
                 !isMyTurn ||
@@ -197,6 +192,7 @@ function GamePage() {
           )}
         </div>
       </footer>
+        {error && <div className="error">⚠️ {error}</div>}
     </main>
   );
 }

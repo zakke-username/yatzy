@@ -1,0 +1,105 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.page > header,
+.page > footer {
+  position: sticky;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  background: var(--white);
+}
+
+.page > header {
+  top: 0;
+  justify-content: space-between;
+  height: 4rem;
+  padding: 0 1rem;
+  border-bottom: 2px solid var(--black);
+}
+
+.page > footer {
+  bottom: 0;
+  justify-content: center;
+  padding: 1rem 2rem;
+  border-top: 2px solid var(--black);
+}
+
+/* Small buttons */
+.small {
+  padding: 0.5rem;
+  background: var(--white);
+  color: inherit;
+  font: inherit;
+  font-size: small;
+}
+
+/* Turn info/title */
+.turn {
+  margin: 0 1rem;
+  overflow: hidden;
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
+}
+
+.turn[data-my-turn="true"] {
+  color: var(--green);
+}
+
+.turn[data-connected="false"] {
+  color: var(--red);
+  font-size: medium;
+}
+
+/* Scoreboard and chat */
+.game {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+  /* Pushes footer to bottom of screen */
+  margin: auto 0;
+  padding: 2rem;
+}
+
+.chat {
+  position: sticky;
+  top: 6rem;
+  flex: none;
+  align-self: stretch;
+  /* screen height - (header + footer height) - footer border */
+  max-height: calc(100vh - 14rem - 2px);
+}
+
+.controls {
+  display: flex;
+  gap: 2rem;
+  max-width: 100%;
+}
+
+/* Pulse highlight on roll button */
+.controls > [data-highlight="true"]:enabled {
+  outline: 8px solid var(--yellow);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    outline-color: transparent;
+  }
+}
+
+@media (width < 768px) {
+  .controls {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .turn[data-connected="false"] {
+    font-size: small;
+  }
+}
