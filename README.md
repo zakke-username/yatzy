@@ -2,21 +2,25 @@
 
 A multiplayer browser Yatzy game written in TypeScript. A monorepo using npm workspaces.
 
-**Play: [freeyatzy.com](https://freeyatzy.com/)**
+**[Play now](https://freeyatzy.com/)**
 
-Simple and easy to use. No login. Open a new lobby with a single click, invite others via a link, and start the game. Select the dice you want to roll, and the app automatically calculates and applies your scores. A per-game chat is included.
+Spin up a game of Yatzy quickly and easily, without needing to log in. Open a new room with a single click, invite others via a link, and start the game. Select the dice to roll, and the game automatically calculates and applies your scores. A per-game chat is included.
 
-The client is a React app, with Vite as a build tool. Clients emit only intent (never credentials), and render the received state. Players are identified by a secret token issued by the server, and authentication happens only during a socket connection handshake. The server is the only source of truth, and ID generation and all randomization use Node's crypto module.
+### Features
 
-A Redis database is used as state storage: a separate in-memory database allows for scaling to multiple server instances and fast operations.
+The client is a React SPA, using Vite as the build tool. Using WebSockets, clients emit only intent and render the updated state.
+
+The server is the only source of truth, including scores and security. Players are authenticated by a secret token issued by the server. Tokens, IDs and dice rolls use cryptographic randomness.
+
+A Redis database is used as state storage for games, players and timers. A separate in-memory database allows for scaling to multiple server instances and fast operations.
 
 ## Tech stack
 
-- **React + Vite + React Router** for front-end
-- **Node** backend
-- **Express** HTTP API
+- **React + Vite + React Router** for front end
+- **Node** back end
+- **Express** for HTTP
 - **Socket.io** for real time communication
-- **Redis** as state storage (game, players, timers)
+- **Redis** as state storage
 
 ## Setup
 
@@ -45,9 +49,7 @@ shared/   Types used by both
 
 ## Screenshots
 
-![Main menu](./screenshots/main-menu.png "Main menu")
-
-<!-- ![Lobby](./screenshots/lobby.png "Lobby") -->
+![Main menu](./screenshots/main-menu.png)
 
 ![Game](./screenshots/game2.png "Gameplay")
 
