@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { setTimeout as sleep } from "node:timers/promises";
 import type { Room } from "../game/engine.ts";
-import { redis } from "./redis.ts";
+import { redis, TTL_S } from "./redis.ts";
 
 const LOCK_MS = 5_000;
 
@@ -19,12 +19,15 @@ export async function getRoom(id: string): Promise<Room | undefined> {
 export async function addRoom(room: Room) {
   const result = await redis.set(roomKey(room.id), JSON.stringify(room), {
     condition: "NX",
+    expiration: { type: "EX", value: TTL_S },
   });
   return result === "OK";
 }
 
 export async function saveRoom(room: Room) {
-  await redis.set(roomKey(room.id), JSON.stringify(room));
+  await redis.set(roomKey(room.id), JSON.stringify(room), {
+    expiration: { type: "EX", value: TTL_S },
+  });
 }
 
 export async function deleteRoom(id: string) {

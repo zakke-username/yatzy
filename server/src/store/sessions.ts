@@ -1,4 +1,4 @@
-import { redis } from "./redis.ts";
+import { redis, TTL_S } from "./redis.ts";
 
 // Stores key-value pairs:
 // Token -> session (room id and player id).
@@ -21,8 +21,11 @@ export async function getSession(token: string): Promise<Session | undefined> {
 export async function saveSession(token: string, session: Session) {
   await redis
     .multi()
-    .set(sessionKey(token), JSON.stringify(session))
+    .set(sessionKey(token), JSON.stringify(session), {
+      expiration: { type: "EX", value: TTL_S },
+    })
     .hSet(tokensKey(session.roomId), session.playerId, token)
+    .expire(tokensKey(session.roomId), TTL_S)
     .exec();
 }
 

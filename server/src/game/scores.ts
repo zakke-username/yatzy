@@ -1,6 +1,13 @@
-import type { Scores } from "../../../shared/types.ts";
+import {
+  LOWER_CATEGORIES,
+  UPPER_CATEGORIES,
+  type Category,
+  type Scores,
+} from "../../../shared/types.ts";
 
 const FACES = [1, 2, 3, 4, 5, 6];
+const BONUS_THRESHOLD = 63;
+const BONUS = 50;
 
 export function calculateScores(dice: number[]): Scores {
   const sorted = dice.toSorted().join("");
@@ -22,6 +29,15 @@ export function calculateScores(dice: number[]): Scores {
     chance: sum(dice),
     yatzy: dice.every((value) => value === dice[0]) ? 50 : 0,
   };
+}
+
+// Calculate upper section sum and total
+export function totals(scores: Scores) {
+  const add = (categories: readonly Category[]) =>
+    categories.reduce((sum, category) => sum + (scores[category] ?? 0), 0);
+  const sum = add(UPPER_CATEGORIES);
+  const bonus = sum >= BONUS_THRESHOLD ? BONUS : 0;
+  return { sum, bonus, total: sum + bonus + add(LOWER_CATEGORIES) };
 }
 
 function count(dice: number[], face: number) {

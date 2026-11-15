@@ -51,20 +51,18 @@ export function registerRoomRoutes(app: Express) {
       if (error) return res.status(409).json({ error });
       await saveRoom(room);
 
-      // Assign 256-bit cryptographically random auth token
+      // Assign random auth token
       const token = randomBytes(32).toString("base64url");
       await saveSession(token, { roomId: room.id, playerId: player.id });
 
       // Auto-kicks new player in case they never connect via socket
       await startLeaveTimer(room.id, player.id);
 
-      res
-        .status(201)
-        .json({
-          roomId: room.id,
-          playerId: player.id,
-          token,
-        } satisfies JoinResponse);
+      res.status(201).json({
+        roomId: room.id,
+        playerId: player.id,
+        token,
+      } satisfies JoinResponse);
     });
   });
 }

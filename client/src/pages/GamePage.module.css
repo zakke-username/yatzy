@@ -81,6 +81,11 @@
   max-width: 100%;
 }
 
+/* Set min width to prevent ui shift */
+.roll-button {
+  min-width: 8rem;
+}
+
 /* Pulse highlight on roll button */
 .controls > [data-highlight="true"]:enabled {
   outline: 8px solid var(--yellow);

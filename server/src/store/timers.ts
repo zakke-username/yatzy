@@ -1,7 +1,7 @@
 // Timers are stored as a sorted set in Redis ("timers" -> string-number pair)
 // Each timer stores a "score", which is a timestamp after which it's run out
 
-import { redis } from "./redis.ts";
+import { redis, TTL_S } from "./redis.ts";
 
 export async function startTimer(name: string, ms: number) {
   await redis.zAdd(
@@ -16,6 +16,8 @@ export async function cancelTimer(name: string) {
 }
 
 export async function getDueTimers() {
+  // Drop timers that stay stuck
+  await redis.zRemRangeByScore("timers", 0, Date.now() - TTL_S * 1000);
   return redis.zRangeByScore("timers", 0, Date.now());
 }
 

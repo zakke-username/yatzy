@@ -3,22 +3,18 @@ import { randomInt, randomUUID } from "node:crypto";
 import {
   CATEGORIES,
   DICE_COUNT,
-  LOWER_CATEGORIES,
   ROLLS_PER_TURN,
-  UPPER_CATEGORIES,
   type ApiError,
   type Category,
   type PublicRoomState,
   type RoomStatus,
   type Scores,
 } from "../../../shared/types.ts";
-import { calculateScores } from "./scores.ts";
+import { calculateScores, totals } from "./scores.ts";
 
 export const MAX_PLAYERS = 8;
 const ROOM_ID_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const ROOM_ID_LENGTH = 6;
-const BONUS_THRESHOLD = 63;
-const BONUS = 50;
 
 export type Player = {
   id: string;
@@ -29,15 +25,6 @@ export type Player = {
   bonus: number;
   total: number;
 };
-
-// Calculate upper section sum and total
-function totals(scores: Scores) {
-  const add = (categories: readonly Category[]) =>
-    categories.reduce((sum, category) => sum + (scores[category] ?? 0), 0);
-  const sum = add(UPPER_CATEGORIES);
-  const bonus = sum >= BONUS_THRESHOLD ? BONUS : 0;
-  return { sum, bonus, total: sum + bonus + add(LOWER_CATEGORIES) };
-}
 
 export type Room = {
   id: string;
@@ -110,7 +97,8 @@ export function rollDice(
   playerId: string,
   held: boolean[],
 ): ApiError | undefined {
-  if (playerId !== room.currentPlayerId) return "NOT_YOUR_TURN";
+  if (playerId !== room.currentPlayerId || room.status !== "playing")
+    return "NOT_YOUR_TURN";
   if (room.rollsLeft === 0) return "NO_ROLLS_LEFT";
 
   // If first roll, roll all dice
@@ -119,7 +107,6 @@ export function rollDice(
   room.dice = room.dice.map((value, i) =>
     room.held[i] ? value : randomInt(1, 7),
   );
-
   room.rollsLeft--;
 }
 
@@ -129,7 +116,8 @@ export function endTurn(
   player: Player,
   category: Category,
 ): ApiError | undefined {
-  if (player.id !== room.currentPlayerId) return "NOT_YOUR_TURN";
+  if (player.id !== room.currentPlayerId || room.status !== "playing")
+    return "NOT_YOUR_TURN";
   if (room.rollsLeft === ROLLS_PER_TURN) return "NOT_ROLLED";
   if (player.scores[category] !== null) return "CATEGORY_TAKEN";
 
@@ -157,7 +145,6 @@ function finishIfDone(room: Room) {
   );
   if (!done) return;
   room.status = "finished";
-  room.currentPlayerId = null;
 }
 
 export function toPublicState(room: Room): PublicRoomState {

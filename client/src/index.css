@@ -24,7 +24,7 @@
   font-family: "PlaypenSans", system-ui, sans-serif;
   color: var(--black);
   text-align: center;
-  background: var(--light-yellow) url("./assets/paper-background.webp");
+  background: var(--white) url("./assets/paper-background.webp");
 }
 
 *,

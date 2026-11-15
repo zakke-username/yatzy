@@ -179,7 +179,7 @@ export function registerSocketHandlers(io: GameServer) {
       }
     });
 
-    // ON DISCONNECT
+    // On disconnect
     socket.on("disconnect", async () => {
       try {
         await lockRoom(roomId, async () => {
@@ -199,7 +199,7 @@ export function registerSocketHandlers(io: GameServer) {
       }
     });
 
-    // CONNECTION HANDLER
+    // Connection handler
     // Last, because this uses the handlers defined above
     try {
       await lockRoom(roomId, async () => {

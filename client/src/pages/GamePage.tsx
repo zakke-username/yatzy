@@ -41,20 +41,13 @@ function GamePage() {
   }, [playing]);
 
   // Turn notification sound
-  const isMyTurn = !!session && room?.currentPlayerId === session.playerId;
+  const isMyTurn =
+    !!session &&
+    room?.status === "playing" &&
+    room?.currentPlayerId === session.playerId;
   useEffect(() => {
     if (isMyTurn) NOTIFICATION_SOUND.play().catch(() => {});
   }, [isMyTurn]);
-
-  // // Scroll to dice on turn start
-  // const sidePanelsRef = useRef<HTMLDivElement>(null);
-  // const turnStart = isMyTurn && room?.rollsLeft === ROLLS_PER_TURN;
-  // useEffect(() => {
-  //   if (!turnStart) return;
-  //   sidePanelsRef.current?.scrollIntoView({
-  //     behavior: "smooth",
-  //   });
-  // }, [turnStart]);
 
   function toggleHeld(index: number) {
     setHeld(held.map((isHeld, i) => (i === index ? !isHeld : isHeld)));
@@ -176,7 +169,7 @@ function GamePage() {
           {isMyTurn && (
             <button
               type="button"
-              className="button"
+              className={`button ${styles["roll-button"]}`}
               disabled={
                 busy ||
                 !isMyTurn ||
