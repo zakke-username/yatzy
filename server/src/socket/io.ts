@@ -1,5 +1,10 @@
 import type { DefaultEventsMap, Server } from "socket.io";
-import { removePlayer, toPublicState, type Room } from "../game/engine.ts";
+import {
+  createRoom,
+  removePlayer,
+  toPublicState,
+  type Room,
+} from "../game/engine.ts";
 import { deleteRoom, getRoom, lockRoom, saveRoom } from "../store/rooms.ts";
 import {
   deleteRoomSessions,
@@ -53,6 +58,16 @@ export async function leaveRoom(
   await deleteSession(room.id, player.id);
   await updateCloseTimer(room);
   io.to(room.id).emit("room:state", toPublicState(room));
+  if (room.status === "finished") await resetRoom(io, room);
+}
+
+// Resets room to lobby state and removes players. Called after game finishes.
+export async function resetRoom(io: GameServer, room: Room) {
+  io.in(room.id).socketsLeave(room.id);
+  await deleteRoomSessions(room.id);
+  const newRoom = { ...createRoom(), id: room.id };
+  await saveRoom(newRoom);
+  await updateCloseTimer(newRoom);
 }
 
 // Kick player automatically on disconnect

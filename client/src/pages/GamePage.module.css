@@ -113,11 +113,12 @@
   content: "!";
   position: absolute;
   top: -0.75rem;
-  right: 1.75rem;
+  right: 2rem;
   width: 1.75rem;
   height: 1.75rem;
   background: var(--red);
   color: var(--white);
+  font-size: large;
   font-weight: bold;
   border-radius: 50%;
 }
@@ -137,11 +138,11 @@
     position: absolute;
     right: 1rem;
     bottom: calc(100% + 1rem);
-    font-size: large;
+    font-size: x-large;
     text-shadow: 1px 1px var(--gray);
   }
 
   .game {
-    padding-bottom: 5rem;
+    padding-bottom: 6rem;
   }
 }

@@ -67,10 +67,6 @@ Everything else uses WebSockets.
 
 ## Screenshots
 
-![Main menu](./screenshots/main.png)
-
 ![Lobby](./screenshots/lobby.png "Lobby")
 
 ![Gameplay](./screenshots/game.png "Gameplay")
-
-![Results](./screenshots/results.png "Results")

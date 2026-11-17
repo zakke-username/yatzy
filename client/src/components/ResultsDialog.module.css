@@ -1,5 +1,6 @@
 .results table {
   font-size: 1.25rem;
+  margin-bottom: 1rem;
 }
 
 .results th,
@@ -18,4 +19,8 @@
 .results td:last-child {
   font-weight: 600;
   text-align: right;
+}
+
+.return {
+  background: var(--red);
 }

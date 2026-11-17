@@ -10,6 +10,7 @@ import {
 import {
   cancelLeaveTimer,
   leaveRoom,
+  resetRoom,
   startLeaveTimer,
   updateCloseTimer,
   type GameServer,
@@ -129,6 +130,7 @@ export function registerSocketHandlers(io: GameServer) {
 
           await saveRoom(room);
           io.to(room.id).emit("room:state", toPublicState(room));
+          if (room.status === "finished") await resetRoom(io, room);
           ack({ ok: true });
         });
       } catch (err) {

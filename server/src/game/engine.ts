@@ -75,7 +75,6 @@ export function addPlayer(room: Room, player: Player): ApiError | undefined {
 }
 
 export function removePlayer(room: Room, playerId: string) {
-  if (room.status === "finished") return; // Final results stay visible
   if (room.currentPlayerId === playerId) nextTurn(room);
   room.players = room.players.filter((player) => player.id !== playerId);
   // If host leaves, next player becomes host

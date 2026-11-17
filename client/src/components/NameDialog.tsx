@@ -10,7 +10,7 @@ type Props = {
 
 function NameDialog({ onSubmit, onCancel }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const [name, setName] = useState("");
+  const [name, setName] = useState(() => sessionStorage.getItem("name") ?? "");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -21,6 +21,7 @@ function NameDialog({ onSubmit, onCancel }: Props) {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    sessionStorage.setItem("name", name);
     setBusy(true);
     setError("");
     try {

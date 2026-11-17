@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, useParams } from "react-router";
+import { Navigate, useNavigate, useParams } from "react-router";
 import notificationSoundUrl from "../assets/notification.mp3";
 import Chat from "../components/Chat.tsx";
 import Dice from "../components/Dice.tsx";
@@ -23,6 +23,7 @@ NOTIFICATION_SOUND.volume = 0.4;
 // The current player rolls the dice, then picks a category to score, which ends their turn
 function GamePage() {
   const roomId = useParams().roomId!.toUpperCase();
+  const navigate = useNavigate();
   const { session, room, leave } = useRoom(roomId);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -164,10 +165,12 @@ function GamePage() {
           onClose={() => setChatOpen(false)}
         />
 
+        {/* GAME OVER: show results dialog */}
         {finished && (
           <ResultsDialog
             players={room.players}
             playerId={session.playerId}
+            onPlayAgain={() => navigate(`/lobby/${room.id}`, { replace: true })}
             onReturn={leave}
           />
         )}

@@ -4,10 +4,9 @@ import { joinRoom } from "../lib/api.ts";
 import { socket } from "../lib/socket.ts";
 import type { JoinResponse, PublicRoomState } from "../../../shared/types.ts";
 
-// The player's session in a room (their token) and the socket connection that uses it.
-// sessionStorage is per tab, keyed by room ID: a refresh keeps the seat, and other tabs can join as other players.
 export function useRoom(roomId: string) {
   const navigate = useNavigate();
+  // Get session data (id and token) from browser storage
   const [session, setSession] = useState<JoinResponse | null>(() => {
     const stored = sessionStorage.getItem(roomId);
     return stored ? JSON.parse(stored) : null;
@@ -32,14 +31,23 @@ export function useRoom(roomId: string) {
       if (reason === "io server disconnect") exit("Disconnected by server");
     };
 
+    const onState = (state: PublicRoomState) => {
+      setRoom(state);
+      // Check if game's finished
+      if (state.status === "finished") {
+        sessionStorage.removeItem(roomId);
+        socket.disconnect();
+      }
+    };
+
     socket.auth = { token: session.token };
-    socket.on("room:state", setRoom);
+    socket.on("room:state", onState);
     socket.on("connect_error", onConnectError);
     socket.on("disconnect", onDisconnect);
     socket.connect();
 
     return () => {
-      socket.off("room:state", setRoom);
+      socket.off("room:state", onState);
       socket.off("connect_error", onConnectError);
       socket.off("disconnect", onDisconnect);
       socket.disconnect();

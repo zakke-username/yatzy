@@ -8,10 +8,11 @@ const FANFARE_SOUND = new Audio(fanfareSoundUrl);
 type Props = {
   players: PublicPlayer[];
   playerId: string; // you
+  onPlayAgain: () => void;
   onReturn: () => void;
 };
 
-function ResultsDialog({ players, playerId, onReturn }: Props) {
+function ResultsDialog({ players, playerId, onPlayAgain, onReturn }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -36,7 +37,6 @@ function ResultsDialog({ players, playerId, onReturn }: Props) {
       <table>
         <tbody>
           {ranked.map((player) => {
-            // Ties share a place: 1, 1, 3
             const place = ranked.findIndex((p) => p.total === player.total) + 1;
             return (
               <tr key={player.id}>
@@ -56,8 +56,15 @@ function ResultsDialog({ players, playerId, onReturn }: Props) {
           })}
         </tbody>
       </table>
-      <button type="button" className="button" onClick={onReturn}>
-        Back to main menu
+      <button type="button" className="button" onClick={onPlayAgain}>
+        Play again
+      </button>
+      <button
+        type="button"
+        className={`button ${styles.return}`}
+        onClick={onReturn}
+      >
+        Exit to main menu
       </button>
     </dialog>
   );
