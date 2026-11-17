@@ -56,6 +56,7 @@ export type PublicRoomState = {
   dice: number[];
   held: boolean[];
   rollsLeft: number;
+  turnEndsAt: number;
   potentialScores: Scores;
 };
 

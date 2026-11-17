@@ -11,6 +11,11 @@ export async function startTimer(name: string, ms: number) {
   );
 }
 
+// Starts a timer, or moves it if it's running, to fire at dueAt (ms timestamp)
+export async function setTimer(name: string, dueAt: number) {
+  await redis.zAdd("timers", { score: dueAt, value: name });
+}
+
 export async function cancelTimer(name: string) {
   await redis.zRem("timers", name);
 }

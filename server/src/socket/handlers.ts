@@ -13,6 +13,7 @@ import {
   resetRoom,
   startLeaveTimer,
   updateCloseTimer,
+  updateTurnTimer,
   type GameServer,
 } from "./io.ts";
 
@@ -65,6 +66,7 @@ export function registerSocketHandlers(io: GameServer) {
           if (error) return ack({ ok: false, error });
 
           await saveRoom(room);
+          await updateTurnTimer(room);
           io.to(room.id).emit("room:state", toPublicState(room));
           ack({ ok: true });
         });
@@ -129,6 +131,7 @@ export function registerSocketHandlers(io: GameServer) {
           if (error) return ack({ ok: false, error });
 
           await saveRoom(room);
+          await updateTurnTimer(room);
           io.to(room.id).emit("room:state", toPublicState(room));
           if (room.status === "finished") await resetRoom(io, room);
           ack({ ok: true });

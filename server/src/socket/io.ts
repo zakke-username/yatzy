@@ -2,6 +2,7 @@ import type { DefaultEventsMap, Server } from "socket.io";
 import {
   createRoom,
   removePlayer,
+  timeOutTurn,
   toPublicState,
   type Room,
 } from "../game/engine.ts";
@@ -15,6 +16,7 @@ import {
   cancelTimer,
   getDueTimers,
   isDue,
+  setTimer,
   startTimer,
 } from "../store/timers.ts";
 import type {
@@ -43,6 +45,13 @@ export async function updateCloseTimer(room: Room) {
   else await cancelTimer(`close:${room.id}`);
 }
 
+// Reset turn timer
+export async function updateTurnTimer(room: Room) {
+  if (room.status === "playing")
+    await setTimer(`turn:${room.id}`, room.turnEndsAt);
+  else await cancelTimer(`turn:${room.id}`);
+}
+
 // Leaving, disconnecting and the leave timer end here.
 export async function leaveRoom(
   io: GameServer,
@@ -57,6 +66,19 @@ export async function leaveRoom(
   await saveRoom(room);
   await deleteSession(room.id, player.id);
   await updateCloseTimer(room);
+  await updateTurnTimer(room);
+  io.to(room.id).emit("room:state", toPublicState(room));
+  if (room.status === "finished") await resetRoom(io, room);
+}
+
+// Turn timer ends here
+async function expireTurn(io: GameServer, roomId: string) {
+  const room = await getRoom(roomId);
+  if (!room) return;
+
+  timeOutTurn(room);
+  await saveRoom(room);
+  await updateTurnTimer(room);
   io.to(room.id).emit("room:state", toPublicState(room));
   if (room.status === "finished") await resetRoom(io, room);
 }
@@ -79,7 +101,7 @@ export async function cancelLeaveTimer(roomId: string, playerId: string) {
   await cancelTimer(`leave:${roomId}:${playerId}`);
 }
 
-// Search the database for timers periodically (autokick, auto delete room)
+// Search the database for timers periodically (autokick, turn timeout, auto delete room)
 export function startTimerSweep(io: GameServer) {
   const sweep = async () => {
     try {
@@ -89,11 +111,13 @@ export function startTimerSweep(io: GameServer) {
           // re-check, in case timer is reset while waiting for lock
           if (!(await isDue(name))) return;
           if (kind === "leave") await leaveRoom(io, roomId, playerId);
+          else if (kind === "turn") await expireTurn(io, roomId);
           else {
             await deleteRoom(roomId);
             await deleteRoomSessions(roomId);
           }
-          await cancelTimer(name);
+          // Remove the timer, unless acting restarted it (a timed-out turn starts the next one)
+          if (await isDue(name)) await cancelTimer(name);
         });
       }
     } catch (err) {

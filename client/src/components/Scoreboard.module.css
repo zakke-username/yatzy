@@ -75,8 +75,7 @@
   padding: 0.5rem 1rem;
   border: none;
   background: none;
-  color: color-mix(in srgb, var(--black) 40%, transparent);
-  font-style: italic;
+  color: var(--gray);
   font-weight: normal;
 }
 
@@ -84,7 +83,7 @@
   box-shadow:
     0 0 4px var(--green) inset,
     -0 -0 4px var(--green) inset;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
 .scoreboard td > button:enabled:hover {
@@ -92,6 +91,7 @@
   box-shadow:
     0 0 6px var(--green) inset,
     -0 -0 6px var(--green) inset;
+  font-weight: bold;
 }
 
 @media (width < 768px) {

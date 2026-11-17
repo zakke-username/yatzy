@@ -13,6 +13,7 @@ import {
 import { calculateScores, totals } from "./scores.ts";
 
 export const MAX_PLAYERS = 8;
+const TURN_MS = 60_000;
 const ROOM_ID_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const ROOM_ID_LENGTH = 6;
 
@@ -35,6 +36,7 @@ export type Room = {
   dice: number[];
   held: boolean[];
   rollsLeft: number;
+  turnEndsAt: number;
 };
 
 function newRoomId() {
@@ -62,6 +64,7 @@ export function createRoom(): Room {
     dice: Array.from({ length: DICE_COUNT }, () => randomInt(1, 7)),
     held: Array<boolean>(DICE_COUNT).fill(false),
     rollsLeft: 0,
+    turnEndsAt: 0,
   };
 }
 
@@ -89,6 +92,7 @@ export function startGame(room: Room, playerId: string): ApiError | undefined {
   room.status = "playing";
   room.currentPlayerId = room.players[0].id;
   room.rollsLeft = ROLLS_PER_TURN;
+  room.turnEndsAt = Date.now() + TURN_MS;
 }
 
 export function rollDice(
@@ -126,6 +130,23 @@ export function endTurn(
   finishIfDone(room);
 }
 
+// End turn on timer running out
+export function timeOutTurn(room: Room) {
+  const player = room.players.find((p) => p.id === room.currentPlayerId);
+  if (room.status !== "playing" || !player || Date.now() < room.turnEndsAt)
+    return;
+
+  const empty = CATEGORIES.filter(
+    (category) => player.scores[category] === null,
+  );
+  const category = empty[randomInt(empty.length)];
+  const rolled = room.rollsLeft < ROLLS_PER_TURN;
+  player.scores[category] = rolled ? calculateScores(room.dice)[category] : 0;
+  Object.assign(player, totals(player.scores));
+  nextTurn(room);
+  finishIfDone(room);
+}
+
 function nextTurn(room: Room) {
   const currentPlayerIndex = room.players.findIndex(
     (player) => player.id === room.currentPlayerId,
@@ -133,6 +154,7 @@ function nextTurn(room: Room) {
   const nextPlayerIndex = (currentPlayerIndex + 1) % room.players.length;
   room.currentPlayerId = room.players[nextPlayerIndex].id;
   room.rollsLeft = ROLLS_PER_TURN;
+  room.turnEndsAt = Date.now() + TURN_MS;
 }
 
 // If all players have filled all scores, game is over
@@ -167,6 +189,7 @@ export function toPublicState(room: Room): PublicRoomState {
     dice: room.dice,
     held: room.held,
     rollsLeft: room.rollsLeft,
+    turnEndsAt: room.turnEndsAt,
     potentialScores: calculateScores(room.dice),
   };
 }

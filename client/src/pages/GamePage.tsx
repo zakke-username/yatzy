@@ -5,6 +5,7 @@ import Chat from "../components/Chat.tsx";
 import Dice from "../components/Dice.tsx";
 import ResultsDialog from "../components/ResultsDialog.tsx";
 import Scoreboard from "../components/Scoreboard.tsx";
+import TurnTimer from "../components/TurnTimer.tsx";
 import { useRoom } from "../hooks/useRoom.ts";
 import { ERROR_MESSAGES } from "../lib/api.ts";
 import { socket } from "../lib/socket.ts";
@@ -20,7 +21,6 @@ const NONE_HELD = Array<boolean>(DICE_COUNT).fill(false);
 const NOTIFICATION_SOUND = new Audio(notificationSoundUrl);
 NOTIFICATION_SOUND.volume = 0.4;
 
-// The current player rolls the dice, then picks a category to score, which ends their turn
 function GamePage() {
   const roomId = useParams().roomId!.toUpperCase();
   const navigate = useNavigate();
@@ -57,6 +57,10 @@ function GamePage() {
     setHeld(held.map((isHeld, i) => (i === index ? !isHeld : isHeld)));
   }
 
+  // A new turn (new turnEndsAt) releases the held dice
+  // oxlint-disable-next-line react/set-state-in-effect
+  useEffect(() => setHeld(NONE_HELD), [room?.turnEndsAt]);
+
   // Flag unread messages
   useEffect(() => {
     if (chatOpen) return;
@@ -74,7 +78,6 @@ function GamePage() {
     const response = await request.catch(() => undefined);
     setBusy(false);
     setError(response && !response.ok ? ERROR_MESSAGES[response.error] : "");
-    return response?.ok;
   }
 
   // Roll dice. rolling = spin dice at constant pace until server responds ("loading")
@@ -86,8 +89,7 @@ function GamePage() {
 
   // Send scoring category
   async function handleScore(category: Category) {
-    if (await send(socket.emitWithAck("turn:end", { category })))
-      setHeld(NONE_HELD);
+    await send(socket.emitWithAck("turn:end", { category }));
   }
 
   // No session = player not in this game, redirect to home page
@@ -127,19 +129,24 @@ function GamePage() {
         >
           ❓
         </a>
-        <h2
-          className={styles.turn}
-          data-my-turn={isMyTurn}
-          data-connected={currentPlayer?.connected}
-        >
-          {currentPlayer?.connected ? (
-            <>
-              {isMyTurn ? <>Your turn!</> : <>{currentPlayer?.name}'s turn</>}
-            </>
-          ) : (
-            <>{currentPlayer?.name} has disconnected: kicking in 30 s...</>
+        <div className={styles["turn-info"]}>
+          <h2
+            className={styles.turn}
+            data-my-turn={isMyTurn}
+            data-connected={currentPlayer?.connected}
+          >
+            {currentPlayer?.connected ? (
+              <>
+                {isMyTurn ? <>Your turn!</> : <>{currentPlayer?.name}'s turn</>}
+              </>
+            ) : (
+              <>{currentPlayer?.name} has disconnected: kicking in 30 s...</>
+            )}
+          </h2>
+          {playing && (
+            <TurnTimer key={room.turnEndsAt} endsAt={room.turnEndsAt} />
           )}
-        </h2>
+        </div>
         <button
           type="button"
           className={`button ${styles.small}`}
