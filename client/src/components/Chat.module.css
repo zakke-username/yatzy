@@ -15,7 +15,7 @@
 }
 
 .chat h3 {
-  margin: 0;
+  margin: 0 0.5rem;
 }
 
 .close {
@@ -65,7 +65,7 @@
 }
 
 /* If screen is wide, show chat contents even if not "open" */
-@media (width >= 600px) {
+@media (width >= 768px) {
   .dialog:not([open]) {
     display: contents;
   }

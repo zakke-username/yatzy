@@ -103,7 +103,7 @@ main.card {
 }
 
 dialog {
-  width: min(100% - 2rem, 26rem);
+  width: min(100% - 2rem, 32rem);
   color: inherit;
   text-align: left;
 }

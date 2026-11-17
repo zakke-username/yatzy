@@ -42,7 +42,7 @@
   text-transform: uppercase;
 }
 
-@media (width < 512px) {
+@media (width < 768px) {
   .home > h1 {
     font-size: 3rem;
   }

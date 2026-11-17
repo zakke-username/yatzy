@@ -80,18 +80,22 @@
   font-weight: normal;
 }
 
-.scoreboard td > button:enabled:hover {
-  color: var(--green);
-  font-weight: bold;
-  cursor: pointer;
+.scoreboard td > button:enabled {
+  box-shadow:
+    0 0 4px var(--green) inset,
+    -0 -0 4px var(--green) inset;
+  border-radius: 2px;
 }
 
-@media (width < 600px) {
+.scoreboard td > button:enabled:hover {
+  cursor: pointer;
+  box-shadow:
+    0 0 6px var(--green) inset,
+    -0 -0 6px var(--green) inset;
+}
+
+@media (width < 768px) {
   .scoreboard {
     padding: 1rem;
-  }
-
-  .scoreboard tbody th {
-    font-size: small;
   }
 }

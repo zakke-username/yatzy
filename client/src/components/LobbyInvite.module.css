@@ -1,15 +1,18 @@
 .invite {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 1.5rem;
 }
 
 .invite > p {
-  margin: auto;
+  margin: 0;
   font-size: 2rem;
+  text-align: left;
 }
 
 .invite > button {
   padding: 0.5rem;
   font-size: medium;
+  text-wrap: nowrap;
 }

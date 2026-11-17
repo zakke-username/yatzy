@@ -37,6 +37,11 @@ const LABELS: Record<(typeof ROWS)[number], string> = {
   total: "Total",
 };
 
+function zeroToDash(score: number | null): string {
+  if (score === null) return "";
+  return score > 0 ? score.toString() : "-";
+}
+
 type Props = {
   players: PublicPlayer[];
   currentPlayerId: string | null;
@@ -102,10 +107,10 @@ function Scoreboard({
                             disabled={disabled}
                             onClick={() => onScore(row)}
                           >
-                            {potentialScores[row]}
+                            {zeroToDash(potentialScores[row])}
                           </button>
                         ) : (
-                          score
+                          zeroToDash(score)
                         )}
                       </td>
                     );

@@ -15,8 +15,8 @@
 }
 
 .players > li[data-host="true"] {
-  border-color: var(--green);
-  background: var(--pink);
+  /* border-color: var(--green); */
+  /* background: var(--pink); */
 }
 
 .name {
