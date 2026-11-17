@@ -28,6 +28,8 @@ function GamePage() {
   const [busy, setBusy] = useState(false);
   const [rolling, setRolling] = useState(false);
   const [held, setHeld] = useState(NONE_HELD);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(false);
 
   // Warn before closing
   const playing = room?.status === "playing";
@@ -49,9 +51,20 @@ function GamePage() {
     if (isMyTurn) NOTIFICATION_SOUND.play().catch(() => {});
   }, [isMyTurn]);
 
+  // Hold dice
   function toggleHeld(index: number) {
     setHeld(held.map((isHeld, i) => (i === index ? !isHeld : isHeld)));
   }
+
+  // Flag unread messages
+  useEffect(() => {
+    if (chatOpen) return;
+    const onMessage = () => setUnreadMessages(true);
+    socket.on("chat:message", onMessage);
+    return () => {
+      socket.off("chat:message", onMessage);
+    };
+  }, [chatOpen]);
 
   // Disables buttons until the server answers or the connection drops, so a double click sends only one request
   async function send(request: Promise<AckResponse>) {
@@ -144,7 +157,12 @@ function GamePage() {
           disabled={busy || !isMyTurn}
           onScore={handleScore}
         />
-        <Chat className={styles.chat} playerId={session.playerId} />
+        <Chat
+          className={styles.chat}
+          playerId={session.playerId}
+          open={chatOpen}
+          onClose={() => setChatOpen(false)}
+        />
 
         {finished && (
           <ResultsDialog
@@ -183,6 +201,20 @@ function GamePage() {
             </button>
           )}
         </div>
+        {/* Narrow screens only: open chat */}
+        <button
+          type="button"
+          className={`button ${styles.small} ${styles["chat-button"]}`}
+          aria-label="Chat"
+          data-unread={unreadMessages}
+          title="Chat"
+          onClick={() => {
+            setChatOpen(true);
+            setUnreadMessages(false);
+          }}
+        >
+          💬
+        </button>
       </footer>
       {error && <div className="error">⚠️ {error}</div>}
     </main>

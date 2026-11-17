@@ -72,3 +72,5 @@ Everything else uses WebSockets.
 ![Lobby](./screenshots/lobby.png "Lobby")
 
 ![Gameplay](./screenshots/game.png "Gameplay")
+
+![Results](./screenshots/results.png "Results")
