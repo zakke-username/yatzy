@@ -34,6 +34,7 @@ function NameDialog({ onSubmit, onCancel }: Props) {
 
   return (
     <dialog
+      className={styles.dialog}
       ref={dialogRef}
       aria-labelledby="dialog-title"
       onCancel={(event) => {

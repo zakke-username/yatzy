@@ -23,7 +23,7 @@ function PlayerList({ room, playerId }: Props) {
             <span className={styles.badge}>Host</span>
           )}
           {!player.connected && (
-            <span className="muted">(disconnected: kicking within 30 s)</span>
+            <span className="muted">(disconnected: kicking soon...)</span>
           )}
         </li>
       ))}

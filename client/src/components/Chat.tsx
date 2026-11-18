@@ -5,7 +5,7 @@ import styles from "./Chat.module.css";
 
 type Props = {
   playerId: string; // you
-  open: boolean; // shown as a dialog: only on narrow screens, which hide the chat otherwise
+  open: boolean; // shown as a dialog: only when there's no room to show the chat inline
   onClose: () => void;
   className?: string;
 };

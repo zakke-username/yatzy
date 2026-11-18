@@ -80,18 +80,15 @@
 }
 
 .scoreboard td > button:enabled {
-  box-shadow:
-    0 0 4px var(--green) inset,
-    -0 -0 4px var(--green) inset;
-  border-radius: 4px;
+  outline: 3px solid rgba(0, 128, 0, 0.5);
+  outline-offset: -3px;
+  border-radius: 2px;
 }
 
 .scoreboard td > button:enabled:hover {
   cursor: pointer;
-  box-shadow:
-    0 0 6px var(--green) inset,
-    -0 -0 6px var(--green) inset;
   font-weight: bold;
+  outline-color: rgba(0, 128, 0, 0.8);
 }
 
 @media (width < 768px) {

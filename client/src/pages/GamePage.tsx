@@ -119,7 +119,7 @@ function GamePage() {
   const currentPlayer = room.players.find((p) => p.id === room.currentPlayerId);
 
   return (
-    <main className={styles.page}>
+    <main className={styles.page} data-players={room.players.length}>
       <header>
         <a
           className={`button ${styles.small}`}
@@ -140,7 +140,7 @@ function GamePage() {
                 {isMyTurn ? <>Your turn!</> : <>{currentPlayer?.name}'s turn</>}
               </>
             ) : (
-              <>{currentPlayer?.name} has disconnected: kicking in 30 s...</>
+              <>{currentPlayer?.name} has disconnected: kicking soon...</>
             )}
           </h2>
           {playing && (
@@ -211,7 +211,7 @@ function GamePage() {
             </button>
           )}
         </div>
-        {/* Narrow screens only: open chat */}
+        {/* Open chat */}
         <button
           type="button"
           className={`button ${styles.small} ${styles["chat-button"]}`}

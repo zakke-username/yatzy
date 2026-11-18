@@ -24,3 +24,9 @@
 .return {
   background: var(--red);
 }
+
+@media (width < 768px) {
+  .results table {
+    font-size: 1rem;
+  }
+}

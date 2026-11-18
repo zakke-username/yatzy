@@ -64,11 +64,9 @@
   flex: 1;
 }
 
-/* If screen is wide, show chat contents even if not "open" */
-@media (width >= 768px) {
-  .dialog:not([open]) {
-    display: contents;
-  }
+/* Closed, the chat shows inline (GamePage hides it when it doesn't fit) */
+.dialog:not([open]) {
+  display: contents;
 }
 
 /* Open dialog: the chat is the card, the dialog only places it */
