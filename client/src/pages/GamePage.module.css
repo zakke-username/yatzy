@@ -44,7 +44,6 @@
   align-items: center;
   justify-content: center;
   min-width: 0;
-  /* margin: 0 1rem; */
   gap: 1rem;
 }
 
@@ -58,7 +57,7 @@
 
 .turn[data-my-turn="true"] {
   color: var(--green);
-  -webkit-text-stroke: 6px yellow;
+  -webkit-text-stroke: 6px rgba(0, 128, 0, 0.2);
   paint-order: stroke fill;
   animation: highlight-text 1s ease-in-out infinite;
 }

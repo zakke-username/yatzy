@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router";
+import rollSoundUrl from "../assets/dice-roll.wav";
 import notificationSoundUrl from "../assets/notification.mp3";
 import Chat from "../components/Chat.tsx";
 import Dice from "../components/Dice.tsx";
@@ -20,6 +21,8 @@ import styles from "./GamePage.module.css";
 const NONE_HELD = Array<boolean>(DICE_COUNT).fill(false);
 const NOTIFICATION_SOUND = new Audio(notificationSoundUrl);
 NOTIFICATION_SOUND.volume = 0.4;
+const ROLL_SOUND = new Audio(rollSoundUrl);
+ROLL_SOUND.volume = 0.5;
 
 function GamePage() {
   const roomId = useParams().roomId!.toUpperCase();
@@ -52,6 +55,15 @@ function GamePage() {
     if (isMyTurn) NOTIFICATION_SOUND.play().catch(() => {});
   }, [isMyTurn]);
 
+  // Roll sound for other players
+  const rollsLeft = room?.rollsLeft;
+  useEffect(() => {
+    if (!isMyTurn && rollsLeft !== undefined && rollsLeft < ROLLS_PER_TURN) {
+      ROLL_SOUND.currentTime = 0;
+      ROLL_SOUND.play().catch(() => {});
+    }
+  }, [rollsLeft, isMyTurn]);
+
   // Hold dice
   function toggleHeld(index: number) {
     setHeld(held.map((isHeld, i) => (i === index ? !isHeld : isHeld)));
@@ -82,6 +94,9 @@ function GamePage() {
 
   // Roll dice. rolling = spin dice at constant pace until server responds ("loading")
   async function handleRoll() {
+    // Play sound for current player only
+    ROLL_SOUND.currentTime = 0;
+    ROLL_SOUND.play().catch(() => {});
     setRolling(true);
     await send(socket.emitWithAck("turn:roll", { held }));
     setRolling(false);
@@ -161,8 +176,8 @@ function GamePage() {
         <Scoreboard
           players={room.players}
           currentPlayerId={room.currentPlayerId}
-          potentialScores={hasRolled ? room.potentialScores : null}
-          disabled={busy || !isMyTurn}
+          potentialScores={isMyTurn && hasRolled ? room.potentialScores : null}
+          disabled={busy}
           onScore={handleScore}
         />
         <Chat

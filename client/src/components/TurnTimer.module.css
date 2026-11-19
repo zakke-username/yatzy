@@ -7,3 +7,9 @@
   text-align: left;
   text-wrap: nowrap;
 }
+
+@media (width < 768px) {
+  .timer {
+    min-width: 5rem;
+  }
+}

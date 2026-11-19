@@ -74,21 +74,18 @@
   width: 100%;
   padding: 0.5rem 1rem;
   border: none;
-  background: none;
-  color: var(--gray);
-  font-weight: normal;
-}
-
-.scoreboard td > button:enabled {
+  border-radius: 4px;
   outline: 3px solid rgba(0, 128, 0, 0.5);
-  outline-offset: -3px;
-  border-radius: 2px;
+  outline-offset: -4px;
+  background: none;
+  color: var(--green);
+  font-weight: normal;
+  cursor: pointer;
 }
 
-.scoreboard td > button:enabled:hover {
-  cursor: pointer;
-  font-weight: bold;
-  outline-color: rgba(0, 128, 0, 0.8);
+.scoreboard td > button:hover {
+  /* font-weight: bold; */
+  outline-color: rgba(0, 128, 0, 1);
 }
 
 @media (width < 768px) {
