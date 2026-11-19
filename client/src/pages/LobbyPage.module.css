@@ -1,3 +1,7 @@
+.window {
+  min-width: min(100dvw - 2rem, 24rem);
+}
+
 .waiting {
   margin: 0;
   color: var(--gray);

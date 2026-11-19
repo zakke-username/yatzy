@@ -82,16 +82,16 @@
   gap: 3rem;
   /* Pushes footer to bottom of screen */
   margin: auto 0;
-  padding: 2rem;
+  padding: 1rem;
 }
 
 .chat {
   position: sticky;
-  top: 6rem;
+  top: 5rem;
   flex: none;
   align-self: stretch;
   /* screen height - (header + footer height) - footer border */
-  max-height: calc(100vh - 14rem - 2px);
+  max-height: calc(100vh - 12rem - 2px);
 }
 
 .controls {
@@ -156,7 +156,7 @@
   }
 
   .turn-info * {
-    font-size: 1.1rem;
+    font-size: large;
   }
 
   .turn[data-connected="false"] {

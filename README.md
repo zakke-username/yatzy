@@ -1,14 +1,12 @@
-# 🎲 Yatzy
+# 🎲 [Yatzy](https://freeyatzy.com/)
 
 A multiplayer browser game written in TypeScript. A monorepo using npm workspaces.
 
-**[Play now](https://freeyatzy.com/)**
+Play a game of Yatzy quickly and easily, without logging in. Open a new room with a single click, invite others with a link, and start the game. Select the dice to roll, and mark a score. A per-game chat is included.
 
-Spin up a game of Yatzy quickly and easily, without needing to log in. Open a new room with a single click, invite others via a link, and start the game. Select the dice to roll, and the game automatically calculates and applies your scores. A per-game chat is included.
+## How it works
 
-### Features
-
-The client is a React single page app. Styling is done using plain CSS modules, and the layout is fully responsive. Using WebSockets, clients emit only intent and render the updated state.
+The client is a React single page app. Styling is done using plain CSS modules, and the layout is responsive and mobile-friendly. Using WebSockets, clients emit only intent and render the updated state.
 
 The server (node, express, socket.io) is the only source of truth, including scores and security. Players are authenticated by a secret token issued by the server, and it's validated only during a socket connection handshake. Tokens, IDs and dice rolls use cryptographic randomness.
 
@@ -16,34 +14,34 @@ A Redis database is used as state storage for games, players and timers, as well
 
 ## Tech stack
 
-- **React + Vite + React Router** for front end
+- **React + Vite** front end
 - **Node** back end
-- **Express** for HTTP
+- **Express** for HTTP routes
 - **Socket.io** for real time communication
 - **Redis** as state storage
 
-## Setup
+## Development setup
 
-Requirements: Node (22.22+) and Redis (7+).
+Requirements: Node (22+) and Redis (7+).
 
-Start Redis, using Docker for example:
+- Start Redis, using Docker for example:
 
 ```sh
 docker run -d --name yatzy-redis -p 127.0.0.1:6379:6379 redis:8-alpine
 ```
 
-Run from repository's root:
+- Run from repository's root:
 
 ```sh
 npm install
 npm run dev
 ```
 
-## Flow
+## API and socket events
+
+Room creation and players joining use HTTP, because sockets need a valid auth token from the beginning. This is returned from the POST join route. Everything else uses WebSockets.
 
 ### HTTP routes
-
-Room creation and players joining use HTTP, because sockets need a valid auth token from the beginning. This is returned from the POST join route.
 
 | Route                             | Body       | Response                      |
 | --------------------------------- | ---------- | ----------------------------- |
@@ -52,8 +50,6 @@ Room creation and players joining use HTTP, because sockets need a valid auth to
 | `POST /api/rooms/:roomId/players` | `{ name }` | `{ roomId, playerId, token }` |
 
 ### Socket events
-
-Everything else uses WebSockets.
 
 | Event          | Payload               | Direction        |                                                  |
 | -------------- | --------------------- | ---------------- | ------------------------------------------------ |

@@ -20,7 +20,7 @@ function LobbyInvite({ roomId }: Props) {
   return (
     <div className={styles.invite}>
       <p>
-        Lobby: <b>{roomId}</b>
+        <b>Lobby</b>: {roomId}
       </p>
       <button type="button" className="button" onClick={copyLink}>
         {copied ? "Copied!" : "Copy link"}

@@ -1,3 +1,8 @@
+.home {
+  display: flex;
+  gap: 2rem;
+}
+
 .home > h1 {
   margin: 1rem auto;
   font-size: 4rem;
@@ -11,21 +16,6 @@
   border-radius: 0.75rem;
   background: var(--pink);
   font-size: 1rem;
-}
-
-.divider {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  color: var(--gray);
-  font-size: 1rem;
-}
-
-.divider::before,
-.divider::after {
-  content: "";
-  flex: 1;
-  border-top: 1px solid var(--light-gray);
 }
 
 .home > form {
@@ -44,6 +34,6 @@
 
 @media (width < 768px) {
   .home > h1 {
-    font-size: 3rem;
+    font-size: 2.5rem;
   }
 }

@@ -4,6 +4,7 @@ import type { PublicPlayer } from "../../../shared/types.ts";
 import styles from "./ResultsDialog.module.css";
 
 const FANFARE_SOUND = new Audio(fanfareSoundUrl);
+FANFARE_SOUND.volume = 0.6;
 
 type Props = {
   players: PublicPlayer[];

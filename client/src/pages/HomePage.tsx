@@ -40,9 +40,7 @@ function HomePage() {
         {!creating ? <>New game</> : <>Loading...</>}
       </button>
       {error && <p className="error">{error}</p>}
-
-      <div className={styles.divider}>or</div>
-
+      <hr />
       <form onSubmit={join}>
         <input
           placeholder="Enter lobby code"

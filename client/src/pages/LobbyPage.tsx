@@ -69,7 +69,7 @@ function LobbyPage() {
     return <Navigate to={`/game/${room.id}`} replace />;
 
   return (
-    <main className="card">
+    <main className={`card ${styles.window}`}>
       <LobbyInvite roomId={room.id} />
       <hr />
       <PlayerList room={room} playerId={session.playerId} />

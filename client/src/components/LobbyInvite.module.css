@@ -1,18 +1,22 @@
 .invite {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .invite > p {
   margin: 0;
   font-size: 2rem;
-  text-align: left;
+  text-align: center;
 }
 
 .invite > button {
-  padding: 0.5rem;
+  padding: 0.5rem 1rem;
   font-size: medium;
   text-wrap: nowrap;
+  color: var(--white);
+  background-color: var(--green);
 }
