@@ -1,5 +1,3 @@
-/* Global styles: the font, colors, HTML element defaults, and the classes shared by several components */
-
 @font-face {
   font-family: "PlaypenSans";
   src: url("./assets/fonts/PlaypenSans-VariableFont_wght.ttf")
@@ -96,7 +94,7 @@ dialog {
   max-width: calc(100vw - 2rem);
 }
 
-/* Home and lobby screens */
+/* Main menu and lobby screens */
 main.card {
   width: fit-content;
   margin: 2rem auto;

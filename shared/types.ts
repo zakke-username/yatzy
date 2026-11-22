@@ -65,6 +65,9 @@ export type CreateRoomResponse = {
   roomId: string;
 };
 
+// The longest name a player can join with (POST /api/rooms/:roomId/players { name }), after trimming
+export const MAX_NAME_LENGTH = 20;
+
 // Returned by joining a room (POST /api/rooms/:roomId/players)
 export type JoinResponse = {
   roomId: string;

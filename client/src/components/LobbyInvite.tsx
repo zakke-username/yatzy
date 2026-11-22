@@ -7,7 +7,7 @@ type Props = {
 
 function LobbyInvite({ roomId }: Props) {
   const [copied, setCopied] = useState(false);
-  const link = `${window.location.origin}/lobby/${roomId}`;
+  const link = `${window.location.origin}/${roomId}`;
 
   async function copyLink() {
     try {

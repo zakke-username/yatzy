@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { MAX_NAME_LENGTH } from "../../../shared/types.ts";
 import styles from "./NameDialog.module.css";
-
-const MAX_NAME_LENGTH = 20;
 
 type Props = {
   onSubmit: (name: string) => Promise<void>;

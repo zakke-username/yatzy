@@ -4,15 +4,17 @@ import { joinRoom } from "../lib/api.ts";
 import { socket } from "../lib/socket.ts";
 import type { JoinResponse, PublicRoomState } from "../../../shared/types.ts";
 
+// Player's session in a room (in sessionStorage)
+// and socket connection
 export function useRoom(roomId: string) {
   const navigate = useNavigate();
-  // Get session data (id and token) from browser storage
   const [session, setSession] = useState<JoinResponse | null>(() => {
     const stored = sessionStorage.getItem(roomId);
     return stored ? JSON.parse(stored) : null;
   });
   const [room, setRoom] = useState<PublicRoomState | null>(null);
 
+  // Connected while there is a session
   useEffect(() => {
     if (!session) return;
 
@@ -21,19 +23,21 @@ export function useRoom(roomId: string) {
       navigate("/", { replace: true, state: { message } });
     };
 
-    // Server refused token
+    // Server refused the token: player was removed or the room closed
     const onConnectError = () => {
       if (!socket.active) exit("This lobby no longer exists");
     };
 
-    // Duplicate tab
+    // Server kicked this connection: a newer tab took the seat
     const onDisconnect = (reason: string) => {
       if (reason === "io server disconnect") exit("Disconnected by server");
     };
 
     const onState = (state: PublicRoomState) => {
       setRoom(state);
-      // Check if game's finished
+
+      // When game is over, keep room and session state,
+      // but remove token from storage and disconnect socket
       if (state.status === "finished") {
         sessionStorage.removeItem(roomId);
         socket.disconnect();
@@ -68,5 +72,11 @@ export function useRoom(roomId: string) {
     navigate("/", { replace: true });
   }
 
-  return { session, room, join, leave };
+  // "Forget" finished game state: tab can join as a new player
+  function reset() {
+    setSession(null);
+    setRoom(null);
+  }
+
+  return { session, room, join, leave, reset };
 }

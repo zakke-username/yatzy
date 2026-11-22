@@ -4,13 +4,12 @@ import { addPlayer, createPlayer, createRoom } from "../game/engine.ts";
 import { startLeaveTimer, updateCloseTimer } from "../socket/io.ts";
 import { addRoom, getRoom, lockRoom, saveRoom } from "../store/rooms.ts";
 import { saveSession } from "../store/sessions.ts";
-import type {
-  CreateRoomResponse,
-  JoinResponse,
-  RoomStatusResponse,
+import {
+  MAX_NAME_LENGTH,
+  type CreateRoomResponse,
+  type JoinResponse,
+  type RoomStatusResponse,
 } from "../../../shared/types.ts";
-
-const MAX_NAME_LENGTH = 20;
 
 // HTTP requests for checking, creating and joining rooms, because sockets use an auth token already in the handshake.
 // Errors thrown here are handled in index.ts.

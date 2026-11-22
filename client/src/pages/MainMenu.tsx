@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { createRoom } from "../lib/api.ts";
-import styles from "./HomePage.module.css";
+import styles from "./MainMenu.module.css";
 
-function HomePage() {
+function MainMenu() {
   const navigate = useNavigate();
   const message = (useLocation().state as { message?: string } | null)?.message;
   const [error, setError] = useState("");
@@ -13,17 +13,16 @@ function HomePage() {
   async function create() {
     setCreating(true);
     try {
-      navigate(`/lobby/${await createRoom()}`);
+      navigate(`/${await createRoom()}`);
     } catch (err) {
       setError((err as Error).message);
-    } finally {
       setCreating(false);
     }
   }
 
   function join(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    navigate(`/lobby/${code.replace(/\s/g, "").toUpperCase()}`);
+    navigate(`/${code.replace(/\s/g, "").toUpperCase()}`);
   }
 
   return (
@@ -36,8 +35,13 @@ function HomePage() {
         </p>
       )}
 
-      <button type="button" className="button" onClick={create}>
-        {!creating ? <>New game</> : <>Loading...</>}
+      <button
+        type="button"
+        className="button"
+        disabled={creating}
+        onClick={create}
+      >
+        {creating ? "Loading..." : "New game"}
       </button>
       {error && <p className="error">{error}</p>}
       <hr />
@@ -59,4 +63,4 @@ function HomePage() {
   );
 }
 
-export default HomePage;
+export default MainMenu;

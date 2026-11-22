@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Navigate, useNavigate, useParams } from "react-router";
 import rollSoundUrl from "../assets/dice-roll.wav";
 import notificationSoundUrl from "../assets/notification.mp3";
 import Chat from "../components/Chat.tsx";
@@ -7,7 +6,6 @@ import Dice from "../components/Dice.tsx";
 import ResultsDialog from "../components/ResultsDialog.tsx";
 import Scoreboard from "../components/Scoreboard.tsx";
 import TurnTimer from "../components/TurnTimer.tsx";
-import { useRoom } from "../hooks/useRoom.ts";
 import { ERROR_MESSAGES } from "../lib/api.ts";
 import { socket } from "../lib/socket.ts";
 import {
@@ -15,19 +13,26 @@ import {
   ROLLS_PER_TURN,
   type AckResponse,
   type Category,
+  type PublicRoomState,
 } from "../../../shared/types.ts";
-import styles from "./GamePage.module.css";
+import styles from "./Game.module.css";
 
 const NONE_HELD = Array<boolean>(DICE_COUNT).fill(false);
+
+// Sounds
 const NOTIFICATION_SOUND = new Audio(notificationSoundUrl);
 NOTIFICATION_SOUND.volume = 0.4;
 const ROLL_SOUND = new Audio(rollSoundUrl);
 ROLL_SOUND.volume = 0.5;
 
-function GamePage() {
-  const roomId = useParams().roomId!.toUpperCase();
-  const navigate = useNavigate();
-  const { session, room, leave } = useRoom(roomId);
+type Props = {
+  room: PublicRoomState;
+  playerId: string; // you
+  onLeave: () => void;
+  onPlayAgain: () => void;
+};
+
+function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [rolling, setRolling] = useState(false);
@@ -35,8 +40,12 @@ function GamePage() {
   const [chatOpen, setChatOpen] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(false);
 
+  const playing = room.status === "playing";
+  const isMyTurn = playing && room.currentPlayerId === playerId;
+  const hasRolled = room.rollsLeft < ROLLS_PER_TURN;
+  const currentPlayer = room.players.find((p) => p.id === room.currentPlayerId);
+
   // Warn before closing
-  const playing = room?.status === "playing";
   useEffect(() => {
     if (!playing) return;
     function warn(event: BeforeUnloadEvent) {
@@ -47,31 +56,21 @@ function GamePage() {
   }, [playing]);
 
   // Turn notification sound
-  const isMyTurn =
-    !!session &&
-    room?.status === "playing" &&
-    room?.currentPlayerId === session.playerId;
   useEffect(() => {
     if (isMyTurn) NOTIFICATION_SOUND.play().catch(() => {});
   }, [isMyTurn]);
 
-  // Roll sound for other players
-  const rollsLeft = room?.rollsLeft;
+  // Roll sound for other players (the roller's plays on click)
   useEffect(() => {
-    if (!isMyTurn && rollsLeft !== undefined && rollsLeft < ROLLS_PER_TURN) {
+    if (!isMyTurn && room.rollsLeft < ROLLS_PER_TURN) {
       ROLL_SOUND.currentTime = 0;
       ROLL_SOUND.play().catch(() => {});
     }
-  }, [rollsLeft, isMyTurn]);
-
-  // Hold dice
-  function toggleHeld(index: number) {
-    setHeld(held.map((isHeld, i) => (i === index ? !isHeld : isHeld)));
-  }
+  }, [room.rollsLeft, isMyTurn]);
 
   // A new turn (new turnEndsAt) releases the held dice
   // oxlint-disable-next-line react/set-state-in-effect
-  useEffect(() => setHeld(NONE_HELD), [room?.turnEndsAt]);
+  useEffect(() => setHeld(NONE_HELD), [room.turnEndsAt]);
 
   // Flag unread messages
   useEffect(() => {
@@ -83,7 +82,13 @@ function GamePage() {
     };
   }, [chatOpen]);
 
-  // Disables buttons until the server answers or the connection drops, so a double click sends only one request
+  // Hold dice
+  function toggleHeld(index: number) {
+    setHeld(held.map((isHeld, i) => (i === index ? !isHeld : isHeld)));
+  }
+
+  // Disables buttons until the server answers or the connection drops,
+  // so a double click sends only one request
   async function send(request: Promise<AckResponse>) {
     setBusy(true);
     // Rejects if the connection drops before the server answers
@@ -92,7 +97,8 @@ function GamePage() {
     setError(response && !response.ok ? ERROR_MESSAGES[response.error] : "");
   }
 
-  // Roll dice. rolling = spin dice at constant pace until server responds ("loading")
+  // Roll dice
+  // rolling = spin dice at constant pace until server responds ("loading")
   async function handleRoll() {
     // Play sound for current player only
     ROLL_SOUND.currentTime = 0;
@@ -102,36 +108,10 @@ function GamePage() {
     setRolling(false);
   }
 
-  // Send scoring category
-  async function handleScore(category: Category) {
-    await send(socket.emitWithAck("turn:end", { category }));
+  // Score a category, which ends the turn
+  function handleScore(category: Category) {
+    send(socket.emitWithAck("turn:end", { category }));
   }
-
-  // No session = player not in this game, redirect to home page
-  if (!session) {
-    return (
-      <Navigate
-        to="/"
-        replace
-        state={{ message: ERROR_MESSAGES.GAME_STARTED }}
-      />
-    );
-  }
-
-  if (!room) {
-    return (
-      <main>
-        <b>Connecting to game...</b>
-      </main>
-    );
-  }
-
-  if (room.status === "waiting")
-    return <Navigate to={`/lobby/${room.id}`} replace />;
-
-  const finished = room.status === "finished";
-  const hasRolled = room.rollsLeft < ROLLS_PER_TURN;
-  const currentPlayer = room.players.find((p) => p.id === room.currentPlayerId);
 
   return (
     <main className={styles.page} data-players={room.players.length}>
@@ -150,13 +130,11 @@ function GamePage() {
             data-my-turn={isMyTurn}
             data-connected={currentPlayer?.connected}
           >
-            {currentPlayer?.connected ? (
-              <>
-                {isMyTurn ? <>Your turn!</> : <>{currentPlayer?.name}'s turn</>}
-              </>
-            ) : (
-              <>{currentPlayer?.name} has disconnected: kicking soon...</>
-            )}
+            {currentPlayer?.connected
+              ? isMyTurn
+                ? "Your turn!"
+                : `${currentPlayer.name}'s turn`
+              : `${currentPlayer?.name} has disconnected: kicking soon...`}
           </h2>
           {playing && (
             <TurnTimer key={room.turnEndsAt} endsAt={room.turnEndsAt} />
@@ -167,7 +145,7 @@ function GamePage() {
           className={`button ${styles.small}`}
           aria-label="Exit"
           title="Exit"
-          onClick={leave}
+          onClick={onLeave}
         >
           ❌
         </button>
@@ -182,18 +160,18 @@ function GamePage() {
         />
         <Chat
           className={styles.chat}
-          playerId={session.playerId}
+          playerId={playerId}
           open={chatOpen}
           onClose={() => setChatOpen(false)}
         />
 
         {/* GAME OVER: show results dialog */}
-        {finished && (
+        {room.status === "finished" && (
           <ResultsDialog
             players={room.players}
-            playerId={session.playerId}
-            onPlayAgain={() => navigate(`/lobby/${room.id}`, { replace: true })}
-            onReturn={leave}
+            playerId={playerId}
+            onPlayAgain={onPlayAgain}
+            onReturn={onLeave}
           />
         )}
       </div>
@@ -214,15 +192,12 @@ function GamePage() {
               type="button"
               className={`button ${styles["roll-button"]}`}
               disabled={
-                busy ||
-                !isMyTurn ||
-                room.rollsLeft === 0 ||
-                held.every((isHeld) => isHeld)
+                busy || room.rollsLeft === 0 || held.every((isHeld) => isHeld)
               }
-              data-highlight={isMyTurn && !hasRolled}
+              data-highlight={!hasRolled}
               onClick={handleRoll}
             >
-              Roll ({room.rollsLeft}/3)
+              Roll ({room.rollsLeft}/{ROLLS_PER_TURN})
             </button>
           )}
         </div>
@@ -246,4 +221,4 @@ function GamePage() {
   );
 }
 
-export default GamePage;
+export default Game;

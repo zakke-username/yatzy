@@ -8,7 +8,6 @@
 }
 
 .scoreboard table {
-  /* width: 100%; */
   width: max-content;
 }
 
@@ -85,7 +84,6 @@
 }
 
 .scoreboard td > button:hover {
-  /* font-weight: bold; */
   outline-color: rgba(0, 128, 0, 1);
 }
 
@@ -95,10 +93,3 @@
     line-height: 1.5rem;
   }
 }
-
-/* @media (width > 768px) and (height < 1024px) {
-  .scoreboard th,
-  .scoreboard td {
-    line-height: 1rem;
-  }
-} */
