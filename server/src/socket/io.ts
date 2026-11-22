@@ -47,7 +47,7 @@ export async function updateCloseTimer(room: Room) {
 
 // Reset turn timer
 export async function updateTurnTimer(room: Room) {
-  if (room.status === "playing")
+  if (room.status === "game")
     await setTimer(`turn:${room.id}`, room.turnEndsAt);
   else await cancelTimer(`turn:${room.id}`);
 }

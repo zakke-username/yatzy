@@ -1,5 +1,4 @@
 import { useState } from "react";
-import LobbyInvite from "../components/LobbyInvite.tsx";
 import PlayerList from "../components/PlayerList.tsx";
 import { ERROR_MESSAGES } from "../lib/api.ts";
 import { socket } from "../lib/socket.ts";
@@ -14,6 +13,17 @@ type Props = {
 
 function Lobby({ room, playerId, onLeave }: Props) {
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(
+        `${window.location.origin}/${room.id}`,
+      );
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {}
+  }
 
   async function startGame() {
     // New status arrives in room:state, and Room shows the game
@@ -23,7 +33,14 @@ function Lobby({ room, playerId, onLeave }: Props) {
 
   return (
     <main className={`card ${styles.window}`}>
-      <LobbyInvite roomId={room.id} />
+      <div className={styles.invite}>
+        <p>
+          <b>Lobby</b>: {room.id}
+        </p>
+        <button type="button" className="button" onClick={copyLink}>
+          {copied ? "Copied!" : "Copy link"}
+        </button>
+      </div>
       <hr />
       <PlayerList room={room} playerId={playerId} />
       <hr />

@@ -58,7 +58,7 @@ export function createRoom(): Room {
   return {
     id: newRoomId(),
     hostId: null,
-    status: "waiting",
+    status: "lobby",
     players: [],
     currentPlayerId: null,
     dice: Array.from({ length: DICE_COUNT }, () => randomInt(1, 7)),
@@ -69,7 +69,7 @@ export function createRoom(): Room {
 }
 
 export function addPlayer(room: Room, player: Player): ApiError | undefined {
-  if (room.status !== "waiting") return "GAME_STARTED";
+  if (room.status !== "lobby") return "GAME_STARTED";
   if (room.players.length >= MAX_PLAYERS) return "ROOM_FULL";
 
   room.players.push(player);
@@ -87,9 +87,9 @@ export function removePlayer(room: Room, playerId: string) {
 
 export function startGame(room: Room, playerId: string): ApiError | undefined {
   if (playerId !== room.hostId) return "NOT_HOST";
-  if (room.status !== "waiting") return "GAME_STARTED";
+  if (room.status !== "lobby") return "GAME_STARTED";
 
-  room.status = "playing";
+  room.status = "game";
   room.currentPlayerId = room.players[0].id;
   room.rollsLeft = ROLLS_PER_TURN;
   room.turnEndsAt = Date.now() + TURN_MS;
@@ -100,7 +100,7 @@ export function rollDice(
   playerId: string,
   held: boolean[],
 ): ApiError | undefined {
-  if (playerId !== room.currentPlayerId || room.status !== "playing")
+  if (playerId !== room.currentPlayerId || room.status !== "game")
     return "NOT_YOUR_TURN";
   if (room.rollsLeft === 0) return "NO_ROLLS_LEFT";
 
@@ -119,7 +119,7 @@ export function endTurn(
   player: Player,
   category: Category,
 ): ApiError | undefined {
-  if (player.id !== room.currentPlayerId || room.status !== "playing")
+  if (player.id !== room.currentPlayerId || room.status !== "game")
     return "NOT_YOUR_TURN";
   if (room.rollsLeft === ROLLS_PER_TURN) return "NOT_ROLLED";
   if (player.scores[category] !== null) return "CATEGORY_TAKEN";
@@ -133,8 +133,7 @@ export function endTurn(
 // End turn on timer running out
 export function timeOutTurn(room: Room) {
   const player = room.players.find((p) => p.id === room.currentPlayerId);
-  if (room.status !== "playing" || !player || Date.now() < room.turnEndsAt)
-    return;
+  if (room.status !== "game" || !player || Date.now() < room.turnEndsAt) return;
 
   const empty = CATEGORIES.filter(
     (category) => player.scores[category] === null,
@@ -159,7 +158,7 @@ function nextTurn(room: Room) {
 
 // If all players have filled all scores, game is over
 function finishIfDone(room: Room) {
-  if (room.status !== "playing") return;
+  if (room.status !== "game") return;
   const done = room.players.every(
     (player) =>
       player.socketId === null || !Object.values(player.scores).includes(null),

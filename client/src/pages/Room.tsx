@@ -21,7 +21,7 @@ function Room() {
     async function checkRoom() {
       try {
         const status = await getRoomStatus(roomId);
-        if (status !== "waiting") throw new Error(ERROR_MESSAGES.GAME_STARTED);
+        if (status !== "lobby") throw new Error(ERROR_MESSAGES.GAME_STARTED);
         if (!ignore) setJoinable(true);
       } catch (err) {
         if (!ignore)
@@ -54,7 +54,7 @@ function Room() {
     );
   }
 
-  if (room.status === "waiting") {
+  if (room.status === "lobby") {
     return <Lobby room={room} playerId={session.playerId} onLeave={leave} />;
   }
 

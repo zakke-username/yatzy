@@ -7,10 +7,11 @@ type Props = {
   playerId: string; // you
   open: boolean; // shown as a dialog: only when there's no room to show the chat inline
   onClose: () => void;
+  onMessage: () => void; // a new message has arrived
   className?: string;
 };
 
-function Chat({ playerId, open, onClose, className = "" }: Props) {
+function Chat({ playerId, open, onClose, onMessage, className = "" }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
@@ -19,13 +20,15 @@ function Chat({ playerId, open, onClose, className = "" }: Props) {
 
   // Socket event handler
   useEffect(() => {
-    const onMessage = (message: ChatMessage) =>
+    const onNewMessage = (message: ChatMessage) => {
       setMessages((list) => [...list, message]);
-    socket.on("chat:message", onMessage);
-    return () => {
-      socket.off("chat:message", onMessage);
+      onMessage();
     };
-  }, []);
+    socket.on("chat:message", onNewMessage);
+    return () => {
+      socket.off("chat:message", onNewMessage);
+    };
+  }, [onMessage]);
 
   // Opens and closes the dialog
   useEffect(() => {

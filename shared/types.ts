@@ -1,6 +1,6 @@
 // Shared contract between server and client
 
-export type RoomStatus = "waiting" | "playing" | "finished";
+export type RoomStatus = "lobby" | "game" | "finished";
 
 // Separate upper and lower categories, for ease of calculating sums
 export const UPPER_CATEGORIES = [
