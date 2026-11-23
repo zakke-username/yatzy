@@ -12,6 +12,7 @@
   --animate-dice-spin: dice-spin 0.25s linear infinite;
   --animate-dice-land: dice-land 1s ease-out;
   --animate-pulse-outline: pulse-outline 1s ease-in-out infinite;
+  --animate-pulse-text: pulse-text 2s ease-in-out infinite;
 
   @keyframes dice-spin {
     to {
@@ -28,6 +29,12 @@
   @keyframes pulse-outline {
     50% {
       outline-color: transparent;
+    }
+  }
+
+  @keyframes pulse-text {
+    50% {
+      transform: scale(1.1);
     }
   }
 }

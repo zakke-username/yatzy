@@ -72,7 +72,7 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
         </a>
         <div className="flex flex-1 justify-between md:justify-center items-center gap-4 min-w-0">
           <h2
-            className={`truncate md:text-xl font-bold pl-4 ${isMyTurn && "text-primary"} ${!currentPlayer?.connected && "text-red-600"}`}
+            className={`truncate md:text-xl font-bold pl-4 ${isMyTurn && "text-primary animate-pulse-text"} ${!currentPlayer?.connected && "text-red-600"}`}
           >
             {currentPlayer?.connected
               ? isMyTurn
@@ -137,7 +137,7 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
         {/* Open chat: just above the footer, on the right */}
         <button
           type="button"
-          className={`btn absolute right-4 bottom-full mb-4 bg-white p-1 text-3xl ${chatOpen && "hidden"}`}
+          className={`btn absolute right-4 bottom-full mb-4 bg-white p-2 text-2xl ${chatOpen && "hidden"}`}
           aria-label="Chat"
           title="Chat"
           onClick={() => {

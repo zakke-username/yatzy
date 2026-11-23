@@ -38,7 +38,7 @@ function Lobby({ room, playerId, onLeave }: Props) {
         </h1>
         <button
           type="button"
-          className="btn p-2 text-black font-medium text-sm bg-yellow-100"
+          className="btn p-2 text-black font-medium text-sm bg-yellow-50"
           onClick={copyLink}
         >
           {copied ? "Copied!" : "Copy link"}

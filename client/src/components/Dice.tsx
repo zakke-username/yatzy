@@ -57,7 +57,7 @@ function Dice({ room, isMyTurn, busy, onRoll }: Props) {
       <div key={room.rollsLeft} className="flex gap-3">
         {room.dice.map((value, index) => (
           <button
-            className="relative w-12 data-[spinning=true]:animate-dice-spin enabled:hover:cursor-pointer enabled:hover:scale-110 select-none"
+            className="relative w-12 data-[spinning=true]:animate-dice-spin enabled:hover:cursor-pointer enabled:hover:scale-110 transition-[scale] duration-100 ease-out select-none"
             data-spinning={rolling && !held[index]} // Constant "loading" spin
             key={index}
             type="button"
@@ -73,7 +73,7 @@ function Dice({ room, isMyTurn, busy, onRoll }: Props) {
               alt={String(value)}
               draggable="false"
             />
-            {held[index] && (
+            {held[index] && room.rollsLeft > 0 && (
               <span
                 className="absolute -top-4 -right-3 text-2xl text-shadow-[2px_2px_black] z-2"
                 aria-hidden="true"

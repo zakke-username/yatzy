@@ -32,7 +32,7 @@ function MainMenu() {
 
       {message && (
         <p
-          className="bg-red-200 p-4 rounded-lg text-red-700 text-center"
+          className="bg-red-200 p-4 rounded-lg text-black text-center"
           role="status"
         >
           {message}
