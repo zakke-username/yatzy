@@ -3,8 +3,15 @@
 @theme {
   --font-sans: "PlaypenSans", system-ui, sans-serif;
 
+  --color-primary: var(--color-green-700);
+  --color-danger: var(--color-red-500);
+
+  --shadow-hard: 4px 4px black;
+  --shadow-bar: 0 0 16px rgba(0, 0, 0, 0.33);
+
   --animate-dice-spin: dice-spin 0.25s linear infinite;
   --animate-dice-land: dice-land 1s ease-out;
+  --animate-pulse-outline: pulse-outline 1s ease-in-out infinite;
 
   @keyframes dice-spin {
     to {
@@ -15,6 +22,12 @@
   @keyframes dice-land {
     from {
       transform: rotate(-2turn);
+    }
+  }
+
+  @keyframes pulse-outline {
+    50% {
+      outline-color: transparent;
     }
   }
 }
@@ -58,10 +71,10 @@
 
 @layer components {
   .btn {
-    @apply cursor-pointer rounded-lg bg-green-700 p-3 font-semibold text-white border-2 border-black shadow-[4px_4px_black] hover:translate-0.5 hover:shadow-[2px_2px_black] active:translate-1 active:shadow-none disabled:opacity-50;
+    @apply cursor-pointer rounded-lg bg-primary p-3 font-semibold text-white border-2 border-black shadow-hard hover:translate-0.5 hover:shadow-[2px_2px_black] active:translate-1 active:shadow-none disabled:opacity-50;
   }
 
   .card {
-    @apply rounded-xl bg-white p-6 border-2 border-black shadow-[4px_4px_black];
+    @apply rounded-xl bg-white p-6 border-2 border-black shadow-hard;
   }
 }

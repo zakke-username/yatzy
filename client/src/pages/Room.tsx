@@ -5,6 +5,7 @@ import { useRoom } from "../hooks/useRoom.ts";
 import { ERROR_MESSAGES, getRoomStatus } from "../lib/api.ts";
 import Game from "./Game.tsx";
 import Lobby from "./Lobby.tsx";
+import loadingIcon from "../assets/loading.svg";
 
 // Room's page for both lobby and game
 // Stays mounted, so socket connection stays too
@@ -48,7 +49,8 @@ function Room() {
 
   if (!session || !room) {
     return (
-      <main className="m-auto">
+      <main className="m-auto flex items-center">
+        <img src={loadingIcon} alt="" className="animate-spin w-6 m-4" />
         <b>Connecting...</b>
       </main>
     );

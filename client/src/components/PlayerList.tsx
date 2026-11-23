@@ -12,16 +12,14 @@ function PlayerList({ room, playerId }: Props) {
         <li
           className={`flex items-center border-2 p-4 rounded-lg ${player.id === playerId ? "border-black" : "border-gray-300"}`}
           key={player.id}
-          data-host={player.id === room.hostId}
-          data-offline={!player.connected}
         >
           <span
-            className={`flex-1 ${player.id === playerId ? "font-semibold" : "font-medium"} ${!player.connected && "text-gray-500"}`}
+            className={`flex-1 truncate ${player.id === playerId ? "font-semibold" : "font-medium"} ${!player.connected && "text-gray-500"}`}
           >
             {player.name}
           </span>
           {player.id === room.hostId && (
-            <span className="bg-green-700 rounded-full px-2 py-1 text-xs text-white font-semibold">
+            <span className="bg-primary rounded-full px-2 py-1 text-xs text-white font-semibold">
               HOST
             </span>
           )}

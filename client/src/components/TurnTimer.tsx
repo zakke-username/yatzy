@@ -15,7 +15,10 @@ function TurnTimer({ endsAt }: Props) {
   const secondsLeft = Math.max(0, Math.ceil((endsAt - now) / 1000));
 
   return (
-    <span className="text-xl min-w-20" title="Seconds left in this turn">
+    <span
+      className="min-w-16 md:text-xl md:min-w-24"
+      title="Seconds left in this turn"
+    >
       ⏳{secondsLeft} s
     </span>
   );

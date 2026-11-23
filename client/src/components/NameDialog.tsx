@@ -58,14 +58,18 @@ function NameDialog({ onSubmit, onCancel }: Props) {
           value={name}
           onChange={(event) => setName(event.target.value)}
         />
-        {error && <p className="error">{error}</p>}
+        {error && (
+          <p className="bg-danger/75 text-white p-2 rounded-lg text-center">
+            {error}
+          </p>
+        )}
         <div className="flex gap-6">
           <button type="submit" className="btn flex-1" disabled={busy}>
             Join
           </button>
           <button
             type="button"
-            className="btn bg-red-500 flex-1"
+            className="btn bg-danger flex-1"
             onClick={onCancel}
           >
             Cancel

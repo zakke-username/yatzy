@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import fanfareSoundUrl from "../assets/fanfare.mp3";
 import type { PublicPlayer } from "../../../shared/types.ts";
-import styles from "./ResultsDialog.module.css";
 
 const FANFARE_SOUND = new Audio(fanfareSoundUrl);
 FANFARE_SOUND.volume = 0.6;
@@ -27,46 +26,50 @@ function ResultsDialog({ players, playerId, onPlayAgain, onReturn }: Props) {
   return (
     <dialog
       ref={dialogRef}
-      className={styles.results}
+      className="card open:flex flex-col items-center gap-8 backdrop:bg-black/60"
       aria-labelledby="results-title"
       onCancel={(event) => {
         event.preventDefault();
         onReturn();
       }}
     >
-      <h2 id="results-title">Game over!</h2>
-      <table>
+      <h2 className="text-2xl font-bold mt-4" id="results-title">
+        Game over!
+      </h2>
+      <table className="w-full">
         <tbody>
           {ranked.map((player) => {
             const place = ranked.findIndex((p) => p.total === player.total) + 1;
             return (
-              <tr key={player.id}>
+              <tr
+                key={player.id}
+                className="*:border-b *:border-gray-300 *:p-4"
+              >
                 <td>{place}.</td>
-                <th scope="row">
+                {/* The names take the space that's left. Your own is bold */}
+                <th
+                  className={`w-full text-left text-nowrap ${player.id === playerId ? "font-bold" : "font-normal"}`}
+                  scope="row"
+                >
                   {place === 1 && <>🥇 </>}
                   {place === 2 && <>🥈 </>}
                   {place === 3 && <>🥉 </>}
                   {player.name}
-                  {player.id === playerId && (
-                    <span className="muted"> (you)</span>
-                  )}
                 </th>
-                <td>{player.total}</td>
+                <td className="text-right font-semibold">{player.total}</td>
               </tr>
             );
           })}
         </tbody>
       </table>
-      <button type="button" className="button" onClick={onPlayAgain}>
-        Play again
-      </button>
-      <button
-        type="button"
-        className={`button ${styles.return}`}
-        onClick={onReturn}
-      >
-        Exit to main menu
-      </button>
+      <div className="flex flex-col gap-4 w-full">
+        <button type="button" className="btn" onClick={onPlayAgain}>
+          Play again
+        </button>
+        <button type="button" className="btn bg-danger" onClick={onReturn}>
+          Exit to main menu
+        </button>
+      </div>
     </dialog>
   );
 }

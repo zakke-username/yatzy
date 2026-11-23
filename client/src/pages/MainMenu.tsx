@@ -5,7 +5,7 @@ import { createRoom } from "../lib/api.ts";
 function MainMenu() {
   const navigate = useNavigate();
   const message = (useLocation().state as { message?: string } | null)?.message;
-  const [error, setError] = useState("test error");
+  const [error, setError] = useState("");
   const [code, setCode] = useState("");
   const [creating, setCreating] = useState(false);
 
@@ -35,7 +35,7 @@ function MainMenu() {
           className="bg-red-200 p-4 rounded-lg text-red-700 text-center"
           role="status"
         >
-          ⚠️ {message}
+          {message}
         </p>
       )}
 

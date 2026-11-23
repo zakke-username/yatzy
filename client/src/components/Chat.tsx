@@ -72,7 +72,7 @@ function Chat({ playerId, open, onClose, onMessage }: Props) {
           <li key={message.id}>
             <strong
               className={
-                message.playerId === playerId ? "text-green-700" : undefined
+                message.playerId === playerId ? "text-primary" : undefined
               }
             >
               {message.name}:

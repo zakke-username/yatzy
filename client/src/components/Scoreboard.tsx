@@ -5,7 +5,6 @@ import {
   type PublicPlayer,
   type Scores,
 } from "../../../shared/types.ts";
-// import styles from "./Scoreboard.module.css";
 
 // The scorecard's rows, top to bottom
 const ROWS = [
@@ -58,9 +57,9 @@ function Scoreboard({
   onScore,
 }: Props) {
   return (
-    <section className="card m-auto mt-16 mb-52 max-w-[calc(100%-2rem)] md:mb-24">
+    <section className="card m-auto max-w-[calc(100%-2rem)]">
       <div className="overflow-x-auto">
-        <table className="w-max border-separate border-spacing-0">
+        <table className="w-max border-separate border-spacing-0 tabular-nums">
           <thead>
             <tr>
               <td className="sticky left-0 border-r-2 border-b-2 border-black bg-white" />
@@ -69,7 +68,7 @@ function Scoreboard({
                 return (
                   <th
                     key={player.id}
-                    className={`border-r border-b-2 border-r-gray-300 border-b-black last:border-r-0 ${isCurrent ? "bg-green-700" : ""} ${!player.connected ? "text-gray-400" : isCurrent ? "text-white" : ""}`}
+                    className={`border-r border-b-2 border-r-gray-300 border-b-black last:border-r-0 ${isCurrent ? "bg-primary" : ""} ${!player.connected ? "text-gray-400" : isCurrent ? "text-white" : ""}`}
                     scope="col"
                     title={player.name}
                   >
@@ -93,9 +92,9 @@ function Scoreboard({
                   ? "border-b-2 border-b-black"
                   : "border-b border-b-gray-300";
               return (
-                <tr key={row} className="leading-relaxed">
+                <tr key={row} className="leading-loose md:leading-7">
                   <th
-                    className={`sticky left-0 border-r-2 border-r-black bg-white px-2 text-left ${bottom} ${isSummary ? "font-bold" : "font-medium"}`}
+                    className={`sticky left-0 border-r-2 border-r-black bg-white px-2 text-left ${bottom} ${isSummary ? "font-semibold" : "font-normal"}`}
                     scope="row"
                   >
                     {LABELS[row]}
@@ -115,7 +114,7 @@ function Scoreboard({
                       >
                         {showPotential ? (
                           <button
-                            className="block w-full text-green-700 hover:font-semibold outline-green-600 hover:outline-green-700 outline-2 -outline-offset-3 rounded-sm hover:cursor-pointer"
+                            className="block w-full text-primary hover:font-semibold outline-green-600 hover:outline-primary outline-2 hover:outline-3 hover:-outline-offset-4 -outline-offset-3 rounded-sm hover:cursor-pointer"
                             type="button"
                             disabled={disabled}
                             onClick={() => onScore(row)}

@@ -56,12 +56,16 @@ function Lobby({ room, playerId, onLeave }: Props) {
             Waiting for host to start...
           </p>
         )}
-        {error && <p className="error">{error}</p>}
 
-        <button type="button" className="btn bg-red-500" onClick={onLeave}>
+        <button type="button" className="btn bg-danger" onClick={onLeave}>
           Exit lobby
         </button>
       </div>
+      {error && (
+        <p className="fixed top-4 left-4 bg-danger/75 p-4 rounded-lg text-white">
+          ⚠️ {error}
+        </p>
+      )}
     </main>
   );
 }

@@ -60,8 +60,8 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
   }
 
   return (
-    <main className="flex flex-col justify-center items-center">
-      <header className="fixed top-0 left-0 z-10 w-dvw h-12 bg-white border-b-2 border-black flex justify-between items-center px-2 shadow-[0_0_16px_rgba(0,0,0,0.33)]">
+    <main className="flex min-h-dvh flex-col gap-4">
+      <header className="sticky top-0 z-10 h-12 bg-white border-b-2 border-black flex justify-between items-center px-2 shadow-bar">
         <a
           className="btn bg-white text-xs p-1"
           href="https://en.wikipedia.org/wiki/Yatzy#Gameplay"
@@ -70,17 +70,15 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
         >
           ❓
         </a>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-1 justify-between md:justify-center items-center gap-4 min-w-0">
           <h2
-            className="text-xl font-bold"
-            data-my-turn={isMyTurn}
-            data-connected={currentPlayer?.connected}
+            className={`truncate md:text-xl font-bold pl-4 ${isMyTurn && "text-primary"} ${!currentPlayer?.connected && "text-red-600"}`}
           >
             {currentPlayer?.connected
               ? isMyTurn
                 ? "Your turn!"
                 : `${currentPlayer.name}'s turn`
-              : `${currentPlayer?.name} has disconnected: kicking soon...`}
+              : `${currentPlayer?.name} has disconnected...`}
           </h2>
           {playing && (
             <TurnTimer key={room.turnEndsAt} endsAt={room.turnEndsAt} />
@@ -126,7 +124,8 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
         />
       )}
 
-      <footer className="fixed bottom-0 left-0 z-10 w-dvw bg-white border-t-2 border-black flex justify-center items-center p-3 shadow-[0_0_16px_rgba(0,0,0,0.33)]">
+      {/* mt-16: on narrow screens the chat button above the footer would cover the scoreboard's last rows */}
+      <footer className="sticky bottom-0 z-10 mt-16 md:mt-0 bg-white border-t-2 border-black flex justify-center items-center p-3 shadow-bar">
         <Dice
           // A new turnEndsAt remounts the dice, which releases held ones
           key={room.turnEndsAt}
@@ -138,7 +137,7 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
         {/* Open chat: just above the footer, on the right */}
         <button
           type="button"
-          className={`btn absolute right-4 bottom-full mb-4 bg-white p-2 text-2xl ${chatOpen && "hidden"}`}
+          className={`btn absolute right-4 bottom-full mb-4 bg-white p-1 text-3xl ${chatOpen && "hidden"}`}
           aria-label="Chat"
           title="Chat"
           onClick={() => {
@@ -154,7 +153,11 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
           )}
         </button>
       </footer>
-      {error && <div className="error">⚠️ {error}</div>}
+      {error && (
+        <div className="fixed top-16 left-4 bg-danger/75 text-white p-2 rounded-lg">
+          ⚠️ {error}
+        </div>
+      )}
     </main>
   );
 }
