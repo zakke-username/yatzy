@@ -1,21 +1,18 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { socket } from "../lib/socket.ts";
 import { MAX_MESSAGE_LENGTH, type ChatMessage } from "../../../shared/types.ts";
-import styles from "./Chat.module.css";
 
 type Props = {
   playerId: string; // you
-  open: boolean; // shown as a dialog: only when there's no room to show the chat inline
+  open: boolean;
   onClose: () => void;
   onMessage: () => void; // a new message has arrived
-  className?: string;
 };
 
-function Chat({ playerId, open, onClose, onMessage, className = "" }: Props) {
+function Chat({ playerId, open, onClose, onMessage }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
 
   // Socket event handler
@@ -30,18 +27,7 @@ function Chat({ playerId, open, onClose, onMessage, className = "" }: Props) {
     };
   }, [onMessage]);
 
-  // Opens and closes the dialog
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog || dialog.open === open) return;
-    if (open) {
-      dialog.showModal();
-    } else {
-      dialog.close();
-    }
-  }, [open]);
-
-  // Scrolls the list to newest message
+  // Scrolls the list to newest message, also on opening: a hidden list loses its position
   useEffect(() => {
     const list = listRef.current;
     if (list) list.scrollTop = list.scrollHeight;
@@ -59,59 +45,61 @@ function Chat({ playerId, open, onClose, onMessage, className = "" }: Props) {
   }
 
   return (
-    // Stays mounted while hidden, so no messages are lost. Escape closes it natively, firing onClose
-    <dialog
-      ref={dialogRef}
-      className={styles.dialog}
+    <section
       aria-label="Chat"
-      onClose={onClose}
+      className={`card fixed right-4 bottom-4 md:rounded-lg md:bottom-22 z-50 h-[calc(100dvh-5rem)] md:h-[min(28rem,100dvh-2rem)] w-[calc(100%-2rem)] md:w-sm flex-col gap-4 p-4 ${open ? "flex" : "hidden"}`}
     >
-      <section className={`card ${styles.chat} ${className}`} aria-label="Chat">
-        <header>
-          <h3>Chat</h3>
-          <button
-            type="button"
-            className={`button ${styles.close}`}
-            aria-label="Close chat"
-            title="Close chat"
-            onClick={onClose}
-          >
-            ❌
-          </button>
-        </header>
-        <ul ref={listRef}>
-          {messages.map((message) => (
-            <li key={message.id}>
-              <strong
-                className={
-                  message.playerId === playerId ? styles.own : undefined
-                }
-              >
-                {message.name}:
-              </strong>{" "}
-              {message.text}
-            </li>
-          ))}
-        </ul>
-        <form onSubmit={handleSubmit}>
-          <input
-            aria-label="Message"
-            placeholder="Message"
-            value={text}
-            maxLength={MAX_MESSAGE_LENGTH}
-            onChange={(event) => setText(event.target.value)}
-          />
-          <button
-            type="submit"
-            className="button"
-            // Stops enter from submitting, only one message at a time
-            disabled={sending || !text.trim()}
-          >
-            Send
-          </button>
-        </form>
-      </section>
-    </dialog>
+      <header className="flex items-center justify-between">
+        <h3 className="text-lg font-bold">Chat</h3>
+        <button
+          type="button"
+          className="btn bg-white p-1 text-xs"
+          aria-label="Close chat"
+          title="Close chat"
+          onClick={onClose}
+        >
+          ➖
+        </button>
+      </header>
+      <ul
+        ref={listRef}
+        className="flex min-h-0 flex-1 flex-col justify-end-safe gap-2 overflow-y-auto overscroll-contain wrap-anywhere"
+      >
+        {messages.length === 0 && (
+          <li className="text-gray-500">No messages</li>
+        )}
+        {messages.map((message) => (
+          <li key={message.id}>
+            <strong
+              className={
+                message.playerId === playerId ? "text-green-700" : undefined
+              }
+            >
+              {message.name}:
+            </strong>{" "}
+            {message.text}
+          </li>
+        ))}
+      </ul>
+      <form className="flex items-center gap-2" onSubmit={handleSubmit}>
+        <input
+          className="flex-1 rounded-lg border-2 border-gray-400 p-2"
+          aria-label="Message"
+          placeholder="Message"
+          value={text}
+          maxLength={MAX_MESSAGE_LENGTH}
+          onChange={(event) => setText(event.target.value)}
+        />
+        <button
+          type="submit"
+          className="btn p-2"
+          // Stops enter from submitting, only one message at a time
+          disabled={sending || !text.trim()}
+        >
+          Send
+        </button>
+      </form>
+    </section>
   );
 }
 

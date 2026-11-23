@@ -28,15 +28,6 @@
   border-top: 2px solid var(--black);
 }
 
-/* Small buttons */
-.small {
-  padding: 0.5rem;
-  background: var(--white);
-  color: inherit;
-  font: inherit;
-  font-size: small;
-}
-
 /* Title + timer */
 .turn-info {
   width: 100%;
@@ -85,41 +76,6 @@
   padding: 1rem;
 }
 
-.chat {
-  position: sticky;
-  top: 5rem;
-  flex: none;
-  align-self: stretch;
-  /* screen height - (header + footer height) - footer border */
-  max-height: calc(100vh - 12rem - 2px);
-}
-
-/* Opens the pop-up chat */
-.chat-button {
-  display: none;
-  position: absolute;
-  right: 1rem;
-  bottom: calc(100% + 1rem);
-  font-size: x-large;
-  text-shadow: 1px 1px var(--gray);
-  width: 3.5rem;
-  height: 3.5rem;
-}
-
-.chat-button[data-unread="true"]::after {
-  content: "!";
-  position: absolute;
-  top: -0.75rem;
-  right: 2.25rem;
-  width: 1.75rem;
-  height: 1.75rem;
-  background: var(--red);
-  color: var(--white);
-  font-size: large;
-  font-weight: bold;
-  border-radius: 50%;
-}
-
 @media (width < 768px) {
   .turn-info {
     justify-content: space-between;
@@ -133,53 +89,5 @@
 
   .turn[data-connected="false"] {
     font-size: small;
-  }
-}
-
-/* 
-  "Minimize" chat based on horizontal space,
-  which depends on number of players (scoreboard):
-  multiple breakpoints according to player count.
-*/
-
-@container style(--chat-popup: true) {
-  .game {
-    padding-bottom: 6rem;
-  }
-
-  .chat-button {
-    display: block;
-  }
-
-  dialog:not([open]) > .chat {
-    display: none;
-  }
-}
-
-/* 1-2 players */
-@media (width < 896px) {
-  .page:is([data-players="1"], [data-players="2"]) {
-    --chat-popup: true;
-  }
-}
-
-/* 3-4 players */
-@media (width < 1024px) {
-  .page:is([data-players="3"], [data-players="4"]) {
-    --chat-popup: true;
-  }
-}
-
-/* 5-6 players */
-@media (width < 1152px) {
-  .page:is([data-players="5"], [data-players="6"]) {
-    --chat-popup: true;
-  }
-}
-
-/* 7-8 players */
-@media (width < 1280px) {
-  .page:is([data-players="7"], [data-players="8"]) {
-    --chat-popup: true;
   }
 }

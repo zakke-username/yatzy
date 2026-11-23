@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import styles from "./TurnTimer.module.css";
 
 type Props = {
   endsAt: number;
@@ -16,7 +15,7 @@ function TurnTimer({ endsAt }: Props) {
   const secondsLeft = Math.max(0, Math.ceil((endsAt - now) / 1000));
 
   return (
-    <span className={styles.timer} title="Seconds left in this turn">
+    <span className="text-xl min-w-20" title="Seconds left in this turn">
       ⏳{secondsLeft} s
     </span>
   );

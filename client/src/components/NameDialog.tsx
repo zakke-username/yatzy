@@ -32,7 +32,7 @@ function NameDialog({ onSubmit, onCancel }: Props) {
 
   return (
     <dialog
-      className="card p-8"
+      className="card backdrop:bg-transparent"
       ref={dialogRef}
       aria-labelledby="dialog-title"
       onCancel={(event) => {
@@ -41,15 +41,15 @@ function NameDialog({ onSubmit, onCancel }: Props) {
         onCancel();
       }}
     >
-      <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
+      <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
         <h2
-          className="text-3xl font-bold text-center text-nowrap m-4"
+          className="text-2xl font-bold text-center text-nowrap m-3"
           id="dialog-title"
         >
           Join game
         </h2>
         <input
-          className="flex-1 text-lg border-gray-400 border-2 p-4 rounded-lg"
+          className="flex-1 border-gray-400 border-2 p-4 rounded-lg"
           placeholder="Enter your name"
           aria-label="Your name"
           autoComplete="nickname"
@@ -59,7 +59,7 @@ function NameDialog({ onSubmit, onCancel }: Props) {
           onChange={(event) => setName(event.target.value)}
         />
         {error && <p className="error">{error}</p>}
-        <div className="flex gap-8">
+        <div className="flex gap-6">
           <button type="submit" className="btn flex-1" disabled={busy}>
             Join
           </button>

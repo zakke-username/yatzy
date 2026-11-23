@@ -16,18 +16,18 @@ function PlayerList({ room, playerId }: Props) {
           data-offline={!player.connected}
         >
           <span
-            className={`flex-1 truncate ${player.id === playerId ? "font-semibold" : "font-medium"} ${!player.connected && "text-gray-500"}`}
+            className={`flex-1 ${player.id === playerId ? "font-semibold" : "font-medium"} ${!player.connected && "text-gray-500"}`}
           >
             {player.name}
           </span>
           {player.id === room.hostId && (
-            <span className="bg-green-700 rounded-full px-2 py-1 text-sm text-white">
-              Host
+            <span className="bg-green-700 rounded-full px-2 py-1 text-xs text-white font-semibold">
+              HOST
             </span>
           )}
           {!player.connected && (
             <span className="text-gray-500 mx-2 truncate">
-              (disconnected, kicking soon...)
+              (disconnected, kicking...)
             </span>
           )}
         </li>

@@ -11,7 +11,6 @@ import {
   ROLLS_PER_TURN,
   type PublicRoomState,
 } from "../../../shared/types.ts";
-import styles from "./Dice.module.css";
 
 const FACES = [one, two, three, four, five, six];
 const NONE_HELD = Array<boolean>(DICE_COUNT).fill(false);
@@ -53,29 +52,42 @@ function Dice({ room, isMyTurn, busy, onRoll }: Props) {
   }
 
   return (
-    <div className={styles.controls}>
+    <div className="flex flex-col gap-2 md:flex-row md:gap-6">
       {/* A roll always changes rollsLeft, so the new key rebuilds the dice and replays their landing spin */}
-      <div key={room.rollsLeft} className={styles.dice}>
+      <div key={room.rollsLeft} className="flex gap-3">
         {room.dice.map((value, index) => (
           <button
+            className="relative w-12 data-[spinning=true]:animate-dice-spin"
+            data-spinning={rolling && !held[index]} // Constant "loading" spin
             key={index}
             type="button"
             aria-pressed={held[index]}
             disabled={busy || !isMyTurn || !hasRolled || room.rollsLeft === 0}
-            data-spinning={rolling && !held[index]} // Constant "loading" spin for the roller, until the server answers
-            data-landing={hasRolled && !room.held[index]} // Just rerolled: a short spin for every player
             onClick={() => toggleHeld(index)}
             draggable="false"
           >
-            <img src={FACES[value - 1]} alt={String(value)} draggable="false" />
-            {held[index] && <span aria-hidden="true">🔒</span>}
+            <img
+              className="data-[landing=true]:animate-dice-land"
+              data-landing={hasRolled && !room.held[index]}
+              src={FACES[value - 1]}
+              alt={String(value)}
+              draggable="false"
+            />
+            {held[index] && (
+              <span
+                className="absolute -top-4 -right-3 text-2xl text-shadow-black text-shadow-[2px_2px_black] z-2"
+                aria-hidden="true"
+              >
+                🔒
+              </span>
+            )}
           </button>
         ))}
       </div>
       {isMyTurn && (
         <button
           type="button"
-          className={`button ${styles.roll}`}
+          className="btn py-2 min-w-32"
           disabled={
             busy || room.rollsLeft === 0 || held.every((isHeld) => isHeld)
           }

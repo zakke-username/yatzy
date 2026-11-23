@@ -31,9 +31,9 @@ function Lobby({ room, playerId, onLeave }: Props) {
   }
 
   return (
-    <main className="card m-auto p-8 max-w-[min(32rem,100%-2rem)] flex flex-col justify-center gap-12">
-      <div className="flex flex-col items-center gap-2">
-        <h1 className="text-3xl sm:text-4xl text-center m-4">
+    <main className="card mx-auto my-4 w-[min(24rem,100%-2rem)] flex flex-col justify-center gap-12">
+      <div className="flex flex-col justify-center items-center gap-2">
+        <h1 className="text-3xl text-center my-2">
           <b>Lobby</b>: {room.id}
         </h1>
         <button
