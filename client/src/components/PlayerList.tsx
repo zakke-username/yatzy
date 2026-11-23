@@ -1,5 +1,4 @@
 import type { PublicRoomState } from "../../../shared/types.ts";
-import styles from "./PlayerList.module.css";
 
 type Props = {
   room: PublicRoomState;
@@ -8,22 +7,28 @@ type Props = {
 
 function PlayerList({ room, playerId }: Props) {
   return (
-    <ul className={styles.players}>
+    <ul className="flex flex-col gap-2">
       {room.players.map((player) => (
         <li
+          className={`flex items-center border-2 p-4 rounded-lg ${player.id === playerId ? "border-black" : "border-gray-300"}`}
           key={player.id}
           data-host={player.id === room.hostId}
           data-offline={!player.connected}
         >
-          <span className={styles.name}>
+          <span
+            className={`flex-1 truncate ${player.id === playerId ? "font-semibold" : "font-medium"} ${!player.connected && "text-gray-500"}`}
+          >
             {player.name}
-            {player.id === playerId && <span className="muted"> (you)</span>}
           </span>
           {player.id === room.hostId && (
-            <span className={styles.badge}>Host</span>
+            <span className="bg-green-700 rounded-full px-2 py-1 text-sm text-white">
+              Host
+            </span>
           )}
           {!player.connected && (
-            <span className="muted">(disconnected: kicking soon...)</span>
+            <span className="text-gray-500 mx-2 truncate">
+              (disconnected, kicking soon...)
+            </span>
           )}
         </li>
       ))}

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { MAX_NAME_LENGTH } from "../../../shared/types.ts";
-import styles from "./NameDialog.module.css";
 
 type Props = {
   onSubmit: (name: string) => Promise<void>;
@@ -33,7 +32,7 @@ function NameDialog({ onSubmit, onCancel }: Props) {
 
   return (
     <dialog
-      className={styles.dialog}
+      className="card p-8"
       ref={dialogRef}
       aria-labelledby="dialog-title"
       onCancel={(event) => {
@@ -42,9 +41,15 @@ function NameDialog({ onSubmit, onCancel }: Props) {
         onCancel();
       }}
     >
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <h2 id="dialog-title">Join game</h2>
+      <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
+        <h2
+          className="text-3xl font-bold text-center text-nowrap m-4"
+          id="dialog-title"
+        >
+          Join game
+        </h2>
         <input
+          className="flex-1 text-lg border-gray-400 border-2 p-4 rounded-lg"
           placeholder="Enter your name"
           aria-label="Your name"
           autoComplete="nickname"
@@ -54,16 +59,18 @@ function NameDialog({ onSubmit, onCancel }: Props) {
           onChange={(event) => setName(event.target.value)}
         />
         {error && <p className="error">{error}</p>}
-        <button
-          type="button"
-          className={`button ${styles.cancel}`}
-          onClick={onCancel}
-        >
-          Cancel
-        </button>
-        <button type="submit" className="button" disabled={busy}>
-          Join
-        </button>
+        <div className="flex gap-8">
+          <button type="submit" className="btn flex-1" disabled={busy}>
+            Join
+          </button>
+          <button
+            type="button"
+            className="btn bg-red-500 flex-1"
+            onClick={onCancel}
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </dialog>
   );

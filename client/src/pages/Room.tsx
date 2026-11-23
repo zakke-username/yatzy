@@ -48,7 +48,7 @@ function Room() {
 
   if (!session || !room) {
     return (
-      <main>
+      <main className="m-auto">
         <b>Connecting...</b>
       </main>
     );

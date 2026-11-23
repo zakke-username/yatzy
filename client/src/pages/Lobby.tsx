@@ -3,7 +3,6 @@ import PlayerList from "../components/PlayerList.tsx";
 import { ERROR_MESSAGES } from "../lib/api.ts";
 import { socket } from "../lib/socket.ts";
 import type { PublicRoomState } from "../../../shared/types.ts";
-import styles from "./Lobby.module.css";
 
 type Props = {
   room: PublicRoomState;
@@ -32,35 +31,37 @@ function Lobby({ room, playerId, onLeave }: Props) {
   }
 
   return (
-    <main className={`card ${styles.window}`}>
-      <div className={styles.invite}>
-        <p>
+    <main className="card m-auto p-8 max-w-[min(32rem,100%-2rem)] flex flex-col justify-center gap-12">
+      <div className="flex flex-col items-center gap-2">
+        <h1 className="text-3xl sm:text-4xl text-center m-4">
           <b>Lobby</b>: {room.id}
-        </p>
-        <button type="button" className="button" onClick={copyLink}>
+        </h1>
+        <button
+          type="button"
+          className="btn p-2 text-black font-medium text-sm bg-yellow-100"
+          onClick={copyLink}
+        >
           {copied ? "Copied!" : "Copy link"}
         </button>
       </div>
-      <hr />
       <PlayerList room={room} playerId={playerId} />
-      <hr />
 
-      {room.hostId === playerId ? (
-        <button type="button" className="button" onClick={startGame}>
-          Start game
+      <div className="flex flex-col gap-4">
+        {room.hostId === playerId ? (
+          <button type="button" className="btn" onClick={startGame}>
+            Start game
+          </button>
+        ) : (
+          <p className="text-xl text-center my-2">
+            Waiting for host to start...
+          </p>
+        )}
+        {error && <p className="error">{error}</p>}
+
+        <button type="button" className="btn bg-red-500" onClick={onLeave}>
+          Exit lobby
         </button>
-      ) : (
-        <p className={styles.waiting}>Waiting for host to start the game…</p>
-      )}
-      {error && <p className="error">{error}</p>}
-
-      <button
-        type="button"
-        className={`button ${styles.exit}`}
-        onClick={onLeave}
-      >
-        Exit lobby
-      </button>
+      </div>
     </main>
   );
 }

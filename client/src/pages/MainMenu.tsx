@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { createRoom } from "../lib/api.ts";
-import styles from "./MainMenu.module.css";
 
 function MainMenu() {
   const navigate = useNavigate();
@@ -26,18 +25,23 @@ function MainMenu() {
   }
 
   return (
-    <main className={`card ${styles.home}`}>
-      <h1>🎲 Yatzy 🎲</h1>
+    <main className="card m-auto p-8 max-w-[min(32rem,100%-2rem)] flex flex-col justify-center gap-8">
+      <h1 className="text-4xl sm:text-6xl my-4 sm:my-8 font-bold text-center text-nowrap">
+        🎲 Yatzy 🎲
+      </h1>
 
       {message && (
-        <p className={styles.notice} role="status">
-          {message}
+        <p
+          className="bg-red-200 p-4 rounded-lg text-red-700 text-center"
+          role="status"
+        >
+          ⚠️ {message}
         </p>
       )}
 
       <button
         type="button"
-        className="button"
+        className="btn"
         disabled={creating}
         onClick={create}
       >
@@ -45,8 +49,9 @@ function MainMenu() {
       </button>
       {error && <p className="error">{error}</p>}
       <hr />
-      <form onSubmit={join}>
+      <form className="flex gap-4" onSubmit={join}>
         <input
+          className="flex-1 text-lg border-gray-400 border-2 p-4 rounded-lg not-placeholder-shown:uppercase"
           placeholder="Enter lobby code"
           aria-label="Lobby code"
           autoComplete="off"
@@ -55,7 +60,7 @@ function MainMenu() {
           value={code}
           onChange={(event) => setCode(event.target.value)}
         />
-        <button type="submit" className="button">
+        <button type="submit" className="btn">
           Join
         </button>
       </form>
