@@ -60,19 +60,12 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
   }
 
   return (
-    <main className="flex min-h-dvh flex-col gap-4">
-      <header className="sticky top-0 z-10 h-12 bg-white border-b-2 border-black flex justify-between items-center px-2 shadow-bar">
-        <a
-          className="btn bg-white text-xs p-1"
-          href="https://en.wikipedia.org/wiki/Yatzy#Gameplay"
-          target="_blank"
-          rel="noreferrer"
-        >
-          ❓
-        </a>
-        <div className="flex flex-1 justify-between md:justify-center items-center gap-4 min-w-0">
+    <main className="flex min-h-dvh flex-col">
+      <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b-2 border-black bg-white px-5 shadow-bar">
+        {/* Turn info */}
+        <div className="flex min-w-0 items-center gap-4">
           <h2
-            className={`truncate md:text-xl font-bold pl-4 ${isMyTurn && "text-primary animate-pulse-text"} ${!currentPlayer?.connected && "text-red-600"}`}
+            className={`truncate font-bold md:text-xl ${isMyTurn ? "animate-pulse-text text-primary" : ""} ${currentPlayer?.connected ? "" : "text-red-600"}`}
           >
             {currentPlayer?.connected
               ? isMyTurn
@@ -84,27 +77,77 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
             <TurnTimer key={room.turnEndsAt} endsAt={room.turnEndsAt} />
           )}
         </div>
-        <button
-          type="button"
-          className="btn bg-white text-xs p-1"
-          aria-label="Exit"
-          title="Exit"
-          onClick={onLeave}
-        >
-          ❌
-        </button>
+
+        {/* Buttons */}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            className="btn relative bg-white p-1"
+            aria-label="Chat"
+            title="Chat"
+            onClick={() => {
+              setChatOpen((chatOpen) => !chatOpen);
+              setUnreadMessages(false);
+            }}
+          >
+            💬
+            {unreadMessages && (
+              <span className="absolute -top-2 -left-2 flex size-5 animate-pulse items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">
+                !
+              </span>
+            )}
+          </button>
+          <a
+            className="btn bg-white p-1"
+            href="https://en.wikipedia.org/wiki/Yatzy#Gameplay"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Rules"
+            title="Rules"
+          >
+            ❓
+          </a>
+          <button
+            type="button"
+            className="btn bg-white p-1"
+            aria-label="Exit"
+            title="Exit"
+            onClick={() => {
+              if (
+                confirm(
+                  "Are you sure you want to leave? You cannot rejoin this game.",
+                )
+              )
+                onLeave();
+            }}
+          >
+            ❌
+          </button>
+        </div>
       </header>
 
-      <Scoreboard
-        players={room.players}
-        currentPlayerId={room.currentPlayerId}
-        potentialScores={isMyTurn && hasRolled ? room.potentialScores : null}
-        disabled={busy}
-        // Scoring a category ends the turn
-        onScore={(category) =>
-          send(socket.emitWithAck("turn:end", { category }))
-        }
-      />
+      <div className="flex flex-1 flex-col items-center justify-center gap-8 py-4">
+        <Scoreboard
+          players={room.players}
+          currentPlayerId={room.currentPlayerId}
+          potentialScores={isMyTurn && hasRolled ? room.potentialScores : null}
+          disabled={busy}
+          // Scoring a category ends the turn
+          onScore={(category) =>
+            send(socket.emitWithAck("turn:end", { category }))
+          }
+        />
+
+        <Dice
+          // A new turnEndsAt remounts the dice, which releases held ones
+          key={room.turnEndsAt}
+          room={room}
+          isMyTurn={isMyTurn}
+          busy={busy}
+          onRoll={(held) => send(socket.emitWithAck("turn:roll", { held }))}
+        />
+      </div>
+
       <Chat
         playerId={playerId}
         open={chatOpen}
@@ -124,39 +167,10 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
         />
       )}
 
-      {/* mt-16: on narrow screens the chat button above the footer would cover the scoreboard's last rows */}
-      <footer className="sticky bottom-0 z-10 mt-16 md:mt-0 bg-white border-t-2 border-black flex justify-center items-center p-3 shadow-bar">
-        <Dice
-          // A new turnEndsAt remounts the dice, which releases held ones
-          key={room.turnEndsAt}
-          room={room}
-          isMyTurn={isMyTurn}
-          busy={busy}
-          onRoll={(held) => send(socket.emitWithAck("turn:roll", { held }))}
-        />
-        {/* Open chat: just above the footer, on the right */}
-        <button
-          type="button"
-          className={`btn absolute right-4 bottom-full mb-4 bg-white p-2 text-2xl ${chatOpen && "hidden"}`}
-          aria-label="Chat"
-          title="Chat"
-          onClick={() => {
-            setChatOpen(true);
-            setUnreadMessages(false);
-          }}
-        >
-          💬
-          {unreadMessages && (
-            <span className="absolute -top-3 -left-3 flex size-7 items-center justify-center rounded-full bg-red-600 text-base font-bold text-white">
-              !
-            </span>
-          )}
-        </button>
-      </footer>
       {error && (
-        <div className="fixed top-16 left-4 bg-danger/75 text-white p-2 rounded-lg">
+        <p className="fixed top-18 left-4 rounded-lg bg-danger/70 p-2 text-white">
           ⚠️ {error}
-        </div>
+        </p>
       )}
     </main>
   );

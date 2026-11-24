@@ -26,14 +26,14 @@ function ResultsDialog({ players, playerId, onPlayAgain, onReturn }: Props) {
   return (
     <dialog
       ref={dialogRef}
-      className="card open:flex flex-col items-center gap-8 backdrop:bg-black/60"
+      className="card min-w-[min(100dvw-2rem,24rem)] flex-col items-center gap-8 backdrop:bg-black/60 open:flex"
       aria-labelledby="results-title"
       onCancel={(event) => {
         event.preventDefault();
         onReturn();
       }}
     >
-      <h2 className="text-2xl font-bold mt-4" id="results-title">
+      <h2 className="mt-4 text-2xl font-bold" id="results-title">
         Game over!
       </h2>
       <table className="w-full">
@@ -48,7 +48,7 @@ function ResultsDialog({ players, playerId, onPlayAgain, onReturn }: Props) {
                 <td>{place}.</td>
                 {/* The names take the space that's left. Your own is bold */}
                 <th
-                  className={`w-full text-left text-nowrap ${player.id === playerId ? "font-bold" : "font-normal"}`}
+                  className={`w-full max-w-0 truncate text-left ${player.id === playerId ? "font-bold" : "font-normal"}`}
                   scope="row"
                 >
                   {place === 1 && <>🥇 </>}
@@ -62,7 +62,7 @@ function ResultsDialog({ players, playerId, onPlayAgain, onReturn }: Props) {
           })}
         </tbody>
       </table>
-      <div className="flex flex-col gap-4 w-full">
+      <div className="flex w-full flex-col gap-4">
         <button type="button" className="btn" onClick={onPlayAgain}>
           Play again
         </button>

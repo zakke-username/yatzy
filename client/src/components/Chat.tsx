@@ -47,7 +47,7 @@ function Chat({ playerId, open, onClose, onMessage }: Props) {
   return (
     <section
       aria-label="Chat"
-      className={`card fixed right-4 bottom-4 md:rounded-lg md:bottom-22 z-50 h-[calc(100dvh-5rem)] md:h-[min(28rem,100dvh-2rem)] w-[calc(100%-2rem)] md:w-sm flex-col gap-4 p-4 ${open ? "flex" : "hidden"}`}
+      className={`card fixed top-18 right-4 z-50 h-[calc(100dvh-5rem)] w-[calc(100%-2rem)] flex-col gap-4 p-4 md:h-[min(32rem,100dvh-6rem)] md:w-sm md:rounded-xl ${open ? "flex" : "hidden"}`}
     >
       <header className="flex items-center justify-between">
         <h3 className="text-lg font-bold">Chat</h3>
@@ -83,7 +83,7 @@ function Chat({ playerId, open, onClose, onMessage }: Props) {
       </ul>
       <form className="flex items-center gap-2" onSubmit={handleSubmit}>
         <input
-          className="flex-1 rounded-lg border-2 border-gray-400 p-2"
+          className="flex-1 p-2"
           aria-label="Message"
           placeholder="Message"
           value={text}

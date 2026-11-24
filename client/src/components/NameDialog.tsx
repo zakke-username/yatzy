@@ -43,13 +43,13 @@ function NameDialog({ onSubmit, onCancel }: Props) {
     >
       <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
         <h2
-          className="text-2xl font-bold text-center text-nowrap m-3"
+          className="m-3 text-center text-2xl font-bold text-nowrap"
           id="dialog-title"
         >
           Join game
         </h2>
         <input
-          className="flex-1 border-gray-400 border-2 p-4 rounded-lg"
+          className="p-4"
           placeholder="Enter your name"
           aria-label="Your name"
           autoComplete="nickname"
@@ -59,7 +59,7 @@ function NameDialog({ onSubmit, onCancel }: Props) {
           onChange={(event) => setName(event.target.value)}
         />
         {error && (
-          <p className="bg-danger/75 text-white p-2 rounded-lg text-center">
+          <p className="rounded-lg bg-danger/75 p-2 text-center text-white">
             {error}
           </p>
         )}
@@ -69,7 +69,7 @@ function NameDialog({ onSubmit, onCancel }: Props) {
           </button>
           <button
             type="button"
-            className="btn bg-danger flex-1"
+            className="btn flex-1 bg-danger"
             onClick={onCancel}
           >
             Cancel

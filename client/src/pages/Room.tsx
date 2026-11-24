@@ -50,7 +50,7 @@ function Room() {
   if (!session || !room) {
     return (
       <main className="m-auto flex items-center">
-        <img src={loadingIcon} alt="" className="animate-spin w-6 m-4" />
+        <img src={loadingIcon} alt="" className="m-4 w-6 animate-spin" />
         <b>Connecting...</b>
       </main>
     );

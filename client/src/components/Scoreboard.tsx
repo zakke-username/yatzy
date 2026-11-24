@@ -14,8 +14,9 @@ const ROWS = [
   ...LOWER_CATEGORIES,
   "total",
 ] as const;
+type Row = (typeof ROWS)[number];
 
-const LABELS: Record<(typeof ROWS)[number], string> = {
+const LABELS: Record<Row, string> = {
   ones: "Ones",
   twos: "Twos",
   threes: "Threes",
@@ -35,6 +36,11 @@ const LABELS: Record<(typeof ROWS)[number], string> = {
   yatzy: "Yatzy",
   total: "Total",
 };
+
+// The rows worked out from the scores
+function isSummary(row: Row | undefined) {
+  return row === "sum" || row === "bonus" || row === "total";
+}
 
 function zeroToDash(score: number | null): string {
   if (score === null) return "";
@@ -57,7 +63,7 @@ function Scoreboard({
   onScore,
 }: Props) {
   return (
-    <section className="card m-auto max-w-[calc(100%-2rem)]">
+    <section className="card max-w-[calc(100%-2rem)]">
       <div className="overflow-x-auto">
         <table className="w-max border-separate border-spacing-0 tabular-nums">
           <thead>
@@ -80,30 +86,27 @@ function Scoreboard({
           </thead>
           <tbody>
             {ROWS.map((row, i) => {
-              const isSummary =
-                row === "sum" || row === "bonus" || row === "total";
+              const summary = isSummary(row);
+              // Thick lines around the summary rows, thin ones between categories, none under the last row
               const nextRow = ROWS[i + 1];
               const bottom = !nextRow
                 ? ""
-                : isSummary ||
-                    nextRow === "sum" ||
-                    nextRow === "bonus" ||
-                    nextRow === "total"
+                : summary || isSummary(nextRow)
                   ? "border-b-2 border-b-black"
                   : "border-b border-b-gray-300";
               return (
                 <tr key={row} className="leading-loose md:leading-7">
                   <th
-                    className={`sticky left-0 border-r-2 border-r-black bg-white px-2 text-left ${bottom} ${isSummary ? "font-semibold" : "font-normal"}`}
+                    className={`sticky left-0 border-r-2 border-r-black bg-white px-2 text-left ${bottom} ${summary ? "font-semibold" : "font-normal"}`}
                     scope="row"
                   >
                     {LABELS[row]}
                   </th>
                   {players.map((player) => {
-                    const score = isSummary ? player[row] : player.scores[row];
+                    const score = summary ? player[row] : player.scores[row];
                     // The current player's empty categories show what their dice would score, as a button that scores it
                     const showPotential =
-                      !isSummary &&
+                      !summary &&
                       score === null &&
                       potentialScores &&
                       player.id === currentPlayerId;
@@ -114,7 +117,7 @@ function Scoreboard({
                       >
                         {showPotential ? (
                           <button
-                            className="block w-full text-primary hover:font-semibold outline-green-600 hover:outline-primary outline-2 hover:outline-3 hover:-outline-offset-4 -outline-offset-3 rounded-sm hover:cursor-pointer"
+                            className="block w-full rounded-sm text-primary outline-2 -outline-offset-3 outline-green-600 hover:cursor-pointer hover:font-semibold hover:outline-3 hover:-outline-offset-4 hover:outline-primary"
                             type="button"
                             disabled={disabled}
                             onClick={() => onScore(row)}

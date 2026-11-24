@@ -31,14 +31,14 @@ function Lobby({ room, playerId, onLeave }: Props) {
   }
 
   return (
-    <main className="card mx-auto my-4 w-[min(24rem,100%-2rem)] flex flex-col justify-center gap-12">
-      <div className="flex flex-col justify-center items-center gap-2">
-        <h1 className="text-3xl text-center my-2">
+    <main className="card mx-auto my-4 flex w-[min(24rem,100%-2rem)] flex-col gap-12">
+      <div className="flex flex-col items-center gap-2">
+        <h1 className="my-2 text-center text-3xl">
           <b>Lobby</b>: {room.id}
         </h1>
         <button
           type="button"
-          className="btn p-2 text-black font-medium text-sm bg-yellow-50"
+          className="btn bg-yellow-50 p-2 text-sm font-medium text-black"
           onClick={copyLink}
         >
           {copied ? "Copied!" : "Copy link"}
@@ -52,7 +52,7 @@ function Lobby({ room, playerId, onLeave }: Props) {
             Start game
           </button>
         ) : (
-          <p className="text-xl text-center my-2">
+          <p className="my-2 text-center text-xl">
             Waiting for host to start...
           </p>
         )}
@@ -62,7 +62,7 @@ function Lobby({ room, playerId, onLeave }: Props) {
         </button>
       </div>
       {error && (
-        <p className="fixed top-4 left-4 bg-danger/75 p-4 rounded-lg text-white">
+        <p className="fixed top-4 left-4 rounded-lg bg-danger/70 p-4 text-white">
           ⚠️ {error}
         </p>
       )}

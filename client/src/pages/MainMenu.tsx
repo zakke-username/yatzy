@@ -25,16 +25,13 @@ function MainMenu() {
   }
 
   return (
-    <main className="card m-auto max-w-[min(24rem,100%-2rem)] flex flex-col justify-center gap-8">
-      <h1 className="text-5xl my-6 font-bold text-center text-nowrap">
+    <main className="card m-auto flex max-w-[min(24rem,100%-2rem)] flex-col gap-8">
+      <h1 className="my-6 text-center text-5xl font-bold text-nowrap">
         🎲 Yatzy 🎲
       </h1>
 
       {message && (
-        <p
-          className="bg-red-200 p-4 rounded-lg text-black text-center"
-          role="status"
-        >
+        <p className="rounded-lg bg-red-200 p-4 text-center" role="status">
           {message}
         </p>
       )}
@@ -47,15 +44,10 @@ function MainMenu() {
       >
         {creating ? "Loading..." : "New game"}
       </button>
-      {error && (
-        <p className="fixed top-4 left-4 bg-red-600/70 text-white p-4 rounded-lg">
-          ⚠️ {error}
-        </p>
-      )}
       <hr />
       <form className="flex gap-6" onSubmit={join}>
         <input
-          className="flex-1 border-gray-400 border-2 p-3 rounded-lg not-placeholder-shown:uppercase"
+          className="flex-1 p-3 not-placeholder-shown:uppercase"
           placeholder="Enter lobby code"
           aria-label="Lobby code"
           autoComplete="off"
@@ -68,6 +60,12 @@ function MainMenu() {
           Join
         </button>
       </form>
+
+      {error && (
+        <p className="fixed top-4 left-4 rounded-lg bg-danger/70 p-4 text-white">
+          ⚠️ {error}
+        </p>
+      )}
     </main>
   );
 }

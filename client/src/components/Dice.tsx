@@ -52,12 +52,12 @@ function Dice({ room, isMyTurn, busy, onRoll }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-4 md:flex-row md:gap-6">
+    <div className="card sticky bottom-4 flex flex-col items-center gap-4 p-4 md:flex-row md:gap-6">
       {/* A roll always changes rollsLeft, so the new key rebuilds the dice and replays their landing spin */}
       <div key={room.rollsLeft} className="flex gap-3">
         {room.dice.map((value, index) => (
           <button
-            className="relative w-12 data-[spinning=true]:animate-dice-spin enabled:hover:cursor-pointer enabled:hover:scale-110 transition-[scale] duration-100 ease-out select-none"
+            className="relative w-12 transition-[scale] duration-100 ease-out select-none enabled:hover:scale-110 enabled:hover:cursor-pointer data-[spinning=true]:animate-dice-spin"
             data-spinning={rolling && !held[index]} // Constant "loading" spin
             key={index}
             type="button"
@@ -75,7 +75,7 @@ function Dice({ room, isMyTurn, busy, onRoll }: Props) {
             />
             {held[index] && room.rollsLeft > 0 && (
               <span
-                className="absolute -top-4 -right-3 text-2xl text-shadow-[2px_2px_black] z-2"
+                className="absolute -top-4 -right-2.5 z-2 text-2xl text-shadow-[2px_2px_black]"
                 aria-hidden="true"
               >
                 🔒
@@ -87,7 +87,7 @@ function Dice({ room, isMyTurn, busy, onRoll }: Props) {
       {isMyTurn && (
         <button
           type="button"
-          className={`btn py-2 min-w-32 ${isMyTurn && room.rollsLeft === ROLLS_PER_TURN && "outline-6 outline-yellow-400 animate-pulse-outline"}`}
+          className={`btn w-72 md:w-32 ${hasRolled ? "" : "animate-pulse-outline outline-6 outline-yellow-400"}`}
           disabled={
             busy || room.rollsLeft === 0 || held.every((isHeld) => isHeld)
           }
