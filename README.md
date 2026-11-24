@@ -72,5 +72,3 @@ Room creation and players joining use HTTP, because sockets need a valid auth to
 ![Lobby](./screenshots/lobby.png "Lobby")
 
 ![Gameplay](./screenshots/game.png "Gameplay")
-
-![Results](./screenshots/results.png "Results")
