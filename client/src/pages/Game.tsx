@@ -61,7 +61,7 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
 
   return (
     <main className="flex min-h-dvh flex-col">
-      <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b-2 border-black bg-white px-5 shadow-bar">
+      <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b-2 border-black bg-white px-4 shadow-bar">
         {/* Turn info */}
         <div className="flex min-w-0 items-center gap-4">
           <h2

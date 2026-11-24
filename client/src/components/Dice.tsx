@@ -52,7 +52,7 @@ function Dice({ room, isMyTurn, busy, onRoll }: Props) {
   }
 
   return (
-    <div className="card sticky bottom-4 flex flex-col items-center gap-4 p-4 md:flex-row md:gap-6">
+    <div className="card sticky bottom-4 flex flex-col items-center gap-4 p-4 md:flex-row md:gap-6 [@media(height<56rem)]:drop-shadow-[0_0_1rem_rgba(0,0,0,0.33)]">
       {/* A roll always changes rollsLeft, so the new key rebuilds the dice and replays their landing spin */}
       <div key={room.rollsLeft} className="flex gap-3">
         {room.dice.map((value, index) => (

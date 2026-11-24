@@ -16,7 +16,7 @@ function TurnTimer({ endsAt }: Props) {
 
   return (
     <span
-      className="min-w-16 tabular-nums md:min-w-24 md:text-xl"
+      className="min-w-16 tabular-nums md:min-w-24 md:text-xl font-semibold"
       title="Seconds left in this turn"
     >
       ⏳{secondsLeft} s
