@@ -63,7 +63,7 @@ function Scoreboard({
   onScore,
 }: Props) {
   return (
-    <section className="card max-w-[calc(100%-2rem)]">
+    <section className="card px-5 py-4 max-w-[calc(100%-2rem)]">
       <div className="overflow-x-auto">
         <table className="w-max border-separate border-spacing-0 tabular-nums">
           <thead>
@@ -95,7 +95,7 @@ function Scoreboard({
                   ? "border-b-2 border-b-black"
                   : "border-b border-b-gray-300";
               return (
-                <tr key={row} className="leading-loose md:leading-7">
+                <tr key={row} className="leading-loose md:leading-6.5">
                   <th
                     className={`sticky left-0 border-r-2 border-r-black bg-white px-2 text-left ${bottom} ${summary ? "font-semibold" : "font-normal"}`}
                     scope="row"

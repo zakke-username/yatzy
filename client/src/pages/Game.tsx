@@ -61,7 +61,7 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
 
   return (
     <main className="flex min-h-dvh flex-col">
-      <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b-2 border-black bg-white px-4 shadow-bar">
+      <header className="sticky top-0 z-10 flex h-12 items-center justify-between gap-4 border-b-2 border-black bg-white pl-5 pr-4 shadow-bar">
         {/* Turn info */}
         <div className="flex min-w-0 items-center gap-4">
           <h2
@@ -82,7 +82,7 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            className="btn relative bg-white p-1"
+            className="btn relative bg-white py-0.5 px-1"
             aria-label="Chat"
             title="Chat"
             onClick={() => {
@@ -98,7 +98,7 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
             )}
           </button>
           <a
-            className="btn bg-white p-1"
+            className="btn bg-white py-0.5 px-1"
             href="https://en.wikipedia.org/wiki/Yatzy#Gameplay"
             target="_blank"
             rel="noreferrer"
@@ -109,7 +109,7 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
           </a>
           <button
             type="button"
-            className="btn bg-white p-1"
+            className="btn bg-white py-0.5 px-1"
             aria-label="Exit"
             title="Exit"
             onClick={() => {

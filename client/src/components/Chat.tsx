@@ -47,7 +47,7 @@ function Chat({ playerId, open, onClose, onMessage }: Props) {
   return (
     <section
       aria-label="Chat"
-      className={`card fixed top-18 right-4 z-50 h-[calc(100dvh-5.5rem)] w-[calc(100%-2rem)] flex-col gap-4 p-4 md:h-[min(32rem,100dvh-5.5rem)] md:w-sm md:rounded-xl drop-shadow-[0_0_1rem_rgba(0,0,0,0.33)] ${open ? "flex" : "hidden"}`}
+      className={`card fixed top-16 right-4 z-50 h-[calc(100dvh-5rem)] w-[calc(100%-2rem)] flex-col gap-4 p-4 md:h-[min(32rem,100dvh-5rem)] md:w-sm md:rounded-xl drop-shadow-[0_0_1rem_rgba(0,0,0,0.33)] ${open ? "flex" : "hidden"}`}
     >
       <header className="flex items-center justify-between">
         <h3 className="text-lg font-bold">Chat</h3>
