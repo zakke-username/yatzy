@@ -33,6 +33,11 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
   const isMyTurn = playing && room.currentPlayerId === playerId;
   const hasRolled = room.rollsLeft < ROLLS_PER_TURN;
   const currentPlayer = room.players.find((p) => p.id === room.currentPlayerId);
+  const errorMessage =
+    error ||
+    (playing && !currentPlayer?.connected
+      ? `${currentPlayer?.name} has disconnected: kicking in 30 seconds...`
+      : "");
 
   // Warn before closing
   useEffect(() => {
@@ -65,17 +70,11 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
         {/* Turn info */}
         <div className="flex min-w-0 items-center gap-4">
           <h2
-            className={`truncate font-bold md:text-xl ${isMyTurn ? "animate-pulse-text text-primary" : ""} ${currentPlayer?.connected ? "" : "text-red-600"}`}
+            className={`truncate font-bold md:text-xl ${isMyTurn ? "animate-pulse-text text-primary" : ""}`}
           >
-            {currentPlayer?.connected
-              ? isMyTurn
-                ? "Your turn!"
-                : `${currentPlayer.name}'s turn`
-              : `${currentPlayer?.name} has disconnected...`}
+            {isMyTurn ? "Your turn!" : `${currentPlayer?.name}'s turn`}
           </h2>
-          {playing && (
-            <TurnTimer key={room.turnEndsAt} endsAt={room.turnEndsAt} />
-          )}
+          {playing && <TurnTimer key={room.turn} msLeft={room.turnMsLeft} />}
         </div>
 
         {/* Buttons */}
@@ -126,6 +125,12 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
         </div>
       </header>
 
+      {errorMessage && (
+        <p className="sticky top-16 m-4 z-100 w-fit rounded-lg bg-danger/80 border-2 border-danger p-2 text-white">
+          ⚠️ {errorMessage}
+        </p>
+      )}
+
       <div className="flex flex-1 flex-col items-center justify-center gap-8 py-4">
         <Scoreboard
           players={room.players}
@@ -139,8 +144,8 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
         />
 
         <Dice
-          // A new turnEndsAt remounts the dice, which releases held ones
-          key={room.turnEndsAt}
+          // A new turn remounts the dice, which releases held ones
+          key={room.turn}
           room={room}
           isMyTurn={isMyTurn}
           busy={busy}
@@ -165,12 +170,6 @@ function Game({ room, playerId, onLeave, onPlayAgain }: Props) {
           onPlayAgain={onPlayAgain}
           onReturn={onLeave}
         />
-      )}
-
-      {error && (
-        <p className="fixed top-18 left-4 rounded-lg bg-danger/70 p-2 text-white">
-          ⚠️ {error}
-        </p>
       )}
     </main>
   );

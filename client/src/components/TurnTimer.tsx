@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 
 type Props = {
-  endsAt: number;
+  msLeft: number; // time left in the turn when its state arrived
 };
 
-function TurnTimer({ endsAt }: Props) {
+function TurnTimer({ msLeft }: Props) {
+  // Deadline on this browser's clock, set once per turn (Game keys this by turn)
+  const [endsAt] = useState(() => Date.now() + msLeft);
   const [now, setNow] = useState(Date.now);
 
   useEffect(() => {

@@ -63,7 +63,7 @@ function Scoreboard({
   onScore,
 }: Props) {
   return (
-    <section className="card px-5 py-4 max-w-[calc(100%-2rem)]">
+    <section className="card p-4 max-w-[calc(100%-2rem)]">
       <div className="overflow-x-auto">
         <table className="w-max border-separate border-spacing-0 tabular-nums">
           <thead>

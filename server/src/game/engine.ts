@@ -36,6 +36,7 @@ export type Room = {
   dice: number[];
   held: boolean[];
   rollsLeft: number;
+  turn: number;
   turnEndsAt: number;
 };
 
@@ -64,6 +65,7 @@ export function createRoom(): Room {
     dice: Array.from({ length: DICE_COUNT }, () => randomInt(1, 7)),
     held: Array<boolean>(DICE_COUNT).fill(false),
     rollsLeft: 0,
+    turn: 0,
     turnEndsAt: 0,
   };
 }
@@ -92,6 +94,7 @@ export function startGame(room: Room, playerId: string): ApiError | undefined {
   room.status = "game";
   room.currentPlayerId = room.players[0].id;
   room.rollsLeft = ROLLS_PER_TURN;
+  room.turn++;
   room.turnEndsAt = Date.now() + TURN_MS;
 }
 
@@ -153,6 +156,7 @@ function nextTurn(room: Room) {
   const nextPlayerIndex = (currentPlayerIndex + 1) % room.players.length;
   room.currentPlayerId = room.players[nextPlayerIndex].id;
   room.rollsLeft = ROLLS_PER_TURN;
+  room.turn++;
   room.turnEndsAt = Date.now() + TURN_MS;
 }
 
@@ -188,7 +192,9 @@ export function toPublicState(room: Room): PublicRoomState {
     dice: room.dice,
     held: room.held,
     rollsLeft: room.rollsLeft,
-    turnEndsAt: room.turnEndsAt,
+    turn: room.turn,
+    // Time left rather than turnEndsAt, since the client's clock may differ from the server's
+    turnMsLeft: Math.max(0, room.turnEndsAt - Date.now()),
     potentialScores: calculateScores(room.dice),
   };
 }
