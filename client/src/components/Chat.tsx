@@ -14,6 +14,7 @@ function Chat({ playerId, open, onClose, onMessage }: Props) {
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const listRef = useRef<HTMLUListElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Socket event handler
   useEffect(() => {
@@ -27,11 +28,43 @@ function Chat({ playerId, open, onClose, onMessage }: Props) {
     };
   }, [onMessage]);
 
+  // Loads the history on mount, and after a reconnect
+  useEffect(() => {
+    const loadHistory = async () => {
+      const response = await socket
+        .emitWithAck("chat:history")
+        .catch(() => undefined);
+      if (response?.ok) setMessages(response.messages);
+    };
+    loadHistory();
+    socket.on("connect", loadHistory);
+    return () => {
+      socket.off("connect", loadHistory);
+    };
+  }, []);
+
   // Scrolls the list to newest message, also on opening: a hidden list loses its position
   useEffect(() => {
     const list = listRef.current;
     if (list) list.scrollTop = list.scrollHeight;
   }, [messages, open]);
+
+  // Focus on message input on open
+  useEffect(() => {
+    if (open) inputRef.current?.focus();
+  }, [open]);
+
+  // Close on esc
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open, onClose]);
 
   // Send message
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -86,6 +119,7 @@ function Chat({ playerId, open, onClose, onMessage }: Props) {
           className="flex-1 p-2"
           aria-label="Message"
           placeholder="Message"
+          ref={inputRef}
           value={text}
           maxLength={MAX_MESSAGE_LENGTH}
           onChange={(event) => setText(event.target.value)}

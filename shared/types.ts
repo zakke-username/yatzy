@@ -107,6 +107,10 @@ export type ChatMessage = {
   text: string;
 };
 
+// Latest messages oldest first
+export type ChatHistoryResponse =
+  { ok: true; messages: ChatMessage[] } | { ok: false; error: ApiError };
+
 // Socket events
 export type ServerToClientEvents = {
   "room:state": (state: PublicRoomState) => void;
@@ -128,4 +132,5 @@ export type ClientToServerEvents = {
     payload: { text: string },
     ack: (response: AckResponse) => void,
   ) => void;
+  "chat:history": (ack: (response: ChatHistoryResponse) => void) => void;
 };

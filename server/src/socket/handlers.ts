@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { endTurn, rollDice, startGame, toPublicState } from "../game/engine.ts";
+import { getChat, saveChatMessage } from "../store/chat.ts";
 import { getRoom, lockRoom, saveRoom } from "../store/rooms.ts";
 import { getSession } from "../store/sessions.ts";
 import {
@@ -142,7 +143,7 @@ export function registerSocketHandlers(io: GameServer) {
       }
     });
 
-    // Send chat message. Messages aren't stored on server, just validated and emitted forward
+    // Send chat message
     socket.on("chat:send", async (payload, ack) => {
       if (typeof ack !== "function") return;
 
@@ -157,13 +158,32 @@ export function registerSocketHandlers(io: GameServer) {
         if (!room || !player)
           return ack({ ok: false, error: "ROOM_NOT_FOUND" });
 
-        io.to(room.id).emit("chat:message", {
+        const message = {
           id: randomUUID(),
           playerId: player.id,
           name: player.name,
           text,
-        });
+        };
+        await saveChatMessage(room.id, message);
+        io.to(room.id).emit("chat:message", message);
         ack({ ok: true });
+      } catch (err) {
+        console.error(err);
+        ack({ ok: false, error: "SERVER_ERROR" });
+      }
+    });
+
+    // Get the room's chat history
+    socket.on("chat:history", async (ack) => {
+      if (typeof ack !== "function") return;
+
+      try {
+        const room = await getRoom(roomId);
+        const player = room?.players.find((p) => p.id === playerId);
+        if (!room || !player)
+          return ack({ ok: false, error: "ROOM_NOT_FOUND" });
+
+        ack({ ok: true, messages: await getChat(room.id) });
       } catch (err) {
         console.error(err);
         ack({ ok: false, error: "SERVER_ERROR" });

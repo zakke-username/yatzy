@@ -6,6 +6,7 @@ import {
   toPublicState,
   type Room,
 } from "../game/engine.ts";
+import { deleteChat } from "../store/chat.ts";
 import { deleteRoom, getRoom, lockRoom, saveRoom } from "../store/rooms.ts";
 import {
   deleteRoomSessions,
@@ -83,10 +84,11 @@ async function expireTurn(io: GameServer, roomId: string) {
   if (room.status === "finished") await resetRoom(io, room);
 }
 
-// Resets room to lobby state and removes players. Called after game finishes.
+// Resets room to lobby state and removes players and chat. Called after game finishes.
 export async function resetRoom(io: GameServer, room: Room) {
   io.in(room.id).socketsLeave(room.id);
   await deleteRoomSessions(room.id);
+  await deleteChat(room.id);
   const newRoom = { ...createRoom(), id: room.id };
   await saveRoom(newRoom);
   await updateCloseTimer(newRoom);
@@ -115,6 +117,7 @@ export function startTimerSweep(io: GameServer) {
           else {
             await deleteRoom(roomId);
             await deleteRoomSessions(roomId);
+            await deleteChat(roomId);
           }
           // Remove the timer, unless acting restarted it (a timed-out turn starts the next one)
           if (await isDue(name)) await cancelTimer(name);
