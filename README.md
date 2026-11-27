@@ -6,7 +6,7 @@ A multiplayer browser game.
 
 Spin up a game of Yatzy quickly and easily, without logging in. Open a new room with a single click, invite others with a link, and start the game. Select the dice to roll, and mark a score. An in-game chat is included.
 
-## Tech stack
+## Tech stack and design
 
 - **React + Tailwind + Vite** front end
 - **Node** back end
@@ -62,8 +62,9 @@ Room creation and players joining use HTTP, because sockets need a valid auth to
 | `turn:end`     | `{ category }`        | Client to server | Select score category and end turn               |
 | `chat:send`    | `{ text }`            | Client to server | Character limit: 200                             |
 | `room:leave`   |                       | Client to server | Removes player and deletes token                 |
+| `chat:history` |          | Client to server | Get chat history of room |
 | `room:state`   | `PublicRoomState`     | Server to client | Sent to the whole room after every change        |
-| `chat:message` | `ChatMessage`         | Server to client | Not stored on server, just validated and emitted |
+| `chat:message` | `ChatMessage`         | Server to client | Validate, store, and emit to room |
 
 ## Screenshots
 
